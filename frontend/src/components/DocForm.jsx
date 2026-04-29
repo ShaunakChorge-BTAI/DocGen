@@ -6,16 +6,63 @@ import PreviewPanel from "./PreviewPanel";
 import SnippetsPanel from "./SnippetsPanel";
 
 const DOC_TYPES = ["BRD", "FSD", "SRS", "User Manual", "Product Brochure"];
+const STORAGE_KEY = "docgen_preview_state";
 
-export default function DocForm({ onGenerated, addToast, initialDocType, initialInstructions, initialGroupId }) {
+function loadPreviewState() {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function savePreviewState(state) {
+  try {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    // ignore storage failures
+  }
+}
+
+function clearPreviewState() {
+  try {
+    sessionStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // ignore storage failures
+  }
+}
+
+export default function DocForm({
+  onGenerated,
+  addToast,
+  initialDocType,
+  initialInstructions,
+  initialGroupId,
+  historySelectionKey,
+}) {
   const { currentProject, authHeaders } = useAuth();
-  const [docType, setDocType] = useState(initialDocType || "BRD");
-  const [instructions, setInstructions] = useState(initialInstructions || "");
+  const stored = loadPreviewState();
+  const shouldRestoreState =
+    stored &&
+    (stored.selectionKey === historySelectionKey ||
+      (stored.selectionKey == null && historySelectionKey == null));
+
+  const [docType, setDocType] = useState(
+    shouldRestoreState ? stored.docType || initialDocType || "BRD" : initialDocType || "BRD"
+  );
+  const [instructions, setInstructions] = useState(
+    shouldRestoreState ? stored.instructions || initialInstructions || "" : initialInstructions || ""
+  );
   const [file, setFile] = useState(null);
   const [showFileUpload, setShowFileUpload] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [preview, setPreview] = useState(null); // { markdown, changedSections }
+  const [preview, setPreview] = useState(
+    shouldRestoreState && stored?.markdown
+      ? { markdown: stored.markdown, changedSections: stored.changedSections || [] }
+      : null
+  );
   const fileInputRef = useRef();
   const instructionsRef = useRef();
 
@@ -31,6 +78,23 @@ export default function DocForm({ onGenerated, addToast, initialDocType, initial
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [instructions, loading, preview]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  function persistPreviewState(nextPreview) {
+    savePreviewState({
+      docType,
+      instructions,
+      markdown: nextPreview.markdown,
+      changedSections: nextPreview.changedSections || [],
+      selectionKey: historySelectionKey ?? null,
+      groupId: initialGroupId || null,
+      projectId: currentProject?.id || null,
+    });
+  }
+
+  function handlePreviewStateChange(updatedPreview) {
+    setPreview(updatedPreview);
+    persistPreviewState(updatedPreview);
+  }
+
   function handleFileChange(e) {
     const selected = e.target.files[0];
     if (!selected) return;
@@ -44,6 +108,7 @@ export default function DocForm({ onGenerated, addToast, initialDocType, initial
   }
 
   function handleReset() {
+    clearPreviewState();
     setDocType(initialDocType || "BRD");
     setInstructions(initialInstructions || "");
     setFile(null);
@@ -79,7 +144,9 @@ export default function DocForm({ onGenerated, addToast, initialDocType, initial
 
     try {
       const { markdown, changed_sections } = await previewDoc(formData, authHeaders);
-      setPreview({ markdown, changedSections: changed_sections });
+      const previewState = { markdown, changedSections: changed_sections };
+      setPreview(previewState);
+      persistPreviewState(previewState);
       addToast("Preview ready — review and confirm to download", "info");
     } catch (err) {
       setError(err.message || "Generation failed. Is Ollama running?");
@@ -111,6 +178,8 @@ export default function DocForm({ onGenerated, addToast, initialDocType, initial
           onReset={handleReset}
           onGenerated={onGenerated}
           addToast={addToast}
+          onPreviewChange={handlePreviewStateChange}
+          clearPreviewStorage={clearPreviewState}
         />
       </div>
     );

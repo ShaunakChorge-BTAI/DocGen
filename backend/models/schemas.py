@@ -37,6 +37,7 @@ class SectionRegenerateRequest(BaseModel):
     document_id: int
     section_name: str
     new_instructions: str
+    preview_only: Optional[bool] = False
 
 
 # ── Comments ───────────────────────────────────────────────────────────────────

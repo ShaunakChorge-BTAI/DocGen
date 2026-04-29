@@ -293,6 +293,10 @@ async def regenerate_section(
     updated_markdown = _replace_section(
         doc.markdown_content, request.section_name, new_section_content
     )
+
+    if request.preview_only:
+        return {"markdown": updated_markdown}
+    
     fmt = doc.export_format or "docx"
     file_buf, ext, media_type = _build_file(updated_markdown, doc.doc_type, doc.version, fmt)
 

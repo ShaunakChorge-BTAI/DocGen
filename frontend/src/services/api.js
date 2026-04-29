@@ -55,14 +55,20 @@ export async function generateDoc(formData, getHeaders = () => ({})) {
   return { blob, filename, docId: res.headers.get("X-Document-Id") };
 }
 
-export async function regenerateSection(payload, getHeaders = () => ({})) {
+export async function regenerateSection(payload, getHeaders = () => ({}), previewOnly = false) {
+  const body = JSON.stringify({ ...payload, preview_only: previewOnly });
   const res = await handleResponse(
     await fetch(`${BASE_URL}/regenerate-section`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...getHeaders() },
-      body: JSON.stringify(payload),
+      body,
     })
   );
+
+  if (previewOnly) {
+    return res.json();
+  }
+
   const blob = await res.blob();
   const cd = res.headers.get("Content-Disposition") || "";
   const filename = (cd.match(/filename="?([^"]+)"?/) || [])[1] || "document.docx";

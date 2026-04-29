@@ -208,9 +208,12 @@ export default function PreviewPanel({
   onReset,
   onGenerated,
   addToast,
+  onPreviewChange,
+  clearPreviewStorage,
 }) {
   const { authHeaders } = useAuth();
   const [phase, setPhase] = useState("previewing"); // previewing | building | built
+  const [currentChangedSections] = useState(changedSections || []);
   const [editMode, setEditMode] = useState(false);
   const [markdown, setMarkdown] = useState(initialMarkdown);
   const [docId, setDocId] = useState(null);
@@ -238,13 +241,13 @@ export default function PreviewPanel({
       setRubrics(d.rubrics || []);
       if (d.rubrics?.length) setSelectedRubric(d.rubrics[0]);
     }).catch(() => {});
-  }, []);
+  }, [authHeaders]);
 
   useEffect(() => {
     if (docId) {
       getComplianceScores(docId, authHeaders).then(setComplianceScores).catch(() => {});
     }
-  }, [docId]);
+  }, [docId, authHeaders]);
 
   async function handleAIReview() {
     setAiReviewRunning(true);
@@ -301,6 +304,7 @@ export default function PreviewPanel({
       setBuiltGroupId(result.groupId || builtGroupId);
       setVersion(result.version);
       setPhase("built");
+      clearPreviewStorage?.();
       triggerDownload(result.blob, result.filename);
       onGenerated();
       addToast("Document built and downloaded", "success");
@@ -322,33 +326,44 @@ export default function PreviewPanel({
   }
 
   async function handleRegenSection(sectionName, newInstructions) {
+    if (!docId) {
+      addToast("Regeneration requires a built document record.", "error");
+      return;
+    }
+
     try {
-      const result = await regenerateSection({
-        document_id: Number(docId),
-        section_name: sectionName,
-        new_instructions: newInstructions,
-      });
-      setBlob(result.blob);
-      setFilename(result.filename);
-      triggerDownload(result.blob, result.filename);
+      const result = await regenerateSection(
+        {
+          document_id: Number(docId),
+          section_name: sectionName,
+          new_instructions: newInstructions,
+        },
+        authHeaders,
+        true
+      );
+      setMarkdown(result.markdown);
+      setPhase("previewing");
+      setBlob(null);
+      setFilename(null);
       setRegenSection(null);
-      addToast(`"${sectionName}" regenerated and downloaded`, "success");
+      onPreviewChange?.({ markdown: result.markdown, changedSections: currentChangedSections });
+      addToast(`"${sectionName}" regenerated. Review before downloading.`, "success");
     } catch (err) {
       addToast(err.message || "Regeneration failed", "error");
     }
   }
 
-  function ChangedBanner() {
-    if (!changedSections?.length) return null;
-    const isAll = changedSections[0]?.toLowerCase() === "all sections";
+  const changedBanner = (() => {
+    if (!currentChangedSections?.length) return null;
+    const isAll = currentChangedSections[0]?.toLowerCase() === "all sections";
     return (
       <div className={`changed-banner${isAll ? " changed-banner-all" : ""}`}>
         {isAll
           ? "New document — all sections generated"
-          : <><strong>Changed sections:</strong> {changedSections.join(", ")}</>}
+          : <><strong>Changed sections:</strong> {currentChangedSections.join(", ")}</>}
       </div>
     );
-  }
+  })();
 
   const transitions = STATUS_TRANSITIONS[docStatus] || [];
 
@@ -379,14 +394,18 @@ export default function PreviewPanel({
           </button>
         </div>
 
-        <ChangedBanner />
+        {changedBanner}
 
         <div className="md-preview-area">
           {editMode ? (
             <textarea
               className="md-edit-textarea"
               value={markdown}
-              onChange={(e) => setMarkdown(e.target.value)}
+              onChange={(e) => {
+                const next = e.target.value;
+                setMarkdown(next);
+                onPreviewChange?.({ markdown: next, changedSections: currentChangedSections });
+              }}
               spellCheck={false}
             />
           ) : (

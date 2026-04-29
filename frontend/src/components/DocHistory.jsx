@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { getDocuments, updateStatus } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 import VersionHistory from "./VersionHistory";
-import DocForm from "./DocForm";
 
 const DOC_TYPES = ["", "BRD", "FSD", "SRS", "User Manual", "Product Brochure"];
 const STATUSES = ["", "draft", "in_review", "approved", "rejected"];
@@ -32,7 +31,7 @@ function formatDate(iso) {
   });
 }
 
-export default function DocHistory({ refreshTrigger, addToast }) {
+export default function DocHistory({ refreshTrigger, addToast, onLoadVersion }) {
   const { currentProject, authHeaders } = useAuth();
   const navigate = useNavigate();
   const [docs, setDocs] = useState([]);
@@ -42,11 +41,6 @@ export default function DocHistory({ refreshTrigger, addToast }) {
   const [search, setSearch] = useState("");
   const [pendingSearch, setPendingSearch] = useState("");
   const [versionGroupId, setVersionGroupId] = useState(null);
-  const [newVersionDoc, setNewVersionDoc] = useState(null); // doc to create new version from
-
-  useEffect(() => {
-    fetchDocs();
-  }, [refreshTrigger, filterType, filterStatus, search, currentProject]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function fetchDocs() {
     setError(null);
@@ -62,6 +56,11 @@ export default function DocHistory({ refreshTrigger, addToast }) {
       setError("Could not load history");
     }
   }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchDocs();
+  }, [refreshTrigger, filterType, filterStatus, search, currentProject]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function submitSearch(e) {
     e.preventDefault();
@@ -133,27 +132,6 @@ export default function DocHistory({ refreshTrigger, addToast }) {
       );
     }
     return null;
-  }
-
-  if (newVersionDoc) {
-    return (
-      <div className="card">
-        <div className="card-title" style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <button className="btn-link" onClick={() => setNewVersionDoc(null)} style={{ fontSize: 18 }}>←</button>
-          New Version — {newVersionDoc.doc_type}
-          <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
-            based on {newVersionDoc.version}
-          </span>
-        </div>
-        <DocForm
-          onGenerated={() => { setNewVersionDoc(null); fetchDocs(); }}
-          addToast={addToast}
-          initialDocType={newVersionDoc.doc_type}
-          initialInstructions={newVersionDoc.instructions}
-          initialGroupId={newVersionDoc.document_group_id}
-        />
-      </div>
-    );
   }
 
   return (
@@ -261,10 +239,10 @@ export default function DocHistory({ refreshTrigger, addToast }) {
                   <div className="history-item-actions">
                     <button
                       className="history-action-btn"
-                      title="Start a new version based on this document"
-                      onClick={() => setNewVersionDoc(doc)}
+                      title="Load this document into the left pane"
+                      onClick={() => onLoadVersion(doc)}
                     >
-                      New Version
+                      Load
                     </button>
                     {doc.document_group_id && (
                       <button

@@ -21,6 +21,7 @@ function AppShell() {
   const addToast = useToast(toasts, setToasts);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [showBulk, setShowBulk] = useState(false);
+  const [selectedHistoryDoc, setSelectedHistoryDoc] = useState(null);
   const navigate = useNavigate();
 
   function handleLogout() {
@@ -30,6 +31,10 @@ function AppShell() {
 
   function handleGenerated() {
     setRefreshTrigger((n) => n + 1);
+  }
+
+  function handleLoadVersion(doc) {
+    setSelectedHistoryDoc(doc);
   }
 
   return (
@@ -92,8 +97,20 @@ function AppShell() {
             path="/"
             element={
               <>
-                <DocForm onGenerated={handleGenerated} addToast={addToast} />
-                <DocHistory refreshTrigger={refreshTrigger} addToast={addToast} />
+                <DocForm
+                  key={selectedHistoryDoc?.id ?? "default"}
+                  onGenerated={handleGenerated}
+                  addToast={addToast}
+                  initialDocType={selectedHistoryDoc?.doc_type}
+                  initialInstructions={selectedHistoryDoc?.instructions}
+                  initialGroupId={selectedHistoryDoc?.document_group_id}
+                  historySelectionKey={selectedHistoryDoc?.id ?? null}
+                />
+                <DocHistory
+                  refreshTrigger={refreshTrigger}
+                  addToast={addToast}
+                  onLoadVersion={handleLoadVersion}
+                />
               </>
             }
           />
