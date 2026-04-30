@@ -118,6 +118,16 @@ export async function getDocument(docId, getHeaders = () => ({})) {
   return res.json();
 }
 
+export async function downloadDocument(docId, getHeaders = () => ({})) {
+  const res = await handleResponse(
+    await fetch(`${BASE_URL}/documents/${docId}/download`, { headers: getHeaders() })
+  );
+  const blob = await res.blob();
+  const cd = res.headers.get("Content-Disposition") || "";
+  const filename = (cd.match(/filename="?([^"]+)"?/) || [])[1] || `document_${docId}.docx`;
+  return { blob, filename };
+}
+
 export async function updateStatus(docId, status, getHeaders = () => ({})) {
   const res = await handleResponse(
     await fetch(`${BASE_URL}/documents/${docId}/status`, {

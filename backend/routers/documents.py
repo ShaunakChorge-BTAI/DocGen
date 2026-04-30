@@ -1,6 +1,8 @@
 import difflib
 import json
+import os
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
@@ -91,6 +93,30 @@ def get_document(
         if doc.project_id is not None and doc.project_id not in allowed and current_user.role != "admin":
             raise HTTPException(status_code=403, detail="Access denied")
     return doc
+
+
+@router.get("/documents/{doc_id}/download")
+def download_document(
+    doc_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user_optional),
+):
+    doc = db.query(Document).filter(Document.id == doc_id).first()
+    if not doc:
+        raise HTTPException(status_code=404, detail="Document not found")
+    if current_user:
+        allowed = get_user_project_ids(current_user, db)
+        if doc.project_id is not None and doc.project_id not in allowed and current_user.role != "admin":
+            raise HTTPException(status_code=403, detail="Access denied")
+    if not doc.file_path or not os.path.exists(doc.file_path):
+        raise HTTPException(status_code=404, detail="Document file not available")
+
+    filename = os.path.basename(doc.file_path)
+    return FileResponse(
+        path=doc.file_path,
+        filename=filename,
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    )
 
 
 @router.patch("/documents/{doc_id}/status")

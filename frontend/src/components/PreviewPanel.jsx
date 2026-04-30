@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { buildDoc, regenerateSection, updateStatus, runAIReview, getComplianceRubrics, runComplianceScore, getComplianceScores } from "../services/api";
+import { buildDoc, downloadDocument, regenerateSection, updateStatus, runAIReview, getComplianceRubrics, runComplianceScore, getComplianceScores } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 import CommentPanel from "./CommentPanel";
 
@@ -201,28 +201,30 @@ function ConfirmDialog({ message, onConfirm, onCancel }) {
 export default function PreviewPanel({
   docType,
   instructions,
-  markdown: initialMarkdown,
-  changedSections,
+  preview,
   groupId,
   projectId,
   onReset,
   onGenerated,
   addToast,
   onPreviewChange,
-  clearPreviewStorage,
 }) {
   const { authHeaders } = useAuth();
-  const [phase, setPhase] = useState("previewing"); // previewing | building | built
-  const [currentChangedSections] = useState(changedSections || []);
+  const initialMode = preview?.mode === "view" ? "view" : "draft";
+  const resolvedDocType = preview?.docType || docType;
+  const [phase, setPhase] = useState("previewing"); // previewing | building
+  const [mode, setMode] = useState(initialMode);
+  const [currentChangedSections] = useState(preview?.changedSections || []);
   const [editMode, setEditMode] = useState(false);
-  const [markdown, setMarkdown] = useState(initialMarkdown);
-  const [docId, setDocId] = useState(null);
-  const [builtGroupId, setBuiltGroupId] = useState(groupId || null);
+  const [markdown, setMarkdown] = useState(preview?.markdown || "");
+  const [docId, setDocId] = useState(preview?.documentId || null);
+  const [builtGroupId, setBuiltGroupId] = useState(preview?.groupId || groupId || null);
   const [blob, setBlob] = useState(null);
-  const [filename, setFilename] = useState(null);
-  const [version, setVersion] = useState(null);
+  const [blobUrl, setBlobUrl] = useState(preview?.blobUrl || null);
+  const [filename, setFilename] = useState(preview?.filename || null);
+  const [version, setVersion] = useState(preview?.version || null);
   const [activeTab, setActiveTab] = useState("document");
-  const [docStatus, setDocStatus] = useState("draft");
+  const [docStatus, setDocStatus] = useState(preview?.status || "draft");
   const [confirmDialog, setConfirmDialog] = useState(null);
   const [regenSection, setRegenSection] = useState(null);
 
@@ -287,30 +289,93 @@ export default function PreviewPanel({
     URL.revokeObjectURL(url);
   }
 
+  function persistPreviewPanelState(overrides = {}) {
+    const nextState = {
+      mode,
+      docType: resolvedDocType,
+      instructions,
+      markdown,
+      changedSections: currentChangedSections,
+      documentId: docId,
+      version,
+      filename,
+      blobUrl,
+      groupId: builtGroupId,
+      projectId,
+      status: docStatus,
+      generationTime: preview?.generationTime,
+      ...overrides,
+    };
+    onPreviewChange?.(nextState);
+    return nextState;
+  }
+
   async function handleConfirm() {
     setPhase("building");
+    
     const fd = new FormData();
-    fd.append("doc_type", docType);
+    fd.append("doc_type", resolvedDocType);
     fd.append("instructions", instructions);
     fd.append("markdown", markdown);
     if (builtGroupId) fd.append("group_id", builtGroupId);
     if (projectId) fd.append("project_id", projectId);
+    if (preview.generationTime != null) {
+      fd.append("generation_time", 
+        preview.generationTime.toString());
+    }
 
     try {
       const result = await buildDoc(fd, authHeaders);
+      const nextBlobUrl = URL.createObjectURL(result.blob);
       setBlob(result.blob);
+      setBlobUrl(nextBlobUrl);
       setFilename(result.filename);
       setDocId(result.docId);
       setBuiltGroupId(result.groupId || builtGroupId);
       setVersion(result.version);
-      setPhase("built");
-      clearPreviewStorage?.();
-      triggerDownload(result.blob, result.filename);
-      onGenerated();
-      addToast("Document built and downloaded", "success");
+      setMode("view");
+      setDocStatus("draft");
+      setPhase("previewing");
+      persistPreviewPanelState({
+        mode: "view",
+        documentId: result.docId,
+        version: result.version,
+        filename: result.filename,
+        blobUrl: nextBlobUrl,
+        status: "draft",
+      });
+      onGenerated?.();
+      addToast("Document confirmed and ready to download.", "success");
     } catch (err) {
       setPhase("previewing");
       addToast(err.message || "Build failed", "error");
+    }
+  }
+
+  async function handleDownload() {
+    if (blob) {
+      triggerDownload(blob, filename || `${resolvedDocType || "document"}.docx`);
+      return;
+    }
+
+    if (!docId) {
+      addToast("No downloadable file available yet.", "error");
+      return;
+    }
+
+    setPhase("building");
+    try {
+      const result = await downloadDocument(docId, authHeaders);
+      const nextBlobUrl = URL.createObjectURL(result.blob);
+      setBlob(result.blob);
+      setBlobUrl(nextBlobUrl);
+      setFilename(result.filename);
+      setPhase("previewing");
+      persistPreviewPanelState({ blobUrl: nextBlobUrl, filename: result.filename });
+      triggerDownload(result.blob, result.filename);
+    } catch (err) {
+      setPhase("previewing");
+      addToast(err.message || "Download failed", "error");
     }
   }
 
@@ -343,281 +408,228 @@ export default function PreviewPanel({
       );
       setMarkdown(result.markdown);
       setPhase("previewing");
+      setMode("draft");
       setBlob(null);
+      setBlobUrl(null);
       setFilename(null);
       setRegenSection(null);
-      onPreviewChange?.({ markdown: result.markdown, changedSections: currentChangedSections });
+      persistPreviewPanelState({ mode: "draft", filename: null, blobUrl: null, status: "draft" });
       addToast(`"${sectionName}" regenerated. Review before downloading.`, "success");
     } catch (err) {
       addToast(err.message || "Regeneration failed", "error");
     }
   }
 
+
   const changedBanner = (() => {
     if (!currentChangedSections?.length) return null;
     const isAll = currentChangedSections[0]?.toLowerCase() === "all sections";
     return (
       <div className={`changed-banner${isAll ? " changed-banner-all" : ""}`}>
-        {isAll
-          ? "New document — all sections generated"
-          : <><strong>Changed sections:</strong> {currentChangedSections.join(", ")}</>}
+        {isAll ? "New document — all sections generated" : <><strong>Changed sections:</strong> {currentChangedSections.join(", ")}</>}
       </div>
     );
   })();
 
   const transitions = STATUS_TRANSITIONS[docStatus] || [];
 
-  // ── Building spinner ─────────────────────────────────────────────────────────
-  if (phase === "building") {
-    return (
-      <div className="preview-card">
-        <div className="spinner-overlay">
-          <div className="spinner" />
-          <div className="spinner-text">Building branded .docx…</div>
-        </div>
-      </div>
-    );
-  }
-
-  // ── Preview (pre-build) ──────────────────────────────────────────────────────
-  if (phase === "previewing") {
-    return (
-      <div className="preview-card">
-        <div className="preview-card-header">
-          <span className="preview-card-title">Preview — {docType}</span>
-          <button
-            type="button"
-            className={`toggle-btn${editMode ? " active" : ""}`}
-            onClick={() => setEditMode((e) => !e)}
-          >
-            {editMode ? "View rendered" : "Edit markdown"}
-          </button>
-        </div>
-
-        {changedBanner}
-
-        <div className="md-preview-area">
-          {editMode ? (
-            <textarea
-              className="md-edit-textarea"
-              value={markdown}
-              onChange={(e) => {
-                const next = e.target.value;
-                setMarkdown(next);
-                onPreviewChange?.({ markdown: next, changedSections: currentChangedSections });
-              }}
-              spellCheck={false}
-            />
-          ) : (
-            <div className="md-rendered">{renderMarkdown(markdown, null)}</div>
-          )}
-        </div>
-
-        <div className="preview-actions-row">
-          <button type="button" className="btn btn-secondary" onClick={onReset}>
-            ← Back
-          </button>
-          <button type="button" className="btn btn-download" onClick={handleConfirm}>
-            Confirm &amp; Download
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // ── Built (post-download) ────────────────────────────────────────────────────
+  // Modals must sit at the top level so they always render when triggered
   return (
     <>
       {regenSection && (
-        <RegenModal
-          sectionName={regenSection}
-          onConfirm={handleRegenSection}
-          onCancel={() => setRegenSection(null)}
-        />
+        <RegenModal sectionName={regenSection} onConfirm={handleRegenSection} onCancel={() => setRegenSection(null)} />
       )}
       {confirmDialog && (
-        <ConfirmDialog
-          message={`Change status to "${confirmDialog.next.replace("_", " ")}"?`}
-          onConfirm={() => handleStatusChange(confirmDialog.next)}
-          onCancel={() => setConfirmDialog(null)}
-        />
+        <ConfirmDialog message={`Change status to "${confirmDialog.next.replace("_", " ")}"?`} onConfirm={() => handleStatusChange(confirmDialog.next)} onCancel={() => setConfirmDialog(null)} />
       )}
 
-      <div className="preview-card">
-        <div className="preview-card-header">
-          <span className="preview-card-title">{docType} · {version}</span>
-          <span className="status-badge" style={{ background: STATUS_COLORS[docStatus] }}>
-            {docStatus.replace("_", " ")}
-          </span>
-        </div>
-
-        <div className="preview-built-actions">
-          <button className="btn btn-download" onClick={() => triggerDownload(blob, filename)}>
-            ⬇ Download again
-          </button>
-          <button className="btn btn-secondary" onClick={onReset}>
-            Generate another
-          </button>
-        </div>
-
-        <div className="preview-tabs">
-          {[
-            { id: "document", label: "Document" },
-            { id: "comments", label: "Comments" },
-            { id: "ai-review", label: "AI Review" },
-            { id: "compliance", label: "Compliance" },
-            { id: "status", label: "Status" },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              className={`preview-tab${activeTab === tab.id ? " active" : ""}`}
-              onClick={() => setActiveTab(tab.id)}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {activeTab === "document" && (
-          <div className="md-preview-area">
-            <div className="md-rendered">
-              {renderMarkdown(markdown, (name) => setRegenSection(name))}
-            </div>
+      {/* ── Building Spinner ── */}
+      {phase === "building" ? (
+        <div className="preview-card">
+          <div className="spinner-overlay">
+            <div className="spinner" />
+            <div className="spinner-text">Building branded .docx…</div>
           </div>
-        )}
-
-        {activeTab === "comments" && (
-          <CommentPanel docId={docId} addToast={addToast} />
-        )}
-
-        {activeTab === "ai-review" && (
-          <div className="ai-review-panel">
-            <div className="ai-review-header">
-              <p className="ai-review-desc">
-                Run a second LLM pass to detect completeness gaps, contradictions, missing requirements,
-                and structural issues. Results are saved as comments on this document.
-              </p>
-              <button
-                className="btn btn-primary"
-                onClick={handleAIReview}
-                disabled={aiReviewRunning}
-              >
-                {aiReviewRunning ? "Reviewing…" : "Run AI Review"}
-              </button>
-            </div>
-
-            {aiReviewResult && (
-              <div className="ai-review-results">
-                {aiReviewResult.issues.length === 0 ? (
-                  <div className="ai-review-clean">No issues found — document looks good.</div>
-                ) : (
-                  <>
-                    <div className="ai-review-summary">
-                      {aiReviewResult.issues.length} issue(s) found · {aiReviewResult.comments_created} comment(s) added
-                    </div>
-                    {aiReviewResult.issues.map((issue, i) => (
-                      <div key={i} className={`ai-issue ai-issue-${issue.issue_type}`}>
-                        <div className="ai-issue-header">
-                          <span className="ai-issue-type">{issue.issue_type.replace(/_/g, " ")}</span>
-                          <span className="ai-issue-section">{issue.section}</span>
-                        </div>
-                        <div className="ai-issue-desc">{issue.description}</div>
-                      </div>
-                    ))}
-                  </>
-                )}
+        </div>
+      ) : mode === "draft" ? (
+        
+        /* ── DRAFT MODE UI ── */
+        <div className="preview-card">
+          <div className="preview-card-header">
+            <span className="preview-card-title">Draft preview — {resolvedDocType}</span>
+            <button type="button" className={`toggle-btn${editMode ? " active" : ""}`} onClick={() => setEditMode((e) => !e)}>
+              {editMode ? "View rendered" : "Edit markdown"}
+            </button>
+          </div>
+          {changedBanner}
+          <div className="md-preview-area">
+            {editMode ? (
+              <textarea className="md-edit-textarea" value={markdown} onChange={(e) => {
+                const next = e.target.value;
+                setMarkdown(next);
+                persistPreviewPanelState({ markdown: next });
+              }} spellCheck={false} />
+            ) : (
+              <div className="md-rendered">
+                {/* Fixed: Pass setRegenSection instead of null so the button appears in Draft mode */}
+                {renderMarkdown(markdown, (name) => setRegenSection(name))}
               </div>
             )}
           </div>
-        )}
+          <div className="preview-actions-row">
+            <button type="button" className="btn btn-secondary" onClick={onReset}> ← Back </button>
+            <button type="button" className="btn btn-download" onClick={handleConfirm}> Confirm </button>
+          </div>
+        </div>
 
-        {activeTab === "compliance" && (
-          <div className="compliance-panel">
-            <div className="compliance-controls">
-              <select
-                className="compliance-rubric-select"
-                value={selectedRubric}
-                onChange={(e) => setSelectedRubric(e.target.value)}
-                disabled={complianceRunning}
-              >
-                {rubrics.length === 0 && <option value="">No rubrics found</option>}
-                {rubrics.map((r) => (
-                  <option key={r} value={r}>{r.replace(/-/g, " ")}</option>
-                ))}
-              </select>
-              <button
-                className="btn btn-primary"
-                onClick={handleComplianceScore}
-                disabled={complianceRunning || !selectedRubric}
-              >
-                {complianceRunning ? "Scoring…" : "Score Document"}
+      ) : (
+
+        /* ── VIEW MODE UI (History / Saved Docs) ── */
+        <div className="preview-card">
+          <div className="preview-card-header">
+            <span className="preview-card-title">{resolvedDocType} · {version || "Saved document"}</span>
+            <span className="status-badge" style={{ background: STATUS_COLORS[docStatus] }}>
+              {docStatus.replace("_", " ")}
+            </span>
+          </div>
+          
+          <div className="preview-built-actions">
+            <button className="btn btn-download" onClick={handleDownload}> ⬇ Download </button>
+            <button className="btn btn-secondary" onClick={onReset}> Generate another </button>
+          </div>
+          
+          <div className="preview-tabs">
+            {[
+              { id: "document", label: "Document" },
+              { id: "comments", label: "Comments" },
+              { id: "ai-review", label: "AI Review" },
+              { id: "compliance", label: "Compliance" },
+              { id: "status", label: "Status" },
+            ].map((tab) => (
+              <button key={tab.id} className={`preview-tab${activeTab === tab.id ? " active" : ""}`} onClick={() => setActiveTab(tab.id)}>
+                {tab.label}
               </button>
-            </div>
+            ))}
+          </div>
 
-            {complianceScores.length > 0 && (() => {
-              const latest = complianceScores[0];
-              const color = latest.score >= 80 ? "#16a34a" : latest.score >= 60 ? "#d97706" : "#dc2626";
-              return (
-                <div className="compliance-result">
-                  <div className="compliance-score-header">
-                    <span className="compliance-rubric-label">{latest.rubric.replace(/-/g, " ")}</span>
-                    <span className="compliance-score-number" style={{ color }}>{latest.score}<span className="compliance-score-max">/100</span></span>
-                  </div>
-                  <div className="compliance-bar-track">
-                    <div className="compliance-bar-fill" style={{ width: `${latest.score}%`, background: color }} />
-                  </div>
-                  <div className="compliance-criteria-list">
-                    {latest.criteria.map((c, i) => (
-                      <div key={i} className={`compliance-criterion compliance-criterion-${c.status}`}>
-                        <span className="compliance-criterion-status">{c.status === "pass" ? "✓" : "✗"}</span>
-                        <span className="compliance-criterion-name">{c.criterion}</span>
-                        {c.note && <span className="compliance-criterion-note">{c.note}</span>}
+          {activeTab === "document" && (
+            <div className="md-preview-area">
+              <div className="md-rendered">
+                {renderMarkdown(markdown, (name) => setRegenSection(name))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === "comments" && (
+            <CommentPanel docId={docId} addToast={addToast} />
+          )}
+
+          {activeTab === "ai-review" && (
+            <div className="ai-review-panel">
+              <div className="ai-review-header">
+                <p className="ai-review-desc">
+                  Run a second LLM pass to detect completeness gaps, contradictions, missing requirements, and structural issues. Results are saved as comments on this document.
+                </p>
+                <button className="btn btn-primary" onClick={handleAIReview} disabled={aiReviewRunning}>
+                  {aiReviewRunning ? "Reviewing…" : "Run AI Review"}
+                </button>
+              </div>
+              {aiReviewResult && (
+                <div className="ai-review-results">
+                  {aiReviewResult.issues.length === 0 ? (
+                    <div className="ai-review-clean">No issues found — document looks good.</div>
+                  ) : (
+                    <>
+                      <div className="ai-review-summary">
+                        {aiReviewResult.issues.length} issue(s) found · {aiReviewResult.comments_created} comment(s) added
                       </div>
-                    ))}
-                  </div>
-                  {complianceScores.length > 1 && (
-                    <details className="compliance-history">
-                      <summary>{complianceScores.length - 1} previous score(s)</summary>
-                      {complianceScores.slice(1).map((s, i) => (
-                        <div key={i} className="compliance-history-item">
-                          {s.rubric.replace(/-/g, " ")} — {s.score}/100 · {new Date(s.scored_at).toLocaleString()}
+                      {aiReviewResult.issues.map((issue, i) => (
+                        <div key={i} className={`ai-issue ai-issue-${issue.issue_type}`}>
+                          <div className="ai-issue-header">
+                            <span className="ai-issue-type">{issue.issue_type.replace(/_/g, " ")}</span>
+                            <span className="ai-issue-section">{issue.section}</span>
+                          </div>
+                          <div className="ai-issue-desc">{issue.description}</div>
                         </div>
                       ))}
-                    </details>
+                    </>
                   )}
                 </div>
-              );
-            })()}
-          </div>
-        )}
-
-        {activeTab === "status" && (
-          <div className="status-panel">
-            <div className="status-current">
-              Current status:{" "}
-              <span style={{ color: STATUS_COLORS[docStatus], fontWeight: 600 }}>
-                {docStatus.replace("_", " ")}
-              </span>
-            </div>
-            <div className="status-actions">
-              {transitions.map((t) => (
-                <button
-                  key={t.next}
-                  className="btn btn-secondary"
-                  onClick={() => setConfirmDialog(t)}
-                >
-                  {t.label}
-                </button>
-              ))}
-              {transitions.length === 0 && (
-                <p className="status-final">
-                  Document is <strong>{docStatus}</strong>. No further transitions.
-                </p>
               )}
             </div>
-          </div>
-        )}
-      </div>
+          )}
+
+          {activeTab === "compliance" && (
+            <div className="compliance-panel">
+              <div className="compliance-controls">
+                <select className="compliance-rubric-select" value={selectedRubric} onChange={(e) => setSelectedRubric(e.target.value)} disabled={complianceRunning}>
+                  {rubrics.length === 0 && <option value="">No rubrics found</option>}
+                  {rubrics.map((r) => <option key={r} value={r}>{r.replace(/-/g, " ")}</option>)}
+                </select>
+                <button className="btn btn-primary" onClick={handleComplianceScore} disabled={complianceRunning || !selectedRubric}>
+                  {complianceRunning ? "Scoring…" : "Score Document"}
+                </button>
+              </div>
+              {complianceScores.length > 0 && (() => {
+                const latest = complianceScores[0];
+                const color = latest.score >= 80 ? "#16a34a" : latest.score >= 60 ? "#d97706" : "#dc2626";
+                return (
+                  <div className="compliance-result">
+                    <div className="compliance-score-header">
+                      <span className="compliance-rubric-label">{latest.rubric.replace(/-/g, " ")}</span>
+                      <span className="compliance-score-number" style={{ color }}>{latest.score}<span className="compliance-score-max">/100</span></span>
+                    </div>
+                    <div className="compliance-bar-track">
+                      <div className="compliance-bar-fill" style={{ width: `${latest.score}%`, background: color }} />
+                    </div>
+                    <div className="compliance-criteria-list">
+                      {latest.criteria.map((c, i) => (
+                        <div key={i} className={`compliance-criterion compliance-criterion-${c.status}`}>
+                          <span className="compliance-criterion-status">{c.status === "pass" ? "✓" : "✗"}</span>
+                          <span className="compliance-criterion-name">{c.criterion}</span>
+                          {c.note && <span className="compliance-criterion-note">{c.note}</span>}
+                        </div>
+                      ))}
+                    </div>
+                    {complianceScores.length > 1 && (
+                      <details className="compliance-history">
+                        <summary>{complianceScores.length - 1} previous score(s)</summary>
+                        {complianceScores.slice(1).map((s, i) => (
+                          <div className="compliance-history-item" key={i}>
+                            {s.rubric.replace(/-/g, " ")} — {s.score}/100 · {new Date(s.scored_at).toLocaleString()}
+                          </div>
+                        ))}
+                      </details>
+                    )}
+                  </div>
+                );
+              })()}
+            </div>
+          )}
+
+          {activeTab === "status" && (
+            <div className="status-panel">
+              <div className="status-current">
+                Current status:{" "}
+                <span style={{ color: STATUS_COLORS[docStatus], fontWeight: 600 }}>
+                  {docStatus.replace("_", " ")}
+                </span>
+              </div>
+              <div className="status-actions">
+                {transitions.map((t) => (
+                  <button key={t.next} className="btn btn-secondary" onClick={() => setConfirmDialog(t)}>
+                    {t.label}
+                  </button>
+                ))}
+                {transitions.length === 0 && (
+                  <p className="status-final">Document is <strong>{docStatus}</strong>. No further transitions.</p>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </>
   );
 }
+

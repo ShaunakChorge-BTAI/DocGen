@@ -49,17 +49,24 @@ function formatDate(iso) {
   });
 }
 
-export default function VersionHistory({ groupId, onClose }) {
+export default function VersionHistory({ groupId, onClose, authHeaders }) {
   const [versions, setVersions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [selectedA, setSelectedA] = useState(null); // older
   const [selectedB, setSelectedB] = useState(null); // newer
   const [diff, setDiff] = useState(null);
 
   useEffect(() => {
     setLoading(true);
-    getDocumentGroup(groupId)
+    setError(null);
+    getDocumentGroup(groupId, authHeaders)
       .then((docs) => {
+        if (!docs || docs.length === 0) {
+          setVersions([]);
+          setError("No versions found for this document.");
+          return;
+        }
         setVersions(docs);
         if (docs.length >= 2) {
           setSelectedA(docs[docs.length - 2]);
@@ -68,9 +75,12 @@ export default function VersionHistory({ groupId, onClose }) {
           setSelectedB(docs[0]);
         }
       })
-      .catch(() => {})
+      .catch((err) => {
+        setError(err.message || "Failed to load versions.");
+        setVersions([]);
+      })
       .finally(() => setLoading(false));
-  }, [groupId]);
+  }, [groupId, authHeaders]);
 
   useEffect(() => {
     if (selectedA && selectedB && selectedA.markdown_content && selectedB.markdown_content) {
@@ -94,6 +104,16 @@ export default function VersionHistory({ groupId, onClose }) {
 
         {loading ? (
           <div className="vh-loading">Loading versions…</div>
+        ) : error ? (
+          <div className="vh-error">
+            <div style={{ padding: "20px", textAlign: "center", color: "#dc2626" }}>
+              {error}
+            </div>
+          </div>
+        ) : versions.length === 0 ? (
+          <div className="vh-no-diff">
+            No versions available for this document.
+          </div>
         ) : (
           <>
             <div className="vh-version-list">

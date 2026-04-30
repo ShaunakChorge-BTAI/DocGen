@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from "react";
-import { previewDoc } from "../services/api";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { previewDoc, getDocument } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 import LoadingSpinner from "./LoadingSpinner";
 import PreviewPanel from "./PreviewPanel";
@@ -40,29 +40,58 @@ export default function DocForm({
   initialInstructions,
   initialGroupId,
   historySelectionKey,
+  selectedHistoryDoc,
+  onClearHistorySelection,
 }) {
   const { currentProject, authHeaders } = useAuth();
+
   const stored = loadPreviewState();
+  //1. Determine if we are actively clicking a history item right now
+  const isHistoryClick = selectedHistoryDoc != null;
+
+  //2. We ONLY restore from sessionStorage if:
+  // - We have stored data
+  // - We are NOT clicking a history item (history click overrides storage)
+  // - The stored data wasnt a history view from a previos session (selectionKey must be null)
   const shouldRestoreState =
     stored &&
-    (stored.selectionKey === historySelectionKey ||
-      (stored.selectionKey == null && historySelectionKey == null));
+    isHistoryClick &&
+    (stored.selectionKey == null);
 
   const [docType, setDocType] = useState(
-    shouldRestoreState ? stored.docType || initialDocType || "BRD" : initialDocType || "BRD"
+    shouldRestoreState
+      ? stored.docType || initialDocType || "BRD"
+      : selectedHistoryDoc?.doc_type || initialDocType || "BRD"
   );
   const [instructions, setInstructions] = useState(
-    shouldRestoreState ? stored.instructions || initialInstructions || "" : initialInstructions || ""
+    shouldRestoreState
+      ? stored.instructions || initialInstructions || ""
+      : selectedHistoryDoc?.instructions || initialInstructions || ""
   );
   const [file, setFile] = useState(null);
   const [showFileUpload, setShowFileUpload] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [preview, setPreview] = useState(
-    shouldRestoreState && stored?.markdown
-      ? { markdown: stored.markdown, changedSections: stored.changedSections || [] }
-      : null
-  );
+  const [preview, setPreview] = useState(() => {
+    if (!shouldRestoreState) return null;
+    return {
+      mode: stored.mode || "draft",
+      markdown: stored.markdown,
+      changedSections: stored.changedSections || [],
+      docType: stored.docType || initialDocType || "BRD",
+      documentId: stored.documentId || null,
+      version: stored.version || null,
+      filename: stored.filename || null,
+      blobUrl: stored.blobUrl || null,
+      groupId: stored.groupId || initialGroupId || null,
+      projectId: stored.projectId || currentProject?.id || null,
+      instructions: stored.instructions || initialInstructions || "",
+      status: stored.status || "draft",
+      generationTime: stored.generationTime || null,
+    };
+  });
+  const [selectedDocLoading, setSelectedDocLoading] = useState(false);
+  const [selectedDocError, setSelectedDocError] = useState(null);
   const fileInputRef = useRef();
   const instructionsRef = useRef();
 
@@ -78,22 +107,65 @@ export default function DocForm({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [instructions, loading, preview]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  function persistPreviewState(nextPreview) {
+  const persistPreviewState = useCallback((nextPreview) => {
     savePreviewState({
-      docType,
-      instructions,
+      mode: nextPreview.mode || "draft",
+      docType: nextPreview.docType || docType,
+      instructions: nextPreview.instructions || instructions,
       markdown: nextPreview.markdown,
       changedSections: nextPreview.changedSections || [],
-      selectionKey: historySelectionKey ?? null,
-      groupId: initialGroupId || null,
-      projectId: currentProject?.id || null,
+      documentId: nextPreview.documentId || null,
+      version: nextPreview.version || null,
+      filename: nextPreview.filename || null,
+      blobUrl: nextPreview.blobUrl || null,
+      groupId: nextPreview.groupId || initialGroupId || null,
+      projectId: nextPreview.projectId || currentProject?.id || null,
+      status: nextPreview.status || "draft",
+      selectionKey: selectedHistoryDoc?.id ?? historySelectionKey ?? null,
+      generationTime: nextPreview.generationTime || null,
     });
-  }
+  }, [docType, instructions, currentProject?.id, initialGroupId, selectedHistoryDoc?.id, historySelectionKey]);
 
   function handlePreviewStateChange(updatedPreview) {
     setPreview(updatedPreview);
     persistPreviewState(updatedPreview);
   }
+
+  useEffect(() => {
+    async function loadSelectedHistoryDoc() {
+      if (!selectedHistoryDoc) return;
+      if (shouldRestoreState && preview?.documentId === selectedHistoryDoc.id) return;
+      setSelectedDocLoading(true);
+      setSelectedDocError(null);
+      try {
+        const doc = await getDocument(selectedHistoryDoc.id, authHeaders);
+        const previewState = {
+          mode: "view",
+          markdown: doc.markdown_content || "",
+          changedSections: [],
+          docType: doc.doc_type,
+          documentId: doc.id,
+          version: doc.version,
+          filename: `${doc.doc_type}_${doc.version}.docx`,
+          blobUrl: null,
+          groupId: doc.document_group_id,
+          projectId: doc.project_id,
+          instructions: doc.instructions,
+          status: doc.status,
+        };
+        setDocType(doc.doc_type);
+        setInstructions(doc.instructions || "");
+        setPreview(previewState);
+        persistPreviewState(previewState);
+      } catch (err) {
+        setSelectedDocError(err.message || "Failed to load history document.");
+      } finally {
+        setSelectedDocLoading(false);
+      }
+    }
+
+    loadSelectedHistoryDoc();
+  }, [selectedHistoryDoc, authHeaders, shouldRestoreState, preview?.documentId, persistPreviewState]);
 
   function handleFileChange(e) {
     const selected = e.target.files[0];
@@ -115,7 +187,9 @@ export default function DocForm({
     setShowFileUpload(false);
     setError(null);
     setPreview(null);
+    setSelectedDocError(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
+    onClearHistorySelection?.();
   }
 
   function appendSnippet(content) {
@@ -143,8 +217,23 @@ export default function DocForm({
     setPreview(null);
 
     try {
-      const { markdown, changed_sections } = await previewDoc(formData, authHeaders);
-      const previewState = { markdown, changedSections: changed_sections };
+      const { markdown, changed_sections, generation_time_seconds } = await previewDoc(formData, authHeaders);
+      
+      const previewState = {
+        mode: "draft",
+        docType,
+        instructions,
+        markdown,
+        changedSections: changed_sections,
+        generationTime: generation_time_seconds,
+        documentId: null,
+        version: null,
+        filename: null,
+        blobUrl: null,
+        groupId: initialGroupId || null,
+        projectId: currentProject?.id || null,
+        status: "draft",
+      };
       setPreview(previewState);
       persistPreviewState(previewState);
       addToast("Preview ready — review and confirm to download", "info");
@@ -155,11 +244,23 @@ export default function DocForm({
     }
   }
 
-  if (loading) {
+  if (loading || (selectedHistoryDoc && !preview && selectedDocLoading)) {
     return (
       <div className="card">
         <div className="card-title">Generate Document</div>
         <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (selectedDocError) {
+    return (
+      <div className="card">
+        <div className="card-title">Generate Document</div>
+        <div className="error-message">{selectedDocError}</div>
+        <button className="btn btn-secondary" type="button" onClick={handleReset}>
+          Back to generator
+        </button>
       </div>
     );
   }
@@ -171,15 +272,13 @@ export default function DocForm({
         <PreviewPanel
           docType={docType}
           instructions={instructions}
-          markdown={preview.markdown}
-          changedSections={preview.changedSections}
+          preview={preview}
           groupId={initialGroupId || null}
           projectId={currentProject?.id || null}
           onReset={handleReset}
           onGenerated={onGenerated}
           addToast={addToast}
           onPreviewChange={handlePreviewStateChange}
-          clearPreviewStorage={clearPreviewState}
         />
       </div>
     );

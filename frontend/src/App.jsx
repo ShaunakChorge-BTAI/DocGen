@@ -37,6 +37,10 @@ function AppShell() {
     setSelectedHistoryDoc(doc);
   }
 
+  function handleClearHistorySelection() {
+    setSelectedHistoryDoc(null);
+  }
+
   return (
     <>
       <header className="app-header">
@@ -105,6 +109,8 @@ function AppShell() {
                   initialInstructions={selectedHistoryDoc?.instructions}
                   initialGroupId={selectedHistoryDoc?.document_group_id}
                   historySelectionKey={selectedHistoryDoc?.id ?? null}
+                  selectedHistoryDoc={selectedHistoryDoc}
+                  onClearHistorySelection={handleClearHistorySelection}
                 />
                 <DocHistory
                   refreshTrigger={refreshTrigger}

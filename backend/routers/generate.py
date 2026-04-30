@@ -136,14 +136,23 @@ async def preview_doc(
         previous_content = _auto_previous_content(db, doc_type, project_id)
 
     model = _active_model(db, project_id)
+
+    t0 = time.perf_counter()
+
     try:
         markdown, changed_sections = generate_document(
             doc_type, instructions, previous_content, model
         )
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"LLM generation failed: {str(e)}")
+    
+    gen_time = round(time.perf_counter() - t0, 2)
 
-    return PreviewResponse(markdown=markdown, changed_sections=changed_sections)
+    return PreviewResponse(
+        markdown=markdown, 
+        changed_sections=changed_sections,
+        generation_time_seconds=gen_time
+    )
 
 
 # ── Step 2: Build + persist ────────────────────────────────────────────────────

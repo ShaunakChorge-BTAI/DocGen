@@ -140,6 +140,7 @@ export default function DocHistory({ refreshTrigger, addToast, onLoadVersion }) 
         <VersionHistory
           groupId={versionGroupId}
           onClose={() => setVersionGroupId(null)}
+          authHeaders={authHeaders}
         />
       )}
 
@@ -239,10 +240,10 @@ export default function DocHistory({ refreshTrigger, addToast, onLoadVersion }) 
                   <div className="history-item-actions">
                     <button
                       className="history-action-btn"
-                      title="Load this document into the left pane"
+                      title="View this document in the left pane"
                       onClick={() => onLoadVersion(doc)}
                     >
-                      Load
+                      View
                     </button>
                     {doc.document_group_id && (
                       <button

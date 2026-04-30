@@ -27,6 +27,7 @@ class DocumentRecord(BaseModel):
 class PreviewResponse(BaseModel):
     markdown: str
     changed_sections: List[str]
+    generation_time_seconds: Optional[float] = None
 
 
 class StatusUpdate(BaseModel):
