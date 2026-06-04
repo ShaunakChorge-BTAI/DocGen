@@ -1,0 +1,65 @@
+{
+  "model": "claude-opus-4-5",
+
+  "permissions": {
+    "allow": [
+      "Bash(python -m pytest*)",
+      "Bash(python -m dbanalyser*)",
+      "Bash(uvicorn dbanalyser*)",
+      "Bash(python -c*)",
+      "Bash(pip install*)",
+      "Bash(pip show*)",
+      "Bash(git status)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git add dbanalyser/*)",
+      "Bash(git add tests/*)",
+      "Bash(git add analysis_config.yaml)",
+      "Bash(git add pyproject.toml)",
+      "Bash(git add CLAUDE.md)",
+      "Bash(git commit*)",
+      "Bash(ls*)",
+      "Bash(mkdir*)",
+      "Bash(grep*)",
+      "Bash(find D:/LTFS/ltfs-analyzer*)",
+      "Bash(tail*)",
+      "Bash(head*)",
+      "Read(D:/LTFS/ltfs-analyzer/**)",
+      "Write(D:/LTFS/ltfs-analyzer/**)",
+      "Edit(D:/LTFS/ltfs-analyzer/**)"
+    ],
+    "deny": [
+      "Bash(git push*)",
+      "Bash(git reset --hard*)",
+      "Bash(git rebase*)",
+      "Bash(git checkout -- *)",
+      "Bash(git clean*)",
+      "Bash(rm -rf*)",
+      "Bash(del /f*)",
+      "Bash(psql * -c DROP*)",
+      "Bash(psql * -c TRUNCATE*)"
+    ]
+  },
+
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd D:/LTFS/ltfs-analyzer && python -m pytest tests/ -x -q --tb=line 2>&1 | tail -6"
+          }
+        ]
+      }
+    ]
+  },
+
+  "env": {
+    "PYTHONPATH": "D:/LTFS/ltfs-analyzer",
+    "DBANALYSER_POSTGRES_PASSWORD": "",
+    "DBANALYSER_API_API_KEY": ""
+  },
+
+  "includeCoAuthoredBy": true
+}

@@ -1,0 +1,64 @@
+# =============================================================================
+#  DBAnalyser — Example Custom Rules File
+# =============================================================================
+#
+#  Place project-specific rules here. Enable custom rules in analysis_config.yaml:
+#
+#    custom_rules:
+#      enabled: true
+#      rules_dir: ./custom_rules
+#
+#  Rule fields:
+#    id            (required) — unique identifier e.g. CUSTOM001
+#    name          (optional) — human-readable name
+#    category      (optional) — category shown in reports (default: Custom)
+#    severity      (optional) — Critical | High | Medium | Low | Info (default: Medium)
+#    pattern       (required) — Python regex matched against each source line
+#    flags         (optional) — IGNORECASE | MULTILINE | DOTALL (default: IGNORECASE)
+#    message       (optional) — issue description shown in findings
+#    recommendation(optional) — remediation advice
+#    object_types  (optional) — [] means all types; or ["Stored Procedure","View","Table",…]
+#    enabled       (optional) — true/false (default: true)
+# =============================================================================
+
+rules:
+
+  # ── Example 1: Disallow direct access to a sensitive table ────────────────
+  - id: CUSTOM001
+    name: "No direct SELECT from SensitiveCustomerData"
+    category: Security
+    severity: High
+    pattern: "SELECT.*FROM.*SensitiveCustomerData"
+    flags: IGNORECASE
+    message: "Direct SELECT from SensitiveCustomerData is not allowed"
+    recommendation: >
+      Use the approved view vw_CustomerDataMasked instead of querying
+      SensitiveCustomerData directly.
+    object_types: []       # [] = applies to all object types
+    enabled: false         # set true to activate this example rule
+
+  # ── Example 2: Enforce naming convention for stored procedures ─────────────
+  - id: CUSTOM002
+    name: "Stored procedure must use approved usp_ prefix"
+    category: Best Practices
+    severity: Low
+    pattern: "CREATE\\s+(OR\\s+REPLACE\\s+)?PROCEDURE\\s+(?!\\[?dbo\\]?\\.\\[?usp_)"
+    flags: IGNORECASE
+    message: "Stored procedure does not follow the usp_ naming convention"
+    recommendation: "Rename the procedure to use the usp_ prefix (e.g. usp_GetCustomer)."
+    object_types: ["Stored Procedure"]
+    enabled: false
+
+  # ── Example 3: Detect deprecated NOLOCK hint in critical tables ────────────
+  - id: CUSTOM003
+    name: "NOLOCK hint on Orders table"
+    category: Reliability
+    severity: Medium
+    pattern: "\\bOrders\\b.*NOLOCK|NOLOCK.*\\bOrders\\b"
+    flags: IGNORECASE
+    message: "NOLOCK hint used on Orders table — risk of dirty reads in financial context"
+    recommendation: >
+      Remove NOLOCK from queries touching the Orders table.
+      Use READ COMMITTED SNAPSHOT isolation instead.
+    object_types: []
+    enabled: false

@@ -1,0 +1,263 @@
+# ============================================================
+#  DBAnalyser — Default Configuration  (v2 — multi-DB)
+#  Override any value with an environment variable:
+#    DBANALYSER_<SECTION>_<KEY>=value
+# ============================================================
+
+# ── Primary Data Source (single-DB / file mode) ──────────────
+source:
+  mode: file                        # "file" | "live_db"
+  file_path: "D:\\LTFS"
+  file_extensions: [".sql", ".ddl"]
+  recursive: true
+  connection_string: ""
+  # Example live_db DSN (Windows Auth):
+  #   "DRIVER={ODBC Driver 17 for SQL Server};SERVER=localhost;DATABASE=MyDB;Trusted_Connection=yes;"
+
+# ── Registered Databases (multi-DB Phase 1) ──────────────────
+# Add one entry per SQL Server database you want to monitor.
+# Run:  dbanalyser db sync   to push these into PostgreSQL.
+# Run:  dbanalyser run --all  to analyse every active database.
+databases:
+  - name: LTFS_DEV
+    environment: development
+    host: localhost
+    port: 1433
+    database_name: LTFS_Dev
+    use_windows_auth: true
+    description: "Local development database"
+    owner_label: "DBA Team"
+    tags: [dev]
+    is_active: true
+
+  - name: DEV_LTFS
+    environment: development
+    host: 172.19.225.120
+    port: 11433
+    database_name: DEV_LTFS
+    use_windows_auth: false
+    username: DEV_LTFS_LOGIN
+    password: DEV_LTFS_LOGIN
+    description: "DEV LTFS SQL Server 2022"
+    owner_label: "DBA Team"
+    tags: [dev]
+    is_active: true
+
+  - name: DEV_SMS_LNT
+    environment: development
+    host: 172.19.225.120
+    port: 11433
+    database_name: DEV_SMS_LNT
+    use_windows_auth: false
+    username: DEV_SMS_LNT_LOGIN
+    password: "DEV_SMS_LNT_LOGIN"
+    description: "DEV SMS LNT SQL Server"
+    owner_label: "DBA Team"
+    tags: [dev, sms]
+    is_active: true
+
+  # Uncomment and fill in to add more:
+  # - name: LTFS_UAT
+  #   environment: uat
+  #   host: uat-sql-server
+  #   port: 1433
+  #   database_name: LTFS_UAT
+  #   use_windows_auth: true
+  #   description: "UAT / staging database"
+  #   owner_label: "DBA Team"
+  #   tags: [uat]
+  #   is_active: true
+  #
+  # - name: LTFS_PROD
+  #   environment: production
+  #   host: prod-sql-server
+  #   port: 1433
+  #   database_name: LTFS_Prod
+  #   use_windows_auth: true
+  #   description: "Production database"
+  #   owner_label: "DBA Team"
+  #   tags: [prod, critical]
+  #   is_active: true
+
+# ── Scope ────────────────────────────────────────────────────
+scope:
+  object_types:
+    - "Stored Procedure"
+    - "View"
+    - "Table"
+    - "Function"
+    - "Trigger"
+  schemas: []                       # [] = all schemas
+  exclude_schemas: [sys, INFORMATION_SCHEMA]
+  include_patterns: []
+  exclude_patterns: []
+
+# ── Analysis categories (set false to skip) ──────────────────
+analysis:
+  categories:
+    security:            true
+    reliability:         true
+    performance:         true
+    data_safety:         true
+    best_practices:      true
+    parameter_sniffing:  true
+    maintainability:     true
+  enable_pk_check:         true
+  enable_col_mismatches:   true
+  enable_unused_joins:     true
+  orphan_detection:        true
+  orphan_confidence_level: relaxed
+  enable_unused_columns:   true
+
+# ── Performance / rule thresholds ────────────────────────────
+performance:
+  parallel_workers:        4
+  max_procedure_lines:     500
+  max_nesting_depth:       4
+  max_parameters:          15
+  slow_query_threshold_ms: 1000
+
+# ── Live-DB DMV settings ─────────────────────────────────────
+live_db:
+  enable_index_analysis:  true
+  enable_dmv_analysis:    true
+  top_n_slow_queries:     50
+  top_n_missing_indexes:  50
+  top_n_wait_stats:       30
+
+# ── Output ───────────────────────────────────────────────────
+output:
+  directory: "./output"
+  formats: [excel, html, csv, json]
+  include_snippets: true
+  max_snippet_lines: 20
+
+# ── PostgreSQL (results + trend storage) ─────────────────────
+postgres:
+  host:     "192.168.202.135"
+  port:     5432
+  database: "dbanalyser"
+  user:     "dbanalyser_user"
+  password: "dbanalyser_user"                    # or set DBANALYSER_POSTGRES_PASSWORD
+  min_conn: 1
+  max_conn: 5
+  schema:   "public"
+
+# ── Versioning / drift detection ─────────────────────────────
+versioning:
+  enabled:            true
+  store_source_hash:  true
+  detect_drift:       true
+
+# ── Run mode ─────────────────────────────────────────────────
+run:
+  parallel_workers: 4
+  environment:      "development"   # development | uat | production
+  log_level:        "INFO"
+  log_file:         ""
+
+# ── REST API server ────────────────────────────────────────────
+# Start with: dbanalyser api  (or: uvicorn dbanalyser.api.main:app --reload)
+# Swagger UI: http://localhost:8000/docs
+api:
+  api_key: ""          # leave blank = open access (local dev only)
+                       # or set env var: DBANALYSER_API_API_KEY=<secret>
+  host:    "0.0.0.0"
+  port:    8000
+  reload:  false
+
+# ── Compliance rule packs ──────────────────────────────────────
+# Activate one or more packs: sox | gdpr | rbi
+# Leave enabled_packs empty ([]) to run no compliance checks.
+compliance:
+  enabled_packs: []        # e.g. [sox, gdpr, rbi]
+
+  # SOX — financial-object detection and audit-trail checks
+  financial_schemas: [dbo]
+  audit_tables: []         # tables already serving as audit sinks (skipped by SOX002)
+
+  # GDPR — PII column patterns (matched case-insensitively against column names)
+  pii_column_patterns:
+    - email
+    - phone
+    - mobile
+    - ssn
+    - nric
+    - dob
+    - passport
+    - address
+    - credit_card
+
+  # RBI — additional sensitive table names beyond the built-in keywords
+  financial_tables: []
+  require_rls: false       # set true to raise findings when RLS policy is absent
+
+# ── Custom YAML rules ──────────────────────────────────────────────────────────
+# Define project-specific rules without writing Python.
+# Place *.yaml files in custom_rules/ directory (see custom_rules/example.yaml).
+custom_rules:
+  enabled: false
+  rules_dir: "./custom_rules"     # scan all *.yaml / *.yml in this directory
+  rules_files: []                 # explicit file paths (optional)
+
+# ── Webhook notifications ──────────────────────────────────────────────────────
+# Alert Slack / Teams when analysis finds Critical or High severity issues.
+notifications:
+  enabled: false
+  slack_webhook_url: ""           # https://hooks.slack.com/services/T.../B.../...
+  teams_webhook_url: ""           # https://outlook.office.com/webhook/...
+  alert_on_severity: [Critical, High]
+  min_findings_to_alert: 1        # minimum matching-severity findings to trigger alert
+  include_summary: true
+
+# ── Scheduled scans ────────────────────────────────────────────────────────────
+# Cron-like scheduling stored in PostgreSQL.
+# Add tasks with:  dbanalyser schedule add LTFS_PROD --cron "daily@02:00"
+# Run due tasks:   dbanalyser schedule run-due
+scheduler:
+  enabled: false
+  check_interval_sec: 60
+
+# ── JWT Authentication (REST API) ──────────────────────────────────────────────
+# Set enabled: true and add users to require Bearer token authentication.
+# Generate a hash:  dbanalyser auth hash-password
+auth:
+  enabled: true
+  secret_key: "ltfs-secret-key-dev-only"   # CHANGE THIS before enabling auth
+  algorithm: HS256
+  token_expire_minutes: 480
+  users:
+    - username: admin
+      password_hash: "$2b$12$jJVgeSpmMM40p25I2Sj7M.PotuJHVcmnK/OE.KEjr2fxeJfMos1yC"   # Admin@123
+      role: admin
+
+# ── AI Optimizer (Anthropic Claude) ───────────────────────────────────────────
+# Uses Claude to analyse and optimize SQL stored procedures, views, and functions.
+# Requires: pip install "dbanalyser[ai]"  (installs anthropic package)
+#
+# ENFORCEMENT RULES (from CLAUDE.md):
+#   1. Schema context is ALWAYS fetched before optimization (via schema_intel)
+#   2. Execution plan is ALWAYS included when available (SET STATISTICS XML ON)
+#   3. Every optimization is logged to ai_optimizations table (persist_results: true)
+#   4. Never call optimize without schema_context — it degrades quality significantly
+#
+# CLI usage:
+#   dbanalyser ingest --db LTFS_DEV           # build schema knowledge base first
+#   dbanalyser optimize dbo.usp_MyProc --sql-file proc.sql
+#   dbanalyser optimize dbo.usp_MyProc --sql-file proc.sql --execution-plan plan.xml
+#
+# Dashboard: AI OPTIMIZATION → AI Optimizer page
+ai_optimizer:
+  enabled: false
+  api_key: ""             # or set ANTHROPIC_API_KEY environment variable
+  model: "claude-3-5-haiku-20241022"   # fast + cost-effective for SQL optimization
+  # Available models:
+  #   claude-3-5-haiku-20241022    ← recommended (fast, low cost)
+  #   claude-3-5-sonnet-20241022   ← higher quality
+  #   claude-sonnet-4-6            ← latest Sonnet
+  #   claude-opus-4-6              ← highest quality, highest cost
+  max_tokens: 4096
+  temperature: 0.1         # low temperature = deterministic, less creative
+  include_schema: true     # always include schema context (DO NOT DISABLE)
+  include_execution_plan: true  # include execution plan when provided
+  persist_results: true    # save all results to ai_optimizations table

@@ -1,0 +1,79 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name            = "dbanalyser"
+version         = "2.0.0"
+description     = "DBAnalyser — Enterprise SQL Database Analysis Platform for LTFS"
+authors         = [{name = "LTFS Technology", email = "tech@ltfs.com"}]
+requires-python = ">=3.10"
+readme          = "README.md"
+license         = {text = "Proprietary"}
+
+dependencies = [
+    # CLI
+    "click>=8.1",
+    "rich>=13.0",               # coloured terminal output
+
+    # Config
+    "pydantic>=2.0",
+    "pydantic-settings>=2.0",
+    "pyyaml>=6.0",
+
+    # Database
+    "psycopg2-binary>=2.9",
+    "sqlalchemy>=2.0",
+
+    # Analysis
+    "pandas>=2.0",
+    "openpyxl>=3.1",
+
+    # Source DB connectivity
+    "pyodbc>=5.0",              # SQL Server
+
+    # REST API
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+
+    # Dashboard
+    "streamlit>=1.35",
+    "plotly>=5.20",
+
+    # Utilities
+    "python-dotenv>=1.0",
+    "tabulate>=0.9",
+    "jinja2>=3.1",
+]
+
+[project.optional-dependencies]
+oracle    = ["oracledb>=1.4"]
+postgres  = ["psycopg2-binary>=2.9"]
+mysql     = ["pymysql>=1.1"]
+api       = ["fastapi>=0.110", "uvicorn[standard]>=0.29"]
+auth      = ["PyJWT>=2.8", "bcrypt>=4.1"]
+ai        = ["anthropic>=0.30"]                         # AI optimizer (Claude)
+embeddings = ["sentence-transformers>=2.7"]             # higher-quality schema embeddings
+dev       = ["pytest>=8.0", "pytest-cov>=5.0", "black>=24.0", "ruff>=0.4"]
+all       = [
+    "fastapi>=0.110", "uvicorn[standard]>=0.29",
+    "PyJWT>=2.8", "bcrypt>=4.1",
+    "anthropic>=0.30",
+    "psycopg2-binary>=2.9",
+    "pyodbc>=5.0",
+]
+
+[project.scripts]
+dbanalyser = "dbanalyser.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["dbanalyser*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts   = "-v --tb=short"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"

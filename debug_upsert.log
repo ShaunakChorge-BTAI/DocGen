@@ -1,0 +1,18 @@
+upsert_db_registry called for UAT_RECON_TOOL_TEST
+  password='UAT_RECON_TOOL_TEST_LOGIN20$2023#'
+  username='UAT_RECON_TOOL_TEST_LOGIN'
+upsert_db_registry called for UAT_ONEX_DOCUMENT_SERVICE
+  password='UAT_ONEX_DOCUMENT_SERVICE_Login$2025#;'
+  username='UAT_ONEX_DOCUMENT_SERVICE_LOGIN'
+upsert_db_registry called for UAT_ONEX_DOCUMENT_SERVICE
+  password='UAT_ONEX_DOCUMENT_SERVICE_Login$2025#;'
+  username='UAT_ONEX_DOCUMENT_SERVICE_LOGIN'
+upsert_db_registry called for ONEX_DOCUMENT_SERVICE
+  password='UAT_ONEX_DOCUMENT_SERVICE_Login$2025#;'
+  username='UAT_ONEX_DOCUMENT_SERVICE_LOGIN'
+upsert_db_registry called for ONEX DOCUMENT SERVICE
+  password='UAT_ONEX_DOCUMENT_SERVICE_Login$2025#;'
+  username='UAT_ONEX_DOCUMENT_SERVICE_LOGIN'
+upsert_db_registry called for UAT_ONEX_DOCUMENT_SERVICE
+  password='UAT_ONEX_DOCUMENT_SERVICE_Login$2025#;'
+  username='UAT_ONEX_DOCUMENT_SERVICE_LOGIN'

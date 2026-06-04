@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-16"?>
+<!--
+  DBAnalyser — Windows Task Scheduler Template
+  =============================================
+  Import this file via:
+    schtasks /Create /XML "task_scheduler_template.xml" /TN "DBAnalyser\DailyRun"
+
+  Or via Task Scheduler GUI:
+    Action → Import Task → select this file
+
+  Customise the <UserId>, <Command>, <Arguments>, and trigger times before importing.
+-->
+<Task version="1.4"
+      xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+
+  <RegistrationInfo>
+    <Date>2024-01-01T00:00:00</Date>
+    <Author>DBAnalyser</Author>
+    <Description>Daily SQL Server code quality and performance analysis run.</Description>
+    <URI>\DBAnalyser\DailyRun</URI>
+  </RegistrationInfo>
+
+  <!-- ── Triggers ─────────────────────────────────────────────────────────── -->
+  <Triggers>
+    <!-- Daily at 06:00 AM -->
+    <CalendarTrigger>
+      <StartBoundary>2024-01-01T06:00:00</StartBoundary>
+      <Enabled>true</Enabled>
+      <ScheduleByDay>
+        <DaysInterval>1</DaysInterval>
+      </ScheduleByDay>
+    </CalendarTrigger>
+  </Triggers>
+
+  <!-- ── Principals (run as) ───────────────────────────────────────────────── -->
+  <Principals>
+    <Principal id="Author">
+      <!-- Replace with the service account that has SQL Server access -->
+      <UserId>DOMAIN\ServiceAccount</UserId>
+      <LogonType>Password</LogonType>
+      <RunLevel>LeastPrivilege</RunLevel>
+    </Principal>
+  </Principals>
+
+  <!-- ── Settings ──────────────────────────────────────────────────────────── -->
+  <Settings>
+    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
+    <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
+    <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>
+    <AllowHardTerminate>true</AllowHardTerminate>
+    <StartWhenAvailable>true</StartWhenAvailable>
+    <RunOnlyIfNetworkAvailable>false</RunOnlyIfNetworkAvailable>
+    <IdleSettings>
+      <StopOnIdleEnd>false</StopOnIdleEnd>
+      <RestartOnIdle>false</RestartOnIdle>
+    </IdleSettings>
+    <AllowStartOnDemand>true</AllowStartOnDemand>
+    <Enabled>true</Enabled>
+    <Hidden>false</Hidden>
+    <RunOnlyIfIdle>false</RunOnlyIfIdle>
+    <WakeToRun>false</WakeToRun>
+    <ExecutionTimeLimit>PT2H</ExecutionTimeLimit>  <!-- 2-hour timeout -->
+    <Priority>7</Priority>
+  </Settings>
+
+  <!-- ── Actions ───────────────────────────────────────────────────────────── -->
+  <Actions Context="Author">
+    <Exec>
+      <!-- Full path to the Python executable in your venv -->
+      <Command>D:\LTFS\ltfs-analyzer\.venv\Scripts\python.exe</Command>
+      <!-- Run the CLI: analyse + generate all reports + persist to PostgreSQL -->
+      <Arguments>-m dbanalyser run --config "D:\LTFS\ltfs-analyzer\analysis_config.yaml" --format all --dmv --label "scheduled_%DATE:~-4,4%%DATE:~-7,2%%DATE:~0,2%"</Arguments>
+      <WorkingDirectory>D:\LTFS\ltfs-analyzer</WorkingDirectory>
+    </Exec>
+  </Actions>
+
+</Task>

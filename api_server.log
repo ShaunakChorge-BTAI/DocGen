@@ -1,0 +1,1821 @@
+DBAnalyser REST API  -> http://127.0.0.1:8000/docs
+  Auth disabled — open access (local use only)
+INFO:     Started server process [20496]
+INFO:     Waiting for application startup.
+20:00:40  INFO      dbanalyser.api — PostgreSQL pool initialised successfully.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:58141 - "POST /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50084 - "OPTIONS /ai/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53566 - "OPTIONS /ai/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53566 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:50084 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:50084 - "OPTIONS /schema/search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50084 - "POST /schema/search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50084 - "POST /schema/search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50084 - "OPTIONS /ai/optimize HTTP/1.1" 200 OK
+20:01:15  INFO      dbanalyser.ai_optimizer.optimizer — optimize_sql_object: optimization_mode='quick', actual_provider='ollama'
+20:01:15  ERROR     dbanalyser.ai_optimizer.optimizer — Ollama optimization failed for dbo.dbo.ProcAutoTaxAndAccountingRefresh.StoredProcedure: 'NoneType' object is not subscriptable
+INFO:     127.0.0.1:50084 - "POST /ai/optimize HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53605 - "POST /schema/search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53605 - "POST /schema/search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53605 - "POST /schema/search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59028 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61514 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53524 - "OPTIONS /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53524 - "POST /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53524 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53524 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64810 - "OPTIONS /runs/trigger HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64810 - "POST /runs/trigger HTTP/1.1" 200 OK
+20:06:29  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+20:06:29  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+20:06:29  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+20:06:29  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+20:06:29  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+20:06:29  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+20:06:29  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+20:06:29  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:64810 - "GET /runs/jobs/64da4df1-dbaf-4274-bdb3-f14f06a37b1c HTTP/1.1" 200 OK
+20:06:31  INFO      dbanalyser.engine.scanner — Live-DB scan: retrieved 326 objects from sys.sql_modules
+20:06:31  INFO      dbanalyser.engine.analyser — Loaded 1684 objects
+INFO:     127.0.0.1:64810 - "GET /runs/jobs/64da4df1-dbaf-4274-bdb3-f14f06a37b1c HTTP/1.1" 200 OK
+20:06:32  INFO      dbanalyser.engine.analyser — Analysis complete in 3.3s | objects=1684 | findings=7010 | health=0.0
+INFO:     127.0.0.1:64810 - "GET /runs/jobs/64da4df1-dbaf-4274-bdb3-f14f06a37b1c HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64810 - "OPTIONS /runs HTTP/1.1" 200 OK
+20:06:34  INFO      dbanalyser.api — PostgreSQL pool lazily reinitialised.
+INFO:     127.0.0.1:64810 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64810 - "GET /runs?db_name=DEV_LTFS HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60938 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58948 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55669 - "OPTIONS /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55669 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59193 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59193 - "OPTIONS /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59193 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49395 - "OPTIONS /runs/trigger HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49395 - "POST /runs/trigger HTTP/1.1" 200 OK
+20:07:28  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+20:07:28  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+20:07:28  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+20:07:28  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+20:07:28  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+20:07:28  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+20:07:28  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+20:07:28  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:53866 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53866 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53866 - "OPTIONS /schema/?db_registry_id=7&object_type=table&limit=1000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53866 - "GET /schema/?db_registry_id=7&object_type=table&limit=1000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49287 - "OPTIONS /schema/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49287 - "OPTIONS /schema/?limit=2000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49287 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49287 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49287 - "GET /schema/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49287 - "GET /schema/?limit=2000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59302 - "OPTIONS /schema/?limit=2000&db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63013 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65344 - "GET /schema/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59302 - "GET /schema/?limit=2000&db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52357 - "OPTIONS /schema/?limit=2000&db_name=DEV_LTFS HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63804 - "OPTIONS /runs?db_name=DEV_LTFS HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52357 - "GET /schema/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52357 - "GET /runs?db_name=DEV_LTFS HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63804 - "GET /schema/?limit=2000&db_name=DEV_LTFS HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54072 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58420 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54072 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54072 - "OPTIONS /findings/summary/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54072 - "GET /findings/summary/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61871 - "GET /schema/?db_registry_id=7&limit=5 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61874 - "GET /schema/summary?db_registry_id=7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61876 - "GET /schema/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61878 - "GET /schema/?limit=5 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54929 - "GET /auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54929 - "GET /auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51402 - "GET /auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51402 - "GET /auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:62252 - "OPTIONS /auth/token HTTP/1.1" 200 OK
+23:35:56  INFO      dbanalyser.api.auth — DB lookup for user 'admin': found
+23:35:56  INFO      dbanalyser.api.auth — Login successful for user 'admin'
+C:\Users\suraj.dubey\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\jwt\api_jwt.py:147: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+  return self._jws.encode(
+INFO:     127.0.0.1:62252 - "POST /auth/token HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62252 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+C:\Users\suraj.dubey\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\jwt\api_jwt.py:365: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+  decoded = self.decode_complete(
+INFO:     127.0.0.1:62252 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62252 - "OPTIONS /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63726 - "OPTIONS /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62252 - "OPTIONS /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63726 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62252 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63726 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63726 - "OPTIONS /findings/summary/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63726 - "GET /findings/summary/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60087 - "OPTIONS /schema/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61152 - "OPTIONS /schema/?limit=2000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60087 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61152 - "GET /schema/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60087 - "GET /schema/?limit=2000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61152 - "OPTIONS /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61152 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58995 - "OPTIONS /ai/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58016 - "OPTIONS /ai/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58016 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58995 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57150 - "OPTIONS /reports/health-gate/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57150 - "OPTIONS /trend/all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57150 - "OPTIONS /audit/?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57150 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57150 - "GET /reports/health-gate/56 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:57150 - "GET /trend/all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57150 - "GET /audit/?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57150 - "GET /reports/health-gate/56 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:57150 - "OPTIONS /schedules HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63561 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57150 - "GET /schedules HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52167 - "OPTIONS /auth/token HTTP/1.1" 200 OK
+23:37:00  INFO      dbanalyser.api.auth — DB lookup for user 'admin': found
+23:37:00  WARNING   dbanalyser.api.auth — Password mismatch for user 'admin'
+INFO:     127.0.0.1:52167 - "POST /auth/token HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:60956 - "GET /auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:60956 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63355 - "GET /health HTTP/1.1" 200 OK
+C:\Users\suraj.dubey\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\jwt\api_jwt.py:365: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+  decoded = self.decode_complete(
+INFO:     127.0.0.1:50695 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58155 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58155 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50695 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58155 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58155 - "GET /findings/summary/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56960 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56960 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61944 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56960 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56307 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61664 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51356 - "GET /findings/summary/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52856 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52856 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52856 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57280 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55066 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57280 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57280 - "GET /findings/summary/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63750 - "GET /schema/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63750 - "GET /schema/?limit=2000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58376 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58376 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52038 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52038 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50248 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50248 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56747 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56747 - "GET /schema/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56747 - "GET /schema/?limit=2000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51228 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56747 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56747 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:51228 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57203 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61494 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57203 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57203 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50848 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:50848 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:50848 - "GET /reports/health-gate/56 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:54377 - "GET /audit/?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63494 - "GET /trend/all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63494 - "GET /reports/health-gate/56 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:49738 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55761 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64147 - "GET /reports/health-gate/56 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:64147 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64147 - "GET /reports/health-gate/56 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:64147 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:55761 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:55761 - "GET /reports/health-gate/56 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:55761 - "GET /reports/health-gate/56 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:55012 - "GET /schedules HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51801 - "OPTIONS /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51801 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51801 - "OPTIONS /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54263 - "GET /reports/health-gate/56 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:51801 - "GET /trend/all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51801 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54263 - "GET /audit/?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54263 - "GET /reports/health-gate/56 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:57972 - "OPTIONS /reports/health-gate/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61408 - "OPTIONS /trend/all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59584 - "OPTIONS /audit/?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63939 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57972 - "GET /reports/health-gate/56 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:62291 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61408 - "GET /trend/all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61408 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59584 - "GET /audit/?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59584 - "OPTIONS /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62291 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61408 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57972 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59584 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59584 - "GET /reports/health-gate/56 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:56274 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56274 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+C:\Users\suraj.dubey\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\jwt\api_jwt.py:365: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+  decoded = self.decode_complete(
+INFO:     127.0.0.1:56274 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56274 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56274 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56274 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56274 - "GET /trend/all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56274 - "GET /audit/?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56274 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56274 - "GET /reports/health-gate/56 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:56274 - "GET /reports/health-gate/56 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:56274 - "OPTIONS /findings/summary/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56274 - "GET /findings/summary/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63094 - "OPTIONS /runs?db_name=DEV_LTFS HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63094 - "GET /runs?db_name=DEV_LTFS HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63094 - "OPTIONS /findings/summary/32 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63094 - "GET /findings/summary/32 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57968 - "OPTIONS /findings/run/32 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57968 - "GET /findings/run/32 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58260 - "OPTIONS /schema/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64114 - "OPTIONS /schema/?limit=2000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55988 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58260 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58260 - "OPTIONS /schema/summary?db_registry_id=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55988 - "GET /schema/?limit=2000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58260 - "OPTIONS /schema/?limit=2000&db_registry_id=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64114 - "GET /schema/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64114 - "GET /schema/?limit=2000&db_registry_id=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58260 - "GET /schema/summary?db_registry_id=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58260 - "OPTIONS /schema/summary?db_registry_id=7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64114 - "OPTIONS /schema/?limit=2000&db_registry_id=7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55988 - "OPTIONS /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64114 - "GET /schema/summary?db_registry_id=7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58260 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55988 - "GET /schema/?limit=2000&db_registry_id=7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55988 - "OPTIONS /schema/summary?db_registry_id=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58260 - "OPTIONS /schema/?limit=2000&db_registry_id=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64114 - "OPTIONS /runs?db_name=LTFS_DEV HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55988 - "GET /schema/summary?db_registry_id=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58260 - "GET /runs?db_name=LTFS_DEV HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64114 - "GET /schema/?limit=2000&db_registry_id=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62286 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62286 - "GET /runs?db_name=DEV_LTFS HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54175 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54175 - "GET /findings/run/32 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56361 - "OPTIONS /ai/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56361 - "OPTIONS /ai/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56361 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56361 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:52091 - "OPTIONS /schema/?db_registry_id=7&object_type=view&limit=1000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52091 - "GET /schema/?db_registry_id=7&object_type=view&limit=1000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52091 - "GET /reports/health-gate/56 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:58753 - "GET /trend/all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65047 - "GET /audit/?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58753 - "GET /reports/health-gate/56 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:58753 - "OPTIONS /schedules HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65047 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58753 - "GET /schedules HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52091 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52327 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54769 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50289 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54769 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50289 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54769 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52327 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51434 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51434 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51434 - "GET /findings/summary/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58352 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58652 - "GET /schema/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54133 - "GET /schema/?limit=2000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58170 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58170 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61368 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61368 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49666 - "GET /reports/health-gate/56 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:49666 - "GET /trend/all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49666 - "GET /audit/?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62793 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64507 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:50500 - "OPTIONS /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50454 - "OPTIONS /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50454 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50500 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63150 - "OPTIONS /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57620 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54805 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63150 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63150 - "OPTIONS /findings/summary/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63150 - "GET /findings/summary/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58965 - "OPTIONS /schema/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58965 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58965 - "OPTIONS /schema/?limit=2000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58965 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58965 - "GET /schema/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58965 - "OPTIONS /schema/summary?db_registry_id=7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58965 - "OPTIONS /schema/?limit=2000&db_registry_id=7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58965 - "OPTIONS /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58965 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58965 - "GET /schema/?limit=2000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60345 - "GET /schema/summary?db_registry_id=7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56970 - "GET /schema/?limit=2000&db_registry_id=7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52273 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52273 - "OPTIONS /schema/summary?db_registry_id=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56970 - "OPTIONS /schema/?limit=2000&db_registry_id=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58965 - "OPTIONS /runs?db_name=DEV_LTFS HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56970 - "GET /schema/summary?db_registry_id=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52273 - "GET /runs?db_name=DEV_LTFS HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52273 - "OPTIONS /findings/run/32 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58965 - "GET /schema/?limit=2000&db_registry_id=6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52273 - "GET /findings/run/32 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51956 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61854 - "OPTIONS /metadata/DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61854 - "GET /metadata/DEV_SMS_LNT HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61854 - "GET /metadata/DEV_SMS_LNT HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63341 - "OPTIONS /ai/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63224 - "OPTIONS /ai/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63224 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63341 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63341 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63224 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64587 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50464 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56897 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56897 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56897 - "OPTIONS /reports/health-gate/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62386 - "OPTIONS /trend/all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56897 - "OPTIONS /audit/?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62386 - "GET /reports/health-gate/56 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:56897 - "GET /trend/all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62386 - "GET /audit/?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62386 - "GET /reports/health-gate/56 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:62386 - "OPTIONS /schedules HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62386 - "GET /schedules HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53459 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63043 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+C:\Users\suraj.dubey\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\jwt\api_jwt.py:365: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+  decoded = self.decode_complete(
+INFO:     127.0.0.1:53459 - "GET /auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:53459 - "GET /auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:63043 - "GET /auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:50504 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52375 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50504 - "GET /auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:50504 - "GET /auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:50504 - "GET /auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:63347 - "OPTIONS /auth/token HTTP/1.1" 200 OK
+08:41:50  INFO      dbanalyser.api.auth — DB lookup for user 'admin': found
+08:41:50  INFO      dbanalyser.api.auth — Login successful for user 'admin'
+C:\Users\suraj.dubey\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\jwt\api_jwt.py:147: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+  return self._jws.encode(
+INFO:     127.0.0.1:63347 - "POST /auth/token HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63347 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63347 - "OPTIONS /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63347 - "OPTIONS /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51576 - "OPTIONS /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63347 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51576 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63347 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63347 - "OPTIONS /findings/summary/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63347 - "GET /findings/summary/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49762 - "OPTIONS /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49762 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49762 - "OPTIONS /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49762 - "GET /findings/summary/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62110 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59904 - "OPTIONS /ai/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59904 - "OPTIONS /ai/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59904 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:59904 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:55845 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:55845 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56642 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50489 - "GET /findings/summary/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59935 - "OPTIONS /schema/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50595 - "OPTIONS /schema/?limit=2000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59935 - "OPTIONS /schema/?limit=2000&db_registry_id=7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55330 - "OPTIONS /schema/summary?db_registry_id=7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56362 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61312 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55330 - "GET /schema/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59935 - "GET /schema/?limit=2000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50595 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56362 - "GET /schema/?limit=2000&db_registry_id=7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51809 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61312 - "GET /schema/summary?db_registry_id=7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61388 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50238 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50238 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50238 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53463 - "OPTIONS /metadata/DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53463 - "GET /metadata/DEV_SMS_LNT HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53463 - "GET /metadata/DEV_SMS_LNT HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53463 - "OPTIONS /metadata/DEV_SMS_LNT/refresh HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60902 - "POST /metadata/DEV_SMS_LNT/refresh HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53900 - "GET /metadata/DEV_SMS_LNT HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53900 - "GET /metadata/DEV_SMS_LNT HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53900 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53900 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53900 - "OPTIONS /schema/?db_registry_id=7&object_type=table&limit=1000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53900 - "GET /schema/?db_registry_id=7&object_type=table&limit=1000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53900 - "OPTIONS /reports/health-gate/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64298 - "OPTIONS /trend/all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53900 - "OPTIONS /audit/?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64298 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53900 - "GET /reports/health-gate/56 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:53900 - "GET /trend/all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64298 - "GET /audit/?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64298 - "GET /reports/health-gate/56 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:64298 - "OPTIONS /schedules HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53900 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64298 - "GET /schedules HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61011 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61011 - "GET /findings/summary/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56232 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52282 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63766 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62989 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51210 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62989 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65501 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54127 - "OPTIONS /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55391 - "OPTIONS /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51059 - "OPTIONS /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58486 - "OPTIONS /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54127 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51059 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55391 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54127 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55391 - "OPTIONS /ai/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54127 - "OPTIONS /ai/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55391 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:55391 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:51252 - "OPTIONS /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60189 - "OPTIONS /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62451 - "OPTIONS /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51252 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62451 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60189 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59591 - "OPTIONS /auth/token HTTP/1.1" 200 OK
+11:11:48  INFO      dbanalyser.api.auth — DB lookup for user 'admin': found
+11:11:49  INFO      dbanalyser.api.auth — Login successful for user 'admin'
+C:\Users\suraj.dubey\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\jwt\api_jwt.py:147: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+  return self._jws.encode(
+INFO:     127.0.0.1:59591 - "POST /auth/token HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59591 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+C:\Users\suraj.dubey\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\jwt\api_jwt.py:365: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+  decoded = self.decode_complete(
+INFO:     127.0.0.1:59591 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59591 - "OPTIONS /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59039 - "OPTIONS /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59591 - "OPTIONS /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59039 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59591 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59039 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59039 - "OPTIONS /findings/summary/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59039 - "GET /findings/summary/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56589 - "OPTIONS /schema/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54224 - "OPTIONS /schema/?limit=2000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56589 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54224 - "GET /schema/summary HTTP/1.1" 200 OK
+11:12:00  WARNING   dbanalyser.schema_intel.repository — list_schema_objects failed: column "parent_name" does not exist
+LINE 3:                        object_name, parent_name, data_type, ...
+                                            ^
+
+INFO:     127.0.0.1:54224 - "OPTIONS /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56589 - "GET /schema/?limit=2000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54224 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53564 - "OPTIONS /ai/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64759 - "OPTIONS /ai/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64759 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53564 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58813 - "OPTIONS /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58813 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58813 - "OPTIONS /schema/search HTTP/1.1" 200 OK
+11:12:23  WARNING   dbanalyser.schema_intel.repository — get_embeddings_for_db failed: column "parent_name" does not exist
+LINE 3:                        parent_name, definition, embedding_js...
+                               ^
+
+INFO:     127.0.0.1:58813 - "POST /schema/search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59077 - "OPTIONS /schema/?db_registry_id=7&object_type=table&limit=1000 HTTP/1.1" 200 OK
+11:12:30  WARNING   dbanalyser.schema_intel.repository — list_schema_objects failed: column "parent_name" does not exist
+LINE 3:                        object_name, parent_name, data_type, ...
+                                            ^
+
+INFO:     127.0.0.1:59077 - "GET /schema/?db_registry_id=7&object_type=table&limit=1000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59077 - "OPTIONS /reports/health-gate/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59077 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59077 - "OPTIONS /trend/all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59077 - "OPTIONS /audit/?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59077 - "GET /reports/health-gate/56 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:59077 - "GET /trend/all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59077 - "GET /audit/?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59077 - "GET /reports/health-gate/56 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:55420 - "OPTIONS /reports/download/56?fmt=pdf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55420 - "GET /reports/download/56?fmt=pdf HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:55950 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58115 - "GET /reports/health-gate/56 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:56747 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52421 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49671 - "GET /trend/all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56656 - "GET /audit/?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56656 - "GET /reports/health-gate/56 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:64117 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50630 - "GET /reports/health-gate/56 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:57580 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50626 - "GET /trend/all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54793 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51767 - "GET /audit/?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51767 - "GET /reports/health-gate/56 HTTP/1.1" 422 Unprocessable Content
+C:\Users\suraj.dubey\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\jwt\api_jwt.py:365: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+  decoded = self.decode_complete(
+INFO:     127.0.0.1:51767 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57580 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57580 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51767 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54793 - "GET /trend/all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54793 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50626 - "GET /audit/?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54793 - "GET /reports/health-gate/56 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:54793 - "GET /reports/health-gate/56 HTTP/1.1" 422 Unprocessable Content
+11:18:58  WARNING   dbanalyser.schema_intel.repository — list_schema_objects failed: column "parent_name" does not exist
+LINE 3:                        object_name, parent_name, data_type, ...
+                                            ^
+
+INFO:     127.0.0.1:59752 - "GET /schema/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49255 - "GET /schema/?limit=2000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65281 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65281 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65281 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64784 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57689 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+C:\Users\suraj.dubey\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\jwt\api_jwt.py:365: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+  decoded = self.decode_complete(
+INFO:     127.0.0.1:57689 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64784 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64784 - "OPTIONS /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57689 - "OPTIONS /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64784 - "OPTIONS /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57689 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51768 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57689 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57689 - "OPTIONS /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57689 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55390 - "OPTIONS /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50542 - "OPTIONS /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52723 - "OPTIONS /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55390 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52723 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55390 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55390 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52723 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+C:\Users\suraj.dubey\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\jwt\api_jwt.py:365: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+  decoded = self.decode_complete(
+INFO:     127.0.0.1:52723 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52723 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52723 - "OPTIONS /ai/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55390 - "OPTIONS /ai/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52723 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:52723 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:50542 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54358 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50542 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50956 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54087 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50956 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59722 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65366 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49896 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65366 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59887 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64573 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59887 - "GET /runs HTTP/1.1" 200 OK
+C:\Users\suraj.dubey\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\jwt\api_jwt.py:365: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+  decoded = self.decode_complete(
+INFO:     127.0.0.1:59887 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59887 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49666 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49666 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:59887 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64573 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59887 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59887 - "OPTIONS /findings/summary/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59887 - "GET /findings/summary/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53774 - "OPTIONS /runs/trigger HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53774 - "POST /runs/trigger HTTP/1.1" 200 OK
+11:40:29  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+11:40:29  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+11:40:29  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+11:40:29  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+11:40:29  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+11:40:29  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+11:40:29  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+11:40:29  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:53774 - "GET /runs/jobs/531b4393-3155-4761-8640-30719b524b4b HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50524 - "OPTIONS /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61505 - "OPTIONS /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58725 - "OPTIONS /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58321 - "OPTIONS /schema/?db_registry_id=7&object_type=table&limit=1000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58321 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58725 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+C:\Users\suraj.dubey\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\jwt\api_jwt.py:365: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+  decoded = self.decode_complete(
+INFO:     127.0.0.1:58321 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58321 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58321 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58725 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58321 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58730 - "GET /auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:58730 - "GET /auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:64076 - "OPTIONS /auth/token HTTP/1.1" 200 OK
+13:09:41  INFO      dbanalyser.api.auth — DB lookup for user 'admin': found
+13:09:42  INFO      dbanalyser.api.auth — Login successful for user 'admin'
+C:\Users\suraj.dubey\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\jwt\api_jwt.py:147: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+  return self._jws.encode(
+INFO:     127.0.0.1:64076 - "POST /auth/token HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64076 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64076 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64076 - "OPTIONS /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64076 - "OPTIONS /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64076 - "OPTIONS /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64076 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56477 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64076 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64076 - "OPTIONS /findings/summary/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64076 - "GET /findings/summary/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62954 - "OPTIONS /runs?db_name=DEV_LTFS HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62954 - "GET /runs?db_name=DEV_LTFS HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62954 - "OPTIONS /reports/download/32?fmt=json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62954 - "GET /reports/download/32?fmt=json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64067 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49956 - "OPTIONS /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49956 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64455 - "GET /runs?db_name=DEV_LTFS HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61745 - "OPTIONS /schema/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61745 - "OPTIONS /schema/?limit=2000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61745 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61745 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61745 - "GET /schema/summary HTTP/1.1" 200 OK
+13:11:32  WARNING   dbanalyser.schema_intel.repository — list_schema_objects failed: column "parent_name" does not exist
+LINE 3:                        object_name, parent_name, data_type, ...
+                                            ^
+
+INFO:     127.0.0.1:61745 - "GET /schema/?limit=2000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61745 - "OPTIONS /schema/summary?db_registry_id=7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61745 - "OPTIONS /schema/?limit=2000&db_registry_id=7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61745 - "OPTIONS /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61745 - "GET /schema/summary?db_registry_id=7 HTTP/1.1" 200 OK
+13:11:32  WARNING   dbanalyser.schema_intel.repository — list_schema_objects failed: column "parent_name" does not exist
+LINE 3:                        object_name, parent_name, data_type, ...
+                                            ^
+
+INFO:     127.0.0.1:61745 - "GET /schema/?limit=2000&db_registry_id=7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61745 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61745 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54900 - "OPTIONS /runs/trigger HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62909 - "POST /runs/trigger HTTP/1.1" 200 OK
+13:11:49  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+13:11:49  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+13:11:49  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+13:11:49  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+13:11:49  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+13:11:49  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+13:11:49  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+13:11:49  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:62909 - "GET /runs/jobs/50433627-cffe-4ac9-8046-e662f00043e9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55387 - "GET /api/v1/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58462 - "GET /databases HTTP/1.1" 200 OK
+13:13:22  WARNING   dbanalyser.schema_intel.repository — list_schema_objects failed: column "parent_name" does not exist
+LINE 3:                        object_name, parent_name, data_type, ...
+                                            ^
+
+INFO:     127.0.0.1:64332 - "GET /schema/summary HTTP/1.1" 200 OK
+13:13:22  WARNING   dbanalyser.schema_intel.repository — list_schema_objects failed: column "parent_name" does not exist
+LINE 3:                        object_name, parent_name, data_type, ...
+                                            ^
+
+INFO:     127.0.0.1:54160 - "GET /schema/?limit=2000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53350 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58462 - "GET /schema/?limit=2000&db_registry_id=7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61569 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49670 - "GET /schema/summary?db_registry_id=7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64332 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50063 - "GET /api/v1/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:50064 - "GET /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60848 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60848 - "POST /runs/trigger HTTP/1.1" 200 OK
+13:15:37  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+13:15:37  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+13:15:37  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+13:15:37  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+13:15:37  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+13:15:37  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+13:15:37  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+13:15:37  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:60848 - "GET /runs/jobs/f5c0eb36-ba80-4459-a980-0f76b0b1499e HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50065 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50065 - "GET /schema/summary HTTP/1.1" 200 OK
+13:16:10  WARNING   dbanalyser.schema_intel.repository — list_schema_objects failed: column "parent_name" does not exist
+LINE 3:                        object_name, parent_name, data_type, ...
+                                            ^
+
+INFO:     127.0.0.1:50065 - "GET /schema/?limit=2000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50065 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50065 - "GET /findings/run/56 HTTP/1.1" 200 OK
+13:16:11  WARNING   dbanalyser.schema_intel.repository — list_schema_objects failed: column "parent_name" does not exist
+LINE 3:                        object_name, parent_name, data_type, ...
+                                            ^
+
+INFO:     127.0.0.1:57358 - "GET /schema/summary?db_registry_id=7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64240 - "GET /schema/?limit=2000&db_registry_id=7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59713 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50065 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61338 - "OPTIONS /metadata/DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61338 - "GET /metadata/DEV_SMS_LNT HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61338 - "GET /metadata/DEV_SMS_LNT HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:50789 - "OPTIONS /ai/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50789 - "OPTIONS /ai/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50789 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:50789 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57350 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51678 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57350 - "GET /schema/summary HTTP/1.1" 200 OK
+13:16:44  WARNING   dbanalyser.schema_intel.repository — list_schema_objects failed: column "parent_name" does not exist
+LINE 3:                        object_name, parent_name, data_type, ...
+                                            ^
+
+INFO:     127.0.0.1:57350 - "GET /schema/?limit=2000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51678 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57350 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51678 - "GET /schema/summary?db_registry_id=7 HTTP/1.1" 200 OK
+13:16:44  WARNING   dbanalyser.schema_intel.repository — list_schema_objects failed: column "parent_name" does not exist
+LINE 3:                        object_name, parent_name, data_type, ...
+                                            ^
+
+INFO:     127.0.0.1:57350 - "GET /schema/?limit=2000&db_registry_id=7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53655 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53655 - "GET /metadata/DEV_SMS_LNT HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53655 - "GET /metadata/DEV_SMS_LNT HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:55334 - "GET /metadata/DEV_SMS_LNT HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:55334 - "GET /metadata/DEV_SMS_LNT HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:59866 - "GET /metadata/DEV_SMS_LNT HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:59866 - "GET /metadata/DEV_SMS_LNT HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56536 - "OPTIONS /metadata/DEV_SMS_LNT/refresh HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56536 - "POST /metadata/DEV_SMS_LNT/refresh HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60031 - "GET /metadata/DEV_SMS_LNT HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60031 - "GET /metadata/DEV_SMS_LNT HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:59035 - "GET /metadata/DEV_SMS_LNT HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:52747 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50513 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54246 - "GET /findings/run/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60694 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54246 - "GET /metadata/DEV_SMS_LNT HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64073 - "OPTIONS /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64073 - "POST /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64073 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64073 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65348 - "OPTIONS /databases/test-connection HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65348 - "POST /databases/test-connection HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:52343 - "POST /databases/test-connection HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:52343 - "POST /databases/test-connection HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:52343 - "POST /databases/test-connection HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:62626 - "POST /databases/test-connection HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:62626 - "POST /databases/test-connection HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:60768 - "POST /databases/test-connection HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:60769 - "POST /api/v1/databases/test-connection HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60771 - "POST /databases/test-connection HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:52226 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62093 - "POST /databases/test-connection HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:57479 - "OPTIONS /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61511 - "OPTIONS /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63845 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57479 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61511 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60118 - "POST /databases/test-connection HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:57519 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57528 - "POST /databases/test-connection HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:62390 - "POST /databases/test-connection HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:62391 - "POST /databases/test-connection HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:62394 - "GET /databases/test-connection HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56911 - "POST /databases/test-connection HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:56912 - "POST /databases/test-connection HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:59378 - "GET /databases/mydb HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:59380 - "GET /databases/mydb HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63910 - "POST /databases/validate HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:61237 - "POST /databases/validate HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:50607 - "POST /databases/validate HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:55714 - "POST /databases/validate HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:55715 - "POST /databases/validate HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:64681 - "OPTIONS /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58025 - "OPTIONS /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61058 - "OPTIONS /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61058 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64681 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58025 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58025 - "OPTIONS /databases/test-connection HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61058 - "POST /databases/test-connection HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:61058 - "POST /databases/test-connection HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:61058 - "POST /databases/test-connection HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:61058 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64257 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+C:\Users\suraj.dubey\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\jwt\api_jwt.py:365: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+  decoded = self.decode_complete(
+INFO:     127.0.0.1:61058 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61058 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64257 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64257 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61058 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50942 - "POST /databases/test-connection HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:54278 - "POST /databases/test-connection HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:54278 - "OPTIONS /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65305 - "POST /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65305 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65305 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49922 - "OPTIONS /findings/summary/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49975 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49922 - "GET /findings/summary/56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49922 - "OPTIONS /runs/trigger HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49975 - "POST /runs/trigger HTTP/1.1" 200 OK
+14:07:36  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+14:07:36  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+14:07:36  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+14:07:36  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+14:07:36  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+14:07:36  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+14:07:36  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+14:07:36  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+14:07:37  INFO      dbanalyser.engine.scanner — Live-DB scan: retrieved 326 objects from sys.sql_modules
+14:07:37  INFO      dbanalyser.engine.analyser — Loaded 1684 objects
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:49975 - "GET /runs/jobs/ca29e8c7-5cdd-496f-bc12-cec319d857e9 HTTP/1.1" 200 OK
+14:07:38  INFO      dbanalyser.engine.analyser — Analysis complete in 2.1s | objects=1684 | findings=7010 | health=0.0
+INFO:     127.0.0.1:49975 - "GET /runs/jobs/ca29e8c7-5cdd-496f-bc12-cec319d857e9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51063 - "POST /runs/trigger HTTP/1.1" 200 OK
+14:08:56  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+14:08:56  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+14:08:56  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+14:08:56  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+14:08:56  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+14:08:56  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+14:08:56  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+14:08:56  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:51063 - "GET /runs/jobs/31dac622-ceac-4130-aa00-92401ba7f103 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57078 - "OPTIONS /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61282 - "OPTIONS /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50581 - "OPTIONS /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57078 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50581 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57078 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57078 - "OPTIONS /findings/summary/57 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57078 - "GET /findings/summary/57 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60301 - "OPTIONS /runs/trigger HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60301 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:04:32  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:04:32  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:04:32  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:04:32  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:04:32  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:04:32  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:04:32  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:04:32  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:60301 - "GET /runs/jobs/aee14bc9-cca2-4930-9f6e-6724fa4f2269 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61394 - "OPTIONS /findings/run/57 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61394 - "GET /findings/run/57 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64994 - "OPTIONS /runs/trigger HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64994 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:04:48  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:04:48  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:04:48  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:04:48  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:04:48  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:04:48  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:04:48  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:04:48  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:63089 - "OPTIONS /runs/57/hard-delete HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63089 - "DELETE /runs/57/hard-delete HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63089 - "DELETE /runs/57/hard-delete HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63089 - "DELETE /runs/57/hard-delete HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63089 - "DELETE /runs/57/hard-delete HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63089 - "DELETE /runs/57/hard-delete HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63089 - "DELETE /runs/57/hard-delete HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63089 - "DELETE /runs/57/hard-delete HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63089 - "DELETE /runs/57/hard-delete HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63089 - "DELETE /runs/57/hard-delete HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63089 - "DELETE /runs/57/hard-delete HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63089 - "DELETE /runs/57/hard-delete HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63089 - "DELETE /runs/57/hard-delete HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63089 - "OPTIONS /runs/31/hard-delete HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63089 - "DELETE /runs/31/hard-delete HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63089 - "DELETE /runs/31/hard-delete HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63089 - "OPTIONS /ai/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52810 - "OPTIONS /ai/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52810 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:52810 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:52810 - "OPTIONS /schema/search HTTP/1.1" 200 OK
+16:05:29  WARNING   dbanalyser.schema_intel.repository — get_embeddings_for_db failed: column "parent_name" does not exist
+LINE 3:                        parent_name, definition, embedding_js...
+                               ^
+
+INFO:     127.0.0.1:63089 - "POST /schema/search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63089 - "OPTIONS /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63089 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+16:05:34  WARNING   dbanalyser.schema_intel.repository — get_embeddings_for_db failed: column "parent_name" does not exist
+LINE 3:                        parent_name, definition, embedding_js...
+                               ^
+
+INFO:     127.0.0.1:63089 - "POST /schema/search HTTP/1.1" 200 OK
+16:05:34  WARNING   dbanalyser.schema_intel.repository — get_embeddings_for_db failed: column "parent_name" does not exist
+LINE 3:                        parent_name, definition, embedding_js...
+                               ^
+
+INFO:     127.0.0.1:63089 - "POST /schema/search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63089 - "OPTIONS /runs?db_name=LTFS_DEV HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63089 - "GET /runs?db_name=LTFS_DEV HTTP/1.1" 200 OK
+16:05:38  WARNING   dbanalyser.schema_intel.repository — get_embeddings_for_db failed: column "parent_name" does not exist
+LINE 3:                        parent_name, definition, embedding_js...
+                               ^
+
+INFO:     127.0.0.1:63089 - "POST /schema/search HTTP/1.1" 200 OK
+16:05:39  WARNING   dbanalyser.schema_intel.repository — get_embeddings_for_db failed: column "parent_name" does not exist
+LINE 3:                        parent_name, definition, embedding_js...
+                               ^
+
+INFO:     127.0.0.1:63089 - "POST /schema/search HTTP/1.1" 200 OK
+16:05:45  WARNING   dbanalyser.schema_intel.repository — get_embeddings_for_db failed: column "parent_name" does not exist
+LINE 3:                        parent_name, definition, embedding_js...
+                               ^
+
+INFO:     127.0.0.1:61543 - "POST /schema/search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61543 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57244 - "GET /findings/summary/57 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61345 - "OPTIONS /runs?db_name=DEV_LTFS HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61345 - "GET /runs?db_name=DEV_LTFS HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56939 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51241 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:06:30  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:06:30  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:06:30  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:06:30  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:06:30  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:06:30  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:06:30  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:06:30  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:51241 - "GET /runs/jobs/d0fcea73-823f-44c3-8376-3a02c523fb90 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60594 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:10:18  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:10:18  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:10:18  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:10:18  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:10:18  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:10:18  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:10:18  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:10:18  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:60594 - "GET /runs/jobs/3fbaf812-d92e-4c06-ae8a-517239627539 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60596 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:11:55  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:11:55  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:11:55  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:11:55  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:11:55  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:11:55  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:11:55  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:11:55  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:55503 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:12:21  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:12:21  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:12:21  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:12:21  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:12:21  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:12:21  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:12:21  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:12:21  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:55506 - "GET /runs/jobs/fef4408b-3d3d-4f93-a31a-5e678783cd66 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50298 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56695 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64921 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56695 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:12:32  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:12:32  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:12:32  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:12:32  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:12:32  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:12:32  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:12:32  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:12:32  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:56695 - "GET /runs/jobs/794467db-bc92-43af-8b74-75368ed210c2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63133 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:12:40  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:12:40  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:12:40  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:12:40  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:12:40  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:12:40  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:12:40  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:12:40  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:63139 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:12:40  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:12:40  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:12:40  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:12:40  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:12:40  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:12:40  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:12:40  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:12:40  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:63133 - "GET /runs/jobs/68813022-0e6a-43c1-8189-7308a054909d HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63133 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:12:43  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:12:43  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:12:43  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:12:43  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:12:43  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:12:43  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:12:43  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:12:43  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:63143 - "GET /runs/jobs/653131fb-2832-42c0-8d69-92ab5617e603 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63133 - "GET /runs/jobs/76bd9686-4bb8-4540-94f1-3646237b5009 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63133 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:12:46  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:12:46  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:12:46  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:12:46  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:12:46  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:12:46  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:12:46  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:12:46  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:63133 - "GET /runs/jobs/9fa17cc4-9032-4e3c-b9f8-4dd16f925aec HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63133 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:12:51  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:12:51  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:12:51  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:12:51  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:12:51  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:12:51  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:12:51  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:12:51  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:63133 - "GET /runs/jobs/31d724c1-de44-45a2-8260-983566f9097e HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63133 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:12:56  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:12:56  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:12:56  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:12:56  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:12:56  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:12:56  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:12:56  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:12:56  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:63133 - "GET /runs/jobs/052da1da-0b2d-4867-a608-4c4978d6c7ed HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63133 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:13:01  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:13:01  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:13:01  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:13:01  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:13:01  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:13:01  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:13:01  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:13:01  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:63133 - "GET /runs/jobs/088e770e-9561-4cae-bc1f-8841d0c10d80 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63133 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:13:04  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:13:04  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:13:04  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:13:04  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:13:04  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:13:04  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:13:04  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:13:04  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:63133 - "GET /runs/jobs/96418024-9ee5-4511-b58e-f6b80c8ee098 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63133 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:13:07  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:13:07  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:13:07  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:13:07  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:13:07  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:13:07  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:13:07  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:13:07  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:63133 - "GET /runs/jobs/93bc3b37-2fa4-44c2-a88c-f45057766bd8 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63133 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:13:10  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:13:10  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:13:10  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:13:10  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:13:10  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:13:10  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:13:10  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:13:10  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:63133 - "GET /runs/jobs/7a377264-6e13-4a6d-b244-d09e7abbf080 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59323 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:13:19  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:13:19  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:13:19  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:13:19  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:13:19  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:13:19  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:13:19  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:13:19  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:50060 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:13:20  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:13:20  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:13:20  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:13:20  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:13:20  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:13:20  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:13:20  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:13:20  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:61377 - "GET /runs/jobs/8c5f3ded-0164-4dc1-a9f0-f56d94e8a9c5 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50060 - "GET /runs/jobs/4873f12d-6730-4a9f-adf8-e86da4aa1932 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61379 - "GET /runs/jobs/8c5f3ded-0164-4dc1-a9f0-f56d94e8a9c5 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61381 - "GET /runs/jobs/8c5f3ded-0164-4dc1-a9f0-f56d94e8a9c5 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61383 - "GET /runs/jobs/8c5f3ded-0164-4dc1-a9f0-f56d94e8a9c5 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61386 - "GET /runs/jobs/8c5f3ded-0164-4dc1-a9f0-f56d94e8a9c5 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54673 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:14:03  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:14:03  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:14:03  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:14:03  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:14:03  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:14:03  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:14:03  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:14:03  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:54676 - "GET /runs/jobs/eb1496ac-cecc-41bb-8523-578d40ca2107 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54678 - "GET /runs/jobs/eb1496ac-cecc-41bb-8523-578d40ca2107 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54680 - "GET /runs/jobs/eb1496ac-cecc-41bb-8523-578d40ca2107 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54683 - "GET /runs/jobs/eb1496ac-cecc-41bb-8523-578d40ca2107 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54685 - "GET /runs/jobs/eb1496ac-cecc-41bb-8523-578d40ca2107 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51254 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:14:43  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:14:43  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:14:43  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:14:43  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:14:43  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:14:43  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:14:43  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:14:43  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+16:14:45  INFO      dbanalyser.engine.scanner — Live-DB scan: retrieved 326 objects from sys.sql_modules
+16:14:45  INFO      dbanalyser.engine.analyser — Loaded 1684 objects
+16:14:46  INFO      dbanalyser.engine.analyser — Analysis complete in 2.9s | objects=1684 | findings=7010 | health=0.0
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:51257 - "GET /runs/jobs/8030caad-1706-4aa6-9ed6-840d5b2cf41f HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65044 - "OPTIONS /runs/trigger HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65044 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:15:08  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:15:08  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:15:08  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:15:08  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:15:08  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:15:08  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:15:09  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:15:09  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:65044 - "GET /runs/jobs/93e8cda2-c846-4d0f-a512-0f59d651cefd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65044 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:15:15  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:15:15  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:15:15  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:15:15  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:15:15  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:15:15  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:15:15  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:15:15  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:65044 - "GET /runs/jobs/73e689a1-2688-4b6a-a2ca-69a4f7cb2547 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59512 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:15:31  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:15:31  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:15:31  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:15:31  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:15:31  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:15:31  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:15:31  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:15:31  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:59516 - "GET /runs/jobs/9c112aef-4692-44dc-9bd3-94f39eb076a0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55898 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:16:34  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:16:34  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:16:34  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:16:34  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:16:34  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:16:34  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:16:34  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:16:34  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:55902 - "GET /runs/jobs/69ad6420-1903-462e-b496-03d8b03e9b9a HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55906 - "GET /runs/jobs/69ad6420-1903-462e-b496-03d8b03e9b9a HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50536 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:18:43  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:18:43  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:18:43  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:18:43  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:18:43  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:18:43  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:18:43  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:18:43  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:50539 - "GET /runs/jobs/6557fe39-543d-4919-8a3c-07d29ebcc850 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64583 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:22:19  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:22:19  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:22:19  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:22:19  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:22:19  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:22:19  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:22:19  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:22:19  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:64583 - "GET /runs/jobs/8a30081a-9b8f-41aa-bd20-b73d3547fe98 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64583 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:22:23  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:22:23  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:22:23  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:22:23  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:22:23  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:22:23  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:22:23  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:22:23  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:64583 - "GET /runs/jobs/cee2b031-4ad0-448f-bfa9-271c33d500f8 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64583 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:22:26  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:22:26  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:22:26  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:22:26  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:22:26  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:22:26  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:22:26  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:22:26  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:64583 - "GET /runs/jobs/8bd2b708-e86d-498e-b74e-32965038e26b HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53997 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:23:43  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:23:43  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:23:43  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:23:43  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:23:43  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:23:43  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:23:43  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:23:43  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:53997 - "GET /runs/jobs/340ed77a-a99d-4130-a9bf-909bc86b06d0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59257 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:26:37  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:26:37  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:26:37  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:26:37  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:26:37  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:26:37  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:26:37  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:26:37  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:59260 - "GET /runs/jobs/197431cd-5547-42e6-b922-c5529fce16ca HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60120 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:27:04  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:27:04  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:27:04  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:27:04  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:27:04  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:27:04  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:27:04  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:27:04  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+16:27:06  INFO      dbanalyser.engine.scanner — Live-DB scan: retrieved 326 objects from sys.sql_modules
+16:27:06  INFO      dbanalyser.engine.analyser — Loaded 1684 objects
+16:27:07  INFO      dbanalyser.engine.analyser — Analysis complete in 2.8s | objects=1684 | findings=7010 | health=0.0
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:60123 - "GET /runs/jobs/ca7ab20e-628e-4459-8dfa-476d9f4d6336 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54983 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:28:48  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:28:48  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:28:48  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:28:48  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:28:48  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:28:48  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:28:48  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:28:48  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:54987 - "GET /runs/jobs/0fff140a-f469-4825-a935-fef6a3db2ec6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54993 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:29:09  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:29:09  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:29:09  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:29:09  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:29:09  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:29:09  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:29:09  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:29:09  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+16:29:09  INFO      dbanalyser.engine.scanner — Live-DB scan: retrieved 326 objects from sys.sql_modules
+16:29:09  INFO      dbanalyser.engine.analyser — Loaded 1684 objects
+16:29:11  INFO      dbanalyser.engine.analyser — Analysis complete in 2.0s | objects=1684 | findings=7010 | health=0.0
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:54996 - "GET /runs/jobs/95ee5f26-9050-4d56-af94-2315247c8ee4 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63082 - "POST /runs/trigger HTTP/1.1" 200 OK
+16:59:05  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+16:59:05  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+16:59:05  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+16:59:05  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+16:59:05  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+16:59:05  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+16:59:05  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+16:59:05  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:60238 - "GET /runs/jobs/3b47fd40-a126-40aa-b163-f7bd1d0a0dc4 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53274 - "POST /runs/trigger HTTP/1.1" 200 OK
+17:00:52  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+17:00:52  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+17:00:52  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+17:00:52  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+17:00:52  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+17:00:52  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+17:00:52  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+17:00:52  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:53277 - "GET /runs/jobs/df5f8ffb-aacc-4b6c-bbd8-5038b3e1e3ad HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59536 - "POST /runs/trigger HTTP/1.1" 200 OK
+17:04:19  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+17:04:19  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+17:04:19  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+17:04:19  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+17:04:19  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+17:04:19  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+17:04:19  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+17:04:19  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+17:04:20  INFO      dbanalyser.engine.scanner — Live-DB scan: retrieved 326 objects from sys.sql_modules
+17:04:20  INFO      dbanalyser.engine.analyser — Loaded 1684 objects
+17:04:22  INFO      dbanalyser.engine.analyser — Analysis complete in 2.9s | objects=1684 | findings=7010 | health=0.0
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:59541 - "GET /runs/jobs/4b5fa54a-4594-46ea-8dd0-0aae96e60916 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55819 - "POST /runs/trigger HTTP/1.1" 200 OK
+17:04:57  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+17:04:57  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+17:04:57  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+17:04:57  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+17:04:57  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+17:04:57  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+17:04:57  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+17:04:57  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:55823 - "GET /runs/jobs/15229db2-f4de-4bfe-8382-c30127875ccd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55829 - "POST /runs/trigger HTTP/1.1" 200 OK
+17:05:21  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+17:05:21  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+17:05:21  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+17:05:21  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+17:05:21  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+17:05:21  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+17:05:21  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+17:05:21  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+17:05:21  INFO      dbanalyser.engine.scanner — Live-DB scan: retrieved 326 objects from sys.sql_modules
+17:05:21  INFO      dbanalyser.engine.analyser — Loaded 1684 objects
+17:05:22  INFO      dbanalyser.engine.analyser — Analysis complete in 1.4s | objects=1684 | findings=7010 | health=0.0
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:55832 - "GET /runs/jobs/d41b22ae-dae6-442a-8ac4-49b2e73b92bb HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51581 - "POST /runs/trigger HTTP/1.1" 200 OK
+17:12:52  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+17:12:52  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+17:12:52  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+17:12:52  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+17:12:52  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+17:12:52  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+17:12:52  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+17:12:52  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:51585 - "GET /runs/jobs/6811f0a8-e44d-4083-9723-acf232177429 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55452 - "POST /runs/trigger HTTP/1.1" 200 OK
+17:16:02  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+17:16:02  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+17:16:02  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+17:16:02  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+17:16:02  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+17:16:02  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+17:16:02  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+17:16:02  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+17:16:04  INFO      dbanalyser.engine.scanner — Live-DB scan: retrieved 326 objects from sys.sql_modules
+17:16:04  INFO      dbanalyser.engine.analyser — Loaded 1684 objects
+17:16:05  INFO      dbanalyser.engine.analyser — Analysis complete in 3.2s | objects=1684 | findings=7010 | health=0.0
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:55456 - "GET /runs/jobs/b0781a81-06fc-426b-99df-88065c09a5af HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55458 - "GET /runs/jobs/b0781a81-06fc-426b-99df-88065c09a5af HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55468 - "POST /runs/trigger HTTP/1.1" 200 OK
+17:16:58  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+17:16:58  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+17:16:58  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+17:16:58  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+17:16:58  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+17:16:58  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+17:16:58  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+17:16:58  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+17:16:58  INFO      dbanalyser.engine.scanner — Live-DB scan: retrieved 326 objects from sys.sql_modules
+17:16:59  INFO      dbanalyser.engine.analyser — Loaded 1684 objects
+17:17:00  INFO      dbanalyser.engine.analyser — Analysis complete in 1.4s | objects=1684 | findings=7010 | health=0.0
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:55471 - "GET /runs/jobs/0c878b69-6308-4042-8413-58c2ba7364d0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64082 - "POST /runs/trigger HTTP/1.1" 200 OK
+17:17:36  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+17:17:36  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+17:17:36  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+17:17:36  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+17:17:36  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+17:17:36  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+17:17:36  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+17:17:36  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+17:17:37  INFO      dbanalyser.engine.scanner — Live-DB scan: retrieved 326 objects from sys.sql_modules
+17:17:37  INFO      dbanalyser.engine.analyser — Loaded 1684 objects
+17:17:38  INFO      dbanalyser.engine.analyser — Analysis complete in 1.6s | objects=1684 | findings=7010 | health=0.0
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:64085 - "GET /runs/jobs/1786ec2c-9311-4ba3-9a1c-cb392f97a8ac HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64091 - "GET /runs/jobs/0c878b69-6308-4042-8413-58c2ba7364d0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52026 - "POST /runs/trigger HTTP/1.1" 200 OK
+17:18:35  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+17:18:35  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+17:18:35  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+17:18:35  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+17:18:35  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+17:18:35  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+17:18:35  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+17:18:35  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+17:18:35  INFO      dbanalyser.engine.scanner — Live-DB scan: retrieved 326 objects from sys.sql_modules
+17:18:35  INFO      dbanalyser.engine.analyser — Loaded 1684 objects
+17:18:37  INFO      dbanalyser.engine.analyser — Analysis complete in 1.5s | objects=1684 | findings=7010 | health=0.0
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:52029 - "GET /runs/jobs/0ad66975-c1da-4ced-aa67-5d3b5c5d7978 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50581 - "POST /runs/trigger HTTP/1.1" 200 OK
+17:19:19  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+17:19:19  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+17:19:19  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+17:19:19  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+17:19:19  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+17:19:19  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+17:19:19  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+17:19:19  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+17:19:19  INFO      dbanalyser.engine.scanner — Live-DB scan: retrieved 326 objects from sys.sql_modules
+17:19:19  INFO      dbanalyser.engine.analyser — Loaded 1684 objects
+17:19:21  INFO      dbanalyser.engine.analyser — Analysis complete in 1.8s | objects=1684 | findings=7010 | health=0.0
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:50584 - "GET /runs/jobs/1200afaa-c404-45b3-bfc8-3ace351d727d HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49256 - "POST /runs/trigger HTTP/1.1" 200 OK
+17:20:19  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+17:20:19  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+17:20:19  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+17:20:19  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+17:20:19  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+17:20:19  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+17:20:19  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+17:20:19  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+17:20:19  INFO      dbanalyser.engine.scanner — Live-DB scan: retrieved 326 objects from sys.sql_modules
+17:20:19  INFO      dbanalyser.engine.analyser — Loaded 1684 objects
+17:20:20  INFO      dbanalyser.engine.analyser — Analysis complete in 1.7s | objects=1684 | findings=7010 | health=0.0
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:49259 - "GET /runs/jobs/065ff575-71ca-4027-8dcc-a946c75e1341 HTTP/1.1" 200 OK
+17:20:27  INFO      dbanalyser.api — PostgreSQL pool lazily reinitialised.
+INFO:     127.0.0.1:49263 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49302 - "GET /runs/jobs/1200afaa-c404-45b3-bfc8-3ace351d727d HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49308 - "GET /runs/jobs/0ad66975-c1da-4ced-aa67-5d3b5c5d7978 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49387 - "POST /runs/trigger HTTP/1.1" 200 OK
+17:21:46  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+17:21:46  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+17:21:46  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+17:21:46  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+17:21:46  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+17:21:46  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+17:21:46  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+17:21:46  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+17:21:46  INFO      dbanalyser.engine.scanner — Live-DB scan: retrieved 326 objects from sys.sql_modules
+17:21:46  INFO      dbanalyser.engine.analyser — Loaded 1684 objects
+17:21:48  INFO      dbanalyser.engine.analyser — Analysis complete in 1.5s | objects=1684 | findings=7010 | health=0.0
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:53816 - "GET /runs/jobs/1e22e634-1867-4e60-ab1f-c30bdff63eca HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63640 - "POST /runs/trigger HTTP/1.1" 200 OK
+17:22:18  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+17:22:18  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+17:22:18  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+17:22:18  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+17:22:18  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+17:22:18  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+17:22:18  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+17:22:18  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+17:22:18  INFO      dbanalyser.engine.scanner — Live-DB scan: retrieved 326 objects from sys.sql_modules
+17:22:18  INFO      dbanalyser.engine.analyser — Loaded 1684 objects
+17:22:19  INFO      dbanalyser.engine.analyser — Analysis complete in 1.2s | objects=1684 | findings=7010 | health=0.0
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:63643 - "GET /runs/jobs/d7631072-b47d-4ff2-b888-6eef86bca825 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55176 - "POST /runs/trigger HTTP/1.1" 200 OK
+22:54:29  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+22:54:29  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+22:54:29  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+22:54:29  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+22:54:29  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+22:54:29  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+22:54:29  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+22:54:29  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:61582 - "POST /runs/trigger HTTP/1.1" 200 OK
+22:54:38  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+22:54:38  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+22:54:38  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+22:54:38  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+22:54:38  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+22:54:38  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+22:54:38  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+22:54:38  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:61585 - "GET /runs/jobs/16e0a577-0b9f-4dd8-b4a2-6500adb4b3c1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61589 - "GET /runs/jobs/16e0a577-0b9f-4dd8-b4a2-6500adb4b3c1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62096 - "GET /runs/jobs/16e0a577-0b9f-4dd8-b4a2-6500adb4b3c1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63018 - "GET /runs/jobs/16e0a577-0b9f-4dd8-b4a2-6500adb4b3c1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56205 - "GET /runs/jobs/16e0a577-0b9f-4dd8-b4a2-6500adb4b3c1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56208 - "GET /runs/jobs/16e0a577-0b9f-4dd8-b4a2-6500adb4b3c1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53911 - "GET /runs/jobs/16e0a577-0b9f-4dd8-b4a2-6500adb4b3c1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63034 - "GET /runs/jobs/16e0a577-0b9f-4dd8-b4a2-6500adb4b3c1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55845 - "POST /runs/trigger HTTP/1.1" 200 OK
+07:16:32  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=LTFS_DEV
+07:16:32  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: name='LTFS_DEV' environment='development' host='localhost' port=1433 database_name='LTFS_Dev' connection_string='' use_windows_auth=True username='' password='' description='Local development database' owner_label='DBA Team' tags=['dev'] is_active=True
+07:16:32  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+07:16:32  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=LTFS_DEV
+DEBUG: [_run_job] Using req.db_name=LTFS_DEV
+INFO:     127.0.0.1:52953 - "GET /runs/jobs/5a7b40ae-7443-4ce2-aa1f-dbcd9fe780e8 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62877 - "GET /runs/jobs/5a7b40ae-7443-4ce2-aa1f-dbcd9fe780e8 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57622 - "GET /runs/jobs/5a7b40ae-7443-4ce2-aa1f-dbcd9fe780e8 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57629 - "GET /runs/jobs/5a7b40ae-7443-4ce2-aa1f-dbcd9fe780e8 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56656 - "GET /runs/jobs/5a7b40ae-7443-4ce2-aa1f-dbcd9fe780e8 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56662 - "GET /runs/jobs/5a7b40ae-7443-4ce2-aa1f-dbcd9fe780e8 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50675 - "GET /runs/jobs/5a7b40ae-7443-4ce2-aa1f-dbcd9fe780e8 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56451 - "GET /runs/jobs/5a7b40ae-7443-4ce2-aa1f-dbcd9fe780e8 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56454 - "GET /runs/jobs/5a7b40ae-7443-4ce2-aa1f-dbcd9fe780e8 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56347 - "OPTIONS /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59156 - "OPTIONS /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55528 - "OPTIONS /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59156 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55528 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56347 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56347 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55528 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+C:\Users\suraj.dubey\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\jwt\api_jwt.py:365: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+  decoded = self.decode_complete(
+INFO:     127.0.0.1:55528 - "GET /auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56347 - "GET /auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56347 - "GET /auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:59580 - "OPTIONS /auth/token HTTP/1.1" 200 OK
+08:41:33  INFO      dbanalyser.api.auth — DB lookup for user 'admin': found
+08:41:34  WARNING   dbanalyser.api.auth — Password mismatch for user 'admin'
+INFO:     127.0.0.1:59580 - "POST /auth/token HTTP/1.1" 401 Unauthorized
+08:41:40  INFO      dbanalyser.api.auth — DB lookup for user 'admin': found
+08:41:41  INFO      dbanalyser.api.auth — Login successful for user 'admin'
+C:\Users\suraj.dubey\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\jwt\api_jwt.py:147: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+  return self._jws.encode(
+INFO:     127.0.0.1:55038 - "POST /auth/token HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55038 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55038 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55038 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55038 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55038 - "OPTIONS /findings/summary/70 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55038 - "GET /findings/summary/70 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64804 - "OPTIONS /schema/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50165 - "OPTIONS /schema/?limit=2000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64804 - "GET /databases HTTP/1.1" 200 OK
+08:42:23  WARNING   dbanalyser.schema_intel.repository — list_schema_objects failed: column "parent_name" does not exist
+LINE 3:                        object_name, parent_name, data_type, ...
+                                            ^
+
+INFO:     127.0.0.1:56741 - "GET /schema/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50165 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59648 - "GET /schema/?limit=2000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50165 - "OPTIONS /findings/run/70 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50165 - "GET /findings/run/70 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50165 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63137 - "OPTIONS /schema/summary?db_registry_id=7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59018 - "OPTIONS /schema/?limit=2000&db_registry_id=7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63137 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59018 - "GET /schema/summary?db_registry_id=7 HTTP/1.1" 200 OK
+08:42:37  WARNING   dbanalyser.schema_intel.repository — list_schema_objects failed: column "parent_name" does not exist
+LINE 3:                        object_name, parent_name, data_type, ...
+                                            ^
+
+INFO:     127.0.0.1:63137 - "GET /schema/?limit=2000&db_registry_id=7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64854 - "OPTIONS /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61686 - "OPTIONS /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61732 - "OPTIONS /findings/run/70 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64901 - "OPTIONS /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64498 - "OPTIONS /schema/summary?db_registry_id=7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55237 - "OPTIONS /schema/?limit=2000&db_registry_id=7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55237 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64498 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+C:\Users\suraj.dubey\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\jwt\api_jwt.py:365: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+  decoded = self.decode_complete(
+INFO:     127.0.0.1:55237 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55237 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55237 - "OPTIONS /schema/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64498 - "OPTIONS /schema/?limit=2000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64901 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61732 - "GET /runs HTTP/1.1" 200 OK
+14:15:12  WARNING   dbanalyser.schema_intel.repository — list_schema_objects failed: column "parent_name" does not exist
+LINE 3:                        object_name, parent_name, data_type, ...
+                                            ^
+
+INFO:     127.0.0.1:64498 - "GET /schema/?limit=2000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64498 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61732 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55237 - "GET /schema/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61732 - "GET /findings/run/70 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62917 - "OPTIONS /findings/summary/70 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62917 - "GET /findings/summary/70 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59912 - "OPTIONS /runs/trigger HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59912 - "POST /runs/trigger HTTP/1.1" 200 OK
+14:15:27  INFO      dbanalyser.api.routes.runs — [_run_job] req.db_name=DEV_SMS_LNT
+14:15:27  INFO      dbanalyser.api.routes.runs — [_run_job] cfg.get_database result: None
+14:15:27  INFO      dbanalyser.api.routes.runs — [_run_job] Falling back to PostgreSQL registry for DEV_SMS_LNT
+14:15:27  INFO      dbanalyser.api.routes.runs — [_run_job] get_db_registry result: True
+14:15:27  INFO      dbanalyser.api.routes.runs — [_run_job] Creating DbEntry from registry row
+14:15:27  INFO      dbanalyser.api.routes.runs — [_run_job] DbEntry created, db_entries now has 1 entries
+14:15:27  INFO      dbanalyser.engine.analyser — Loading SQL objects (mode=live_db) …
+14:15:27  INFO      dbanalyser.engine.scanner — Scanning live SQL Server database
+14:15:28  INFO      dbanalyser.engine.scanner — Live-DB scan: retrieved 326 objects from sys.sql_modules
+14:15:28  INFO      dbanalyser.engine.analyser — Loaded 1684 objects
+DEBUG: [_run_job] req.all_dbs=False, req.db_name=DEV_SMS_LNT
+DEBUG: [_run_job] Using req.db_name=DEV_SMS_LNT
+INFO:     127.0.0.1:59912 - "GET /runs/jobs/b57acbe3-dff1-4681-8cb0-44e6c93268a2 HTTP/1.1" 200 OK
+14:15:29  INFO      dbanalyser.engine.analyser — Analysis complete in 2.3s | objects=1684 | findings=7010 | health=0.0
+INFO:     127.0.0.1:59912 - "GET /runs/jobs/b57acbe3-dff1-4681-8cb0-44e6c93268a2 HTTP/1.1" 200 OK
+14:15:46  INFO      dbanalyser.api — PostgreSQL pool lazily reinitialised.
+INFO:     127.0.0.1:63309 - "GET /databases HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63309 - "GET /schema/summary HTTP/1.1" 200 OK
+14:15:46  WARNING   dbanalyser.schema_intel.repository — list_schema_objects failed: column "parent_name" does not exist
+LINE 3:                        object_name, parent_name, data_type, ...
+                                            ^
+
+INFO:     127.0.0.1:63309 - "GET /schema/?limit=2000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63309 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58613 - "OPTIONS /findings/run/71 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63309 - "GET /findings/run/70 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58613 - "GET /findings/run/71 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58613 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63309 - "GET /schema/summary?db_registry_id=7 HTTP/1.1" 200 OK
+14:15:51  WARNING   dbanalyser.schema_intel.repository — list_schema_objects failed: column "parent_name" does not exist
+LINE 3:                        object_name, parent_name, data_type, ...
+                                            ^
+
+INFO:     127.0.0.1:50849 - "GET /schema/?limit=2000&db_registry_id=7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60198 - "OPTIONS /findings/run/67 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60198 - "GET /findings/run/67 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60198 - "OPTIONS /findings/run/57 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60198 - "GET /findings/run/57 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61296 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61296 - "OPTIONS /runs?db_name=LTFS_DEV HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61296 - "GET /runs?db_name=LTFS_DEV HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61296 - "OPTIONS /findings/run/3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61296 - "GET /findings/run/3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61296 - "OPTIONS /findings/run/7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61296 - "GET /findings/run/7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61296 - "OPTIONS /runs?db_name=DEV_LTFS HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49155 - "GET /findings/run/71 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61296 - "GET /runs?db_name=DEV_LTFS HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61296 - "OPTIONS /ai/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49155 - "OPTIONS /ai/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49155 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49155 - "GET /ai/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:52478 - "OPTIONS /schema/search HTTP/1.1" 200 OK
+14:16:29  WARNING   dbanalyser.schema_intel.repository — get_embeddings_for_db failed: column "parent_name" does not exist
+LINE 3:                        parent_name, definition, embedding_js...
+                               ^
+
+INFO:     127.0.0.1:52478 - "POST /schema/search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52478 - "GET /runs?db_name=DEV_SMS_LNT HTTP/1.1" 200 OK
+14:16:32  WARNING   dbanalyser.schema_intel.repository — get_embeddings_for_db failed: column "parent_name" does not exist
+LINE 3:                        parent_name, definition, embedding_js...
+                               ^
+
+INFO:     127.0.0.1:52478 - "POST /schema/search HTTP/1.1" 200 OK
+14:16:33  WARNING   dbanalyser.schema_intel.repository — get_embeddings_for_db failed: column "parent_name" does not exist
+LINE 3:                        parent_name, definition, embedding_js...
+                               ^
+
+INFO:     127.0.0.1:52478 - "POST /schema/search HTTP/1.1" 200 OK
+14:16:35  WARNING   dbanalyser.schema_intel.repository — get_embeddings_for_db failed: column "parent_name" does not exist
+LINE 3:                        parent_name, definition, embedding_js...
+                               ^
+
+INFO:     127.0.0.1:52478 - "POST /schema/search HTTP/1.1" 200 OK
+14:16:35  WARNING   dbanalyser.schema_intel.repository — get_embeddings_for_db failed: column "parent_name" does not exist
+LINE 3:                        parent_name, definition, embedding_js...
+                               ^
+
+INFO:     127.0.0.1:52478 - "POST /schema/search HTTP/1.1" 200 OK
+14:16:40  WARNING   dbanalyser.schema_intel.repository — get_embeddings_for_db failed: column "parent_name" does not exist
+LINE 3:                        parent_name, definition, embedding_js...
+                               ^
+
+INFO:     127.0.0.1:52478 - "POST /schema/search HTTP/1.1" 200 OK
+14:16:41  WARNING   dbanalyser.schema_intel.repository — get_embeddings_for_db failed: column "parent_name" does not exist
+LINE 3:                        parent_name, definition, embedding_js...
+                               ^
+
+INFO:     127.0.0.1:52478 - "POST /schema/search HTTP/1.1" 200 OK
+14:16:42  WARNING   dbanalyser.schema_intel.repository — get_embeddings_for_db failed: column "parent_name" does not exist
+LINE 3:                        parent_name, definition, embedding_js...
+                               ^
+
+INFO:     127.0.0.1:52478 - "POST /schema/search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51947 - "OPTIONS /schema/?db_registry_id=6&object_type=table&limit=1000 HTTP/1.1" 200 OK
+14:16:53  WARNING   dbanalyser.schema_intel.repository — list_schema_objects failed: column "parent_name" does not exist
+LINE 3:                        object_name, parent_name, data_type, ...
+                                            ^
+
+INFO:     127.0.0.1:51947 - "GET /schema/?db_registry_id=6&object_type=table&limit=1000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53993 - "OPTIONS /reports/health-gate/71 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53993 - "OPTIONS /trend/all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53993 - "GET /runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53993 - "OPTIONS /audit/?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53993 - "GET /reports/health-gate/71 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:53993 - "GET /trend/all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53993 - "GET /audit/?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53993 - "GET /reports/health-gate/71 HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:53993 - "GET /databases HTTP/1.1" 200 OK

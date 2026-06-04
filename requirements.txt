@@ -1,0 +1,40 @@
+# Core API & Configuration
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+PyYAML>=6.0.0
+
+# CLI & Terminal Output
+click>=8.0.0
+rich>=13.0.0
+
+# Security & Authentication
+PyJWT>=2.8.0
+bcrypt>=4.1.0
+passlib>=1.7.4
+
+# Database & ORM
+SQLAlchemy>=2.0.0
+psycopg2-binary>=2.9.0
+
+# Multi-Database Drivers (Uncomment the ones you actively scan)
+pyodbc>=5.0.0
+pymssql>=2.2.0
+mysql-connector-python>=8.0.0
+oracledb>=2.0.0
+snowflake-connector-python>=3.0.0
+
+# Data Processing & Reporting
+pandas>=2.0.0
+openpyxl>=3.1.0
+reportlab>=4.0.0
+
+# Background Jobs & External Requests
+apscheduler>=3.10.0
+httpx>=0.27.0
+
+# AI & Machine Learning
+anthropic>=0.30.0
+sentence-transformers>=2.7.0
+
