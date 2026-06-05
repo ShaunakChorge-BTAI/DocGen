@@ -115,7 +115,7 @@ export default function SchemaQualityPage() {
     objChartData = Object.entries(counts).map(([k, v]) => ({ name: k, count: v }))
   }
 
-  const totalObjects = effectiveSummary?.total ?? Object.values(objCounts).reduce((a: any, b: any) => a + b, 0) || allObjects.length
+  const totalObjects = (effectiveSummary?.total ?? Object.values(objCounts).reduce((a: any, b: any) => a + b, 0)) || allObjects.length
 
   // Run object count for subtitle (from actual run, more accurate than schema_objects)
   const currentRun = runData?.[0]
