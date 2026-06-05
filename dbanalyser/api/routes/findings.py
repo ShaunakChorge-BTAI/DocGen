@@ -9,7 +9,7 @@ from fastapi import APIRouter, HTTPException, Query
 from dbanalyser.api.auth import AuthDep
 from dbanalyser.api.schemas import FindingListResponse
 from dbanalyser.db.connection import get_cursor
-from dbanalyser.db.repository import get_findings
+from dbanalyser.db.repository import get_findings, get_finding_by_id
 
 router = APIRouter(prefix="/findings", tags=["Findings"])
 
@@ -70,3 +70,34 @@ def findings_summary(run_id: int) -> Dict[str, Any]:
         }
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
+
+@router.get("/{finding_id}", dependencies=[AuthDep])
+def get_finding_detail(finding_id: int):
+    """Get single finding by ID."""
+    try:
+        finding = get_finding_by_id(finding_id)
+        if not finding:
+            raise HTTPException(status_code=404, detail="Finding not found")
+        # Ensure we return a structured payload matching the frontend's expectations
+        return finding
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+@router.patch("/{finding_id}/status", dependencies=[AuthDep])
+def patch_finding_status(finding_id: int, body: dict):
+    """Update finding status."""
+    try:
+        from dbanalyser.db.repository import update_finding_status
+        new_status = body.get("new_status")
+        if new_status:
+            update_finding_status(finding_id, new_status)
+        return {"status": "ok"}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+@router.post("/{finding_id}/comments", dependencies=[AuthDep])
+def post_finding_comment(finding_id: int, body: dict):
+    """Add finding comment (mocked)."""
+    return {"status": "ok"}

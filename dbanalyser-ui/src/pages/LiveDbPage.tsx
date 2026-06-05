@@ -56,8 +56,15 @@ export default function LiveDbPage() {
   ])
   const [liveStatus, setLiveStatus] = useState<any>(null)
 
+  const [selectedDb, setSelectedDb] = useState<string>('')
+  const [selectedRun, setSelectedRun] = useState<number | null>(null)
+
   const queryClient = useQueryClient()
-  const { selectedDb, selectedRun } = useOutletContext<{ selectedDb: string | null; selectedRun: number | null }>()
+  const { selectedDb: ctxDb } = useOutletContext<{ selectedDb: string | null }>()
+
+  useEffect(() => {
+    if (ctxDb && !selectedDb) setSelectedDb(ctxDb)
+  }, [ctxDb, selectedDb])
 
   // Databases
   const { data: dbList = [] } = useQuery({
@@ -74,6 +81,15 @@ export default function LiveDbPage() {
 
   // Use live_db runs preferentially
   const liveRuns  = runs.filter(r => r.source_mode === 'live_db')
+
+  useEffect(() => {
+    if (runs.length > 0 && selectedRun === null) {
+      setSelectedRun(liveRuns[0]?.id ?? runs[0]?.id)
+    } else if (runs.length === 0 && selectedRun !== null) {
+      setSelectedRun(null)
+    }
+  }, [runs, liveRuns, selectedRun])
+
   const effectiveRunId = selectedRun ?? liveRuns[0]?.id ?? runs[0]?.id ?? null
   const selectedRunObj = runs.find(r => r.id === effectiveRunId)
 
@@ -86,9 +102,9 @@ export default function LiveDbPage() {
   const allFindings: any[] = findingsData?.findings ?? []
 
   // ── Derived ──────────────────────────────────────────────────────────────
-  const perfFindings   = allFindings.filter(f => f.category === 'Performance')
-  const safetyFindings = allFindings.filter(f => f.category === 'Data Safety')
-  const bpFindings     = allFindings.filter(f => f.category === 'Best Practices')
+  const perfFindings   = allFindings.filter(f => f.category === 'Performance' || f.rule_id?.startsWith('PERF'))
+  const safetyFindings = allFindings.filter(f => f.category === 'Data Safety' || f.rule_id?.startsWith('DS'))
+  const bpFindings     = allFindings.filter(f => f.category === 'Best Practices' || f.rule_id?.startsWith('BP') || f.rule_id?.startsWith('MNT'))
 
   // Filter findings based on KPI filter
   const displayFindings = kpiFilter
@@ -194,11 +210,47 @@ export default function LiveDbPage() {
   return (
     <div>
       <PageHeader
-        title="Live DB"
-        subtitle={selectedRunObj
-          ? `${selectedRunObj.label} · ${selectedRunObj.source_mode} · ${allFindings.length} findings`
-          : 'Performance, index analysis, and data safety findings from live database scans'}
+        title="Live Database Monitoring"
+        subtitle="Real-time performance, metadata changes, and execution metrics from live SQL connections"
       />
+
+      {/* ── DB & Run Filter dropdowns ──────────────────────────────────────────────── */}
+      <div className="flex flex-wrap items-center gap-6 mb-4">
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-on-surface-variant font-medium uppercase tracking-wide">Database:</span>
+          <select
+            value={selectedDb}
+            onChange={(e) => {
+              setSelectedDb(e.target.value)
+              setSelectedRun(null)
+            }}
+            className="text-sm bg-surface-low rounded-lg px-3 py-1.5 text-on-surface border-0 outline-none focus:ring-2 focus:ring-primary/20"
+          >
+            <option value="">All Databases</option>
+            {dbList.map((db: any) => (
+              <option key={db.name} value={db.name}>{db.name}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-on-surface-variant font-medium uppercase tracking-wide">Run:</span>
+          <select
+            value={selectedRun ?? ''}
+            onChange={(e) => setSelectedRun(e.target.value ? parseInt(e.target.value) : null)}
+            className="text-sm bg-surface-low rounded-lg px-3 py-1.5 text-on-surface border-0 outline-none focus:ring-2 focus:ring-primary/20"
+            disabled={!selectedDb}
+          >
+            <option value="">Latest Run</option>
+            {runs.map((r: any) => (
+              <option key={r.id} value={r.id}>
+                Run #{r.id} - {r.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       <TabBar tabs={TABS} active={tab} onChange={setTab} />
 
       {/* ── OVERVIEW ─────────────────────────────────────────────────── */}

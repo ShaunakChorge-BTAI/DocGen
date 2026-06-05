@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useOutletContext } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { dbApi } from '../lib/api'
 import PageHeader from '../components/PageHeader'
 
@@ -8,7 +8,7 @@ const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 export default function RunAssessmentPage() {
   const qc = useQueryClient()
-  const { setSelectedDb, setSelectedRun } = useOutletContext<any>()
+  const navigate = useNavigate()
 
   const [selectedDb, setDb]   = useState('')
   const [label, setLabel]     = useState('')
@@ -70,11 +70,10 @@ export default function RunAssessmentPage() {
             setDone(true)
             setRunning(false)
 
-            // Refresh queries and auto-select the new run
+            // Refresh queries and auto-navigate to the new run
             qc.invalidateQueries()
-            if (s.run_id && typeof setSelectedDb === 'function') {
-              setSelectedDb(selectedDb)
-              setSelectedRun(s.run_id)
+            if (s.run_id) {
+              navigate(`/analysis?run_id=${s.run_id}`)
             }
           } else if (s.status === 'failed') {
             clearInterval(pollRef.current!)

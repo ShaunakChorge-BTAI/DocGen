@@ -467,6 +467,12 @@ def bulk_insert_findings(run_int_id: int, findings: List[Finding]) -> None:
         psycopg2.extras.execute_values(conn.cursor(), sql, rows, page_size=500)
 
 
+def get_finding_by_id(finding_id: int) -> Optional[Dict[str, Any]]:
+    with get_cursor() as cur:
+        cur.execute("SELECT * FROM findings WHERE id = %s", (finding_id,))
+        row = cur.fetchone()
+        return dict(row) if row else None
+
 def get_findings(run_int_id: int,
                  severity: Optional[str] = None,
                  category: Optional[str] = None,

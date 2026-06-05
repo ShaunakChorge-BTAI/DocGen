@@ -57,7 +57,10 @@ def optimize_object(body: OptimizeRequest):
             optimization_mode = body.mode,
         )
     except Exception as exc:
-        raise HTTPException(500, f"Optimization failed: {exc}")
+        return OptimizeResponse(
+            object_name  = body.object_name,
+            error        = f"Optimization failed: {exc}",
+        )
 
     if result.error:
         return OptimizeResponse(

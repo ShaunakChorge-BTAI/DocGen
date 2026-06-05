@@ -1,14 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../lib/auth'
 
-interface Props {
-  selectedDb:    string | null
-  setSelectedDb: (v: string | null) => void
-  selectedRun:   number | null
-  setSelectedRun:(v: number | null) => void
-}
-
-export default function TopBar({ selectedDb, setSelectedDb, selectedRun, setSelectedRun }: Props) {
+export default function TopBar() {
   const { user, logout } = useAuth()
   const qc = useQueryClient()
 

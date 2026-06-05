@@ -86,15 +86,15 @@ function FindingsTable({ findings, emptyMsg }: { findings: any[]; emptyMsg: stri
 
 export default function CompliancePage() {
   const [tab, setTab] = useState('overview')
-  const outlet = useOutletContext<{ selectedDb: string | null; selectedRun: number | null }>()
-
-  const [selectedDb, setSelectedDb] = useState<string | null>(null)
+  const [selectedDb, setSelectedDb] = useState<string>('')
   const [selectedRun, setSelectedRun] = useState<number | null>(null)
+  const [selectedSeverity, setSelectedSeverity] = useState<string>('')
+
+  const { selectedDb: ctxDb } = useOutletContext<{ selectedDb: string | null }>()
 
   useEffect(() => {
-    if (outlet?.selectedDb && !selectedDb) setSelectedDb(outlet.selectedDb)
-    if (outlet?.selectedRun && !selectedRun) setSelectedRun(outlet.selectedRun)
-  }, [outlet])
+    if (ctxDb && !selectedDb) setSelectedDb(ctxDb)
+  }, [ctxDb, selectedDb])
 
   const { data: dbsData } = useQuery({
     queryKey: ['databases'],
@@ -109,27 +109,39 @@ export default function CompliancePage() {
   const runs = runData ?? []
 
   useEffect(() => {
-    if (selectedDb && runs.length > 0) {
-      if (!runs.find(r => r.id === selectedRun)) {
-        setSelectedRun(runs[0].id)
-      }
-    } else if (!selectedDb && !selectedRun) {
+    if (runs.length > 0 && selectedRun === null) {
+      setSelectedRun(runs[0].id)
+    } else if (runs.length === 0 && selectedRun !== null) {
       setSelectedRun(null)
     }
-  }, [selectedDb, runs])
+  }, [runs, selectedRun])
 
-  const effectiveRunId = selectedRun
+  const effectiveRunId = selectedRun ?? runs[0]?.id ?? null
 
   const { data: findingsData } = useQuery({
     queryKey: ['findings', effectiveRunId],
     queryFn:  () => findingsApi.byRun(effectiveRunId!).then(r => r.data),
     enabled:  !!effectiveRunId,
   })
-  const allFindings: any[] = findingsData?.findings ?? []
+  const allFindingsRaw: any[] = findingsData?.findings ?? []
 
-  // Filter by compliance categories
-  const compFindings = allFindings.filter(f => COMPLIANCE_CATEGORIES.includes(f.category))
-  const byCategory   = (cat: string) => allFindings.filter(f => f.category === cat)
+  // Filter by severity if selected
+  const allFindings = selectedSeverity
+    ? allFindingsRaw.filter(f => f.severity === selectedSeverity)
+    : allFindingsRaw
+
+  // Remap categories for Dangerous SQL and Security
+  const compFindings = allFindings.map(f => {
+    if (f.rule_id?.startsWith('DNG')) {
+      return { ...f, mapped_category: 'Dangerous SQL' }
+    }
+    if (f.category === 'Security' || f.rule_id?.startsWith('SEC')) {
+      return { ...f, mapped_category: 'Security' }
+    }
+    return { ...f, mapped_category: f.category }
+  }).filter(f => COMPLIANCE_CATEGORIES.includes(f.mapped_category))
+
+  const byCategory   = (cat: string) => compFindings.filter(f => f.mapped_category === cat)
 
   const soxFindings      = byCategory('Compliance-SOX')
   const gdprFindings     = byCategory('Compliance-GDPR')
@@ -157,6 +169,58 @@ export default function CompliancePage() {
         title="Compliance"
         subtitle={`${compFindings.length} compliance findings · SOX · GDPR · RBI · Security`}
       />
+      {/* ── DB, Run, & Severity Filter dropdowns ──────────────────────────────────────────────── */}
+      <div className="flex flex-wrap items-center gap-6 mb-4">
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-on-surface-variant font-medium uppercase tracking-wide">Database:</span>
+          <select
+            value={selectedDb}
+            onChange={(e) => {
+              setSelectedDb(e.target.value)
+              setSelectedRun(null)
+            }}
+            className="text-sm bg-surface-low rounded-lg px-3 py-1.5 text-on-surface border-0 outline-none focus:ring-2 focus:ring-primary/20"
+          >
+            <option value="">All Databases</option>
+            {databases.map((db: any) => (
+              <option key={db.name} value={db.name}>{db.name}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-on-surface-variant font-medium uppercase tracking-wide">Run:</span>
+          <select
+            value={selectedRun ?? ''}
+            onChange={(e) => setSelectedRun(e.target.value ? parseInt(e.target.value) : null)}
+            className="text-sm bg-surface-low rounded-lg px-3 py-1.5 text-on-surface border-0 outline-none focus:ring-2 focus:ring-primary/20"
+            disabled={!selectedDb}
+          >
+            <option value="">Latest Run</option>
+            {runs.map((r: any) => (
+              <option key={r.id} value={r.id}>
+                Run #{r.id} - {r.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-on-surface-variant font-medium uppercase tracking-wide">Severity:</span>
+          <select
+            value={selectedSeverity}
+            onChange={(e) => setSelectedSeverity(e.target.value)}
+            className="text-sm bg-surface-low rounded-lg px-3 py-1.5 text-on-surface border-0 outline-none focus:ring-2 focus:ring-primary/20"
+          >
+            <option value="">All Severities</option>
+            <option value="Critical">Critical</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+          </select>
+        </div>
+      </div>
+
       <TabBar tabs={TABS} active={tab} onChange={setTab} />
 
       {/* Selectors */}

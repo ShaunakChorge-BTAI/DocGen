@@ -25,8 +25,7 @@ interface Database {
 }
 
 export default function ObjectDependenciesPage() {
-  const { selectedDb } = useOutletContext<any>()
-
+  const [selectedDb, setSelectedDb] = useState<string>('')
   const [selectedObjectType, setSelectedObjectType] = useState<string>('')
   const [selectedObject, setSelectedObject] = useState<string>('')
   const [searchQuery, setSearchQuery] = useState<string>('')
@@ -119,6 +118,27 @@ export default function ObjectDependenciesPage() {
       <div className="grid grid-cols-12 gap-6">
         {/* Selection Panel */}
         <div className="col-span-4 space-y-4">
+          {/* Object Type Selector */}
+          {/* Database Selector */}
+          <div className="bg-surface-lowest rounded-xl p-5 shadow-card">
+            <label className="text-sm font-semibold text-on-surface block mb-3">Database</label>
+            <select
+              value={selectedDb}
+              onChange={(e) => {
+                setSelectedDb(e.target.value)
+                setSelectedObjectType('')
+                setSelectedObject('')
+                setSearchQuery('')
+              }}
+              className="w-full bg-surface-low rounded-lg px-3 py-2.5 text-sm text-on-surface border-0 outline-none focus:ring-2 focus:ring-primary/20"
+            >
+              <option value="">Select a database…</option>
+              {(databases || []).map((db: any) => (
+                <option key={db.name} value={db.name}>{db.name}</option>
+              ))}
+            </select>
+          </div>
+
           {/* Object Type Selector */}
           <div className="bg-surface-lowest rounded-xl p-5 shadow-card">
             <label className="text-sm font-semibold text-on-surface block mb-3">Object Type</label>

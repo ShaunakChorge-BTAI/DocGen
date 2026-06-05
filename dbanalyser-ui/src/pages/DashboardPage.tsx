@@ -192,8 +192,8 @@ function RunsPanel({
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function DashboardPage() {
   const [tab, setTab]         = useState('overview')
-  const { selectedDb, selectedRun, setSelectedDb, setSelectedRun } =
-    useOutletContext<any>()
+  const [selectedDb, setSelectedDb] = useState<string | null>(null)
+  const [selectedRun, setSelectedRun] = useState<number | null>(null)
   const nav                   = useNavigate()
   const qc                    = useQueryClient()
   const dbSectionRef          = useRef<HTMLDivElement>(null)

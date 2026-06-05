@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useOutletContext } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, CartesianGrid } from 'recharts'
@@ -20,14 +20,38 @@ export default function ReportsPage() {
   const [tab, setTab]       = useState('download')
   const [fmt, setFmt]       = useState('pdf')
   const [downloading, setDownloading] = useState(false)
-  const { selectedRun }     = useOutletContext<{ selectedDb: string | null; selectedRun: number | null }>()
+  
+  const [selectedDb, setSelectedDb] = useState<string>('')
+  const [selectedRun, setSelectedRun] = useState<number | null>(null)
+
+  const { selectedDb: ctxDb } = useOutletContext<{ selectedDb: string | null }>()
+
+  // Sync DB from context
+  useEffect(() => {
+    if (ctxDb && !selectedDb) setSelectedDb(ctxDb)
+  }, [ctxDb, selectedDb])
+
+  // Databases
+  const { data: dbList = [] } = useQuery({
+    queryKey: ['databases', false],
+    queryFn:  () => api.get('/db-registry/').then(r => r.data as any[]),
+  })
 
   // Runs list
   const { data: runData } = useQuery({
-    queryKey: ['runs'],
-    queryFn:  () => runApi.list().then(r => r.data.runs),
+    queryKey: ['runs', selectedDb],
+    queryFn:  () => api.get('/runs', { params: selectedDb ? { db_name: selectedDb } : {} }).then(r => r.data.runs),
   })
   const runs: any[] = runData ?? []
+
+  useEffect(() => {
+    if (runs.length > 0 && selectedRun === null) {
+      setSelectedRun(runs[0].id)
+    } else if (runs.length === 0 && selectedRun !== null) {
+      setSelectedRun(null)
+    }
+  }, [runs, selectedRun])
+
   const effectiveRunId = selectedRun ?? runs[0]?.id ?? null
   const selectedRunObj = runs.find(r => r.id === effectiveRunId)
 
@@ -95,6 +119,44 @@ export default function ReportsPage() {
   return (
     <div>
       <PageHeader title="Reports" subtitle="Download reports, check health gates, and view trend analysis" />
+
+      {/* ── DB & Run Filter dropdowns ──────────────────────────────────────────────── */}
+      <div className="flex flex-wrap items-center gap-6 mb-4">
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-on-surface-variant font-medium uppercase tracking-wide">Database:</span>
+          <select
+            value={selectedDb}
+            onChange={(e) => {
+              setSelectedDb(e.target.value)
+              setSelectedRun(null)
+            }}
+            className="text-sm bg-surface-low rounded-lg px-3 py-1.5 text-on-surface border-0 outline-none focus:ring-2 focus:ring-primary/20"
+          >
+            <option value="">All Databases</option>
+            {dbList.map((db: any) => (
+              <option key={db.name} value={db.name}>{db.name}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-on-surface-variant font-medium uppercase tracking-wide">Run:</span>
+          <select
+            value={selectedRun ?? ''}
+            onChange={(e) => setSelectedRun(e.target.value ? parseInt(e.target.value) : null)}
+            className="text-sm bg-surface-low rounded-lg px-3 py-1.5 text-on-surface border-0 outline-none focus:ring-2 focus:ring-primary/20"
+            disabled={!selectedDb}
+          >
+            <option value="">Latest Run</option>
+            {runs.map((r: any) => (
+              <option key={r.id} value={r.id}>
+                Run #{r.id} - {r.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       <TabBar tabs={TABS} active={tab} onChange={setTab} />
 
       {/* ── Download Report ────────────────────────────────────────────── */}

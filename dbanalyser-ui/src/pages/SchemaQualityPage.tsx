@@ -22,13 +22,14 @@ const schemaApi = {
 export default function SchemaQualityPage() {
   const [tab, setTab]         = useState('overview')
   const [dbFilter, setDbFilter] = useState<string>('')
-  const [issueTypeFilter, setIssueTypeFilter] = useState<'all' | 'pk' | 'indexes' | 'columns' | 'orphans'>('all')  // PHASE 1: Issue type filter
-  const { selectedDb, selectedRun } = useOutletContext<{ selectedDb: string | null; selectedRun: number | null }>()
+  const [selectedRun, setSelectedRun] = useState<number | null>(null)
+  const [issueTypeFilter, setIssueTypeFilter] = useState<'all' | 'pk' | 'indexes' | 'columns' | 'orphans'>('all')
 
-  // Sync dbFilter with selectedDb from TopBar when it changes
+  const { selectedDb } = useOutletContext<{ selectedDb: string | null }>()
+
   useEffect(() => {
-    if (selectedDb) setDbFilter(selectedDb)
-  }, [selectedDb])
+    if (selectedDb && !dbFilter) setDbFilter(selectedDb)
+  }, [selectedDb, dbFilter])
 
   // All registered databases for the filter dropdown
   const { data: dbListData } = useQuery({
@@ -60,7 +61,18 @@ export default function SchemaQualityPage() {
     queryFn:  () => api.get<{ runs: any[] }>('/runs', { params: dbFilter ? { db_name: dbFilter } : {} })
                        .then(r => r.data.runs),
   })
-  const effectiveRunId = selectedRun ?? runData?.[0]?.id ?? null
+  const runs = runData ?? []
+
+  // Auto-select first run if none selected
+  useEffect(() => {
+    if (runs.length > 0 && selectedRun === null) {
+      setSelectedRun(runs[0].id)
+    } else if (runs.length === 0 && selectedRun !== null) {
+      setSelectedRun(null)
+    }
+  }, [runs, selectedRun])
+
+  const effectiveRunId = selectedRun ?? runs[0]?.id ?? null
 
   const { data: findingsData } = useQuery({
     queryKey: ['findings', effectiveRunId],
@@ -128,19 +140,41 @@ export default function SchemaQualityPage() {
         subtitle={`${runObjectCount} objects · ${effectiveRunId ? `Run #${effectiveRunId}` : 'Select a run'}${dbFilter ? ` · ${dbFilter}` : ''}`}
       />
 
-      {/* ── DB Filter dropdown (QW-6: converted from pills for better space usage) ──────────────────────────────────────────────── */}
-      <div className="flex items-center gap-3 mb-4">
-        <span className="text-xs text-on-surface-variant font-medium uppercase tracking-wide">Database:</span>
-        <select
-          value={dbFilter}
-          onChange={(e) => setDbFilter(e.target.value)}
-          className="text-sm bg-surface-low rounded-lg px-3 py-1.5 text-on-surface border-0 outline-none focus:ring-2 focus:ring-primary/20"
-        >
-          <option value="">All Databases</option>
-          {dbList.map((db: any) => (
-            <option key={db.name} value={db.name}>{db.name}</option>
-          ))}
-        </select>
+      {/* ── DB & Run Filter dropdowns ──────────────────────────────────────────────── */}
+      <div className="flex flex-wrap items-center gap-6 mb-4">
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-on-surface-variant font-medium uppercase tracking-wide">Database:</span>
+          <select
+            value={dbFilter}
+            onChange={(e) => {
+              setDbFilter(e.target.value)
+              setSelectedRun(null) // Reset run when DB changes
+            }}
+            className="text-sm bg-surface-low rounded-lg px-3 py-1.5 text-on-surface border-0 outline-none focus:ring-2 focus:ring-primary/20"
+          >
+            <option value="">All Databases</option>
+            {dbList.map((db: any) => (
+              <option key={db.name} value={db.name}>{db.name}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-on-surface-variant font-medium uppercase tracking-wide">Run:</span>
+          <select
+            value={selectedRun ?? ''}
+            onChange={(e) => setSelectedRun(e.target.value ? parseInt(e.target.value) : null)}
+            className="text-sm bg-surface-low rounded-lg px-3 py-1.5 text-on-surface border-0 outline-none focus:ring-2 focus:ring-primary/20"
+            disabled={!dbFilter}
+          >
+            <option value="">Latest Run</option>
+            {runs.map((r: any) => (
+              <option key={r.id} value={r.id}>
+                Run #{r.id} - {r.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <TabBar tabs={TABS} active={tab} onChange={setTab} />
