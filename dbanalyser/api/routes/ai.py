@@ -126,5 +126,6 @@ def ai_health_status():
         "ollama_url": OLLAMA_BASE_URL,
         "model": LLM_MODEL,
         "latency_ms": res.latency_ms,
-        "error": res.error
+        "error": res.error,
+        "ollama_available": status == "healthy"
     }
