@@ -1,9 +1,0 @@
-DBAnalyser REST API  -> http://0.0.0.0:8000/docs
-  Auth disabled — open access (local use only)
-INFO:     Started server process [32200]
-INFO:     Waiting for application startup.
-08:41:35  INFO      dbanalyser.api — PostgreSQL pool initialised successfully.
-INFO:     Application startup complete.
-ERROR:    [Errno 10048] error while attempting to bind on address ('0.0.0.0', 8000): [winerror 10048] only one usage of each socket address (protocol/network address/port) is normally permitted
-INFO:     Waiting for application shutdown.
-INFO:     Application shutdown complete.
