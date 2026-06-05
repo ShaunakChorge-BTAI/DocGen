@@ -466,6 +466,20 @@ def load_config(path: str | Path = "analysis_config.yaml") -> Settings:
     """
     raw = _load_yaml(path)
 
+    # Load local overrides if they exist
+    local_path = Path(path).parent / "analysis_config_local.yaml"
+    if local_path.exists():
+        local_raw = _load_yaml(local_path)
+        # Deep merge local_raw into raw
+        def deep_merge(dict1, dict2):
+            for k, v in dict2.items():
+                if k in dict1 and isinstance(dict1[k], dict) and isinstance(v, dict):
+                    deep_merge(dict1[k], v)
+                else:
+                    dict1[k] = v
+        deep_merge(raw, local_raw)
+
+
     # Top-level YAML key aliases (old → new)
     _top_aliases = {
         "data_source": "source",

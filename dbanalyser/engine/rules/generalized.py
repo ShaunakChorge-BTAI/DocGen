@@ -65,6 +65,10 @@ class UniversalEmptyCatchBlockRule(BaseRule):
         src = self._safe_source(obj)
         # Matches empty BEGIN CATCH ... END CATCH or EXCEPTION WHEN ... THEN END
         for m in self.find_pattern(r'\b(CATCH|EXCEPTION)\b[\s\n]*(END\b|WHEN\s+OTHERS\s+THEN\s+END\b)', src):
+            # Avoid matching END CATCH followed by END (false positive)
+            pre_text = src[:m.start()].rstrip()
+            if pre_text.lower().endswith("end"):
+                continue
             ln = self.line_of(m, src)
             findings.append(RuleFinding(
                 rule_id=self.rule_id, category=self.category, severity="High",

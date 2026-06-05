@@ -68,6 +68,13 @@ def scan_live_metrics(db_name: str, metric_types: Optional[List[str]] = None):
         if not driver.test_connection():
             raise HTTPException(status_code=400, detail="Failed to connect to database. Check credentials.")
 
+        if db_entry.db_type == 'postgresql':
+            return {
+                'message': "Not applicable for PostgreSQL",
+                'not_supported': True,
+                'reason': "Metric uses SQL Server DMV syntax. Live DB metrics are not fully supported for PostgreSQL yet."
+            }
+
         # Get monitor adapter and capture metrics
         monitor = get_monitor(db_entry.db_type, driver)
         timestamp_iso = datetime.utcnow().isoformat()
@@ -372,6 +379,12 @@ def get_database_live_status(db_name: str):
         driver = get_driver(db_entry)
         if not driver.test_connection():
             raise HTTPException(status_code=400, detail="Failed to connect to database. Check credentials.")
+
+        if db_entry.db_type == 'postgresql':
+            return {
+                'not_supported': True,
+                'reason': "Metric uses SQL Server DMV syntax. Live DB metrics are not fully supported for PostgreSQL yet."
+            }
 
         # Get monitor adapter and capture key metrics
         monitor = get_monitor(db_entry.db_type, driver)

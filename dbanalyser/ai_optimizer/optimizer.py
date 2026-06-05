@@ -180,77 +180,42 @@ def _optimize_with_ollama(
     t0 = time.time()
     findings = findings or []
 
-    try:
-        # Try to import requests for HTTP call to Ollama
-        import requests  # type: ignore
-    except ImportError:
-        log.warning("requests package not installed, cannot use Ollama")
+    prompt = _build_ollama_prompt(
+        object_name=object_name,
+        source_sql=source_sql,
+        schema_context=schema_context,
+        findings=findings,
+        execution_plan=execution_plan,
+    )
+
+    from dbanalyser.ai_optimizer.llm_client import call_llm, LLM_MODEL
+    
+    llm_res = call_llm(prompt=prompt, timeout=30)
+    
+    if llm_res.error:
+        log.warning(f"Ollama optimization failed: {llm_res.error}")
         return None
-
-    # Get Ollama config
-    try:
-        from dbanalyser.config import load_config
-        cfg = load_config()
-        ollama_base_url = getattr(cfg.ai_optimizer, "ollama_base_url",
-                                  "http://172.19.25.94:11434")
-        ollama_model = getattr(cfg.ai_optimizer, "ollama_model", "llama3.1")
-    except Exception:
-        ollama_base_url = "http://172.19.25.94:11434"
-        ollama_model = "llama3.1"
-
+        
     optimized_sql = source_sql
     reasoning = ""
     confidence = 0.0
-    error = None
-
-    try:
-        prompt = _build_ollama_prompt(
-            object_name=object_name,
-            source_sql=source_sql,
-            schema_context=schema_context,
-            findings=findings,
-            execution_plan=execution_plan,
-        )
-
-        # Call Ollama API
-        response = requests.post(
-            f"{ollama_base_url}/api/generate",
-            json={
-                "model": ollama_model,
-                "prompt": prompt,
-                "temperature": 0.1,
-                "num_predict": min(max_tokens, 2048),
-                "stream": False,
-            },
-            timeout=30,
-        )
-        response.raise_for_status()
-
-        raw = response.json().get("response", "").strip()
-
-        # Parse response (attempt JSON extraction)
-        if "{" in raw:
-            try:
-                json_part = raw[raw.index("{"):raw.rindex("}")+1]
-                data = json.loads(json_part)
-                optimized_sql = data.get("optimized_sql", source_sql)
-                reasoning = data.get("reasoning", "")
-                confidence = float(data.get("confidence_score", 0.6))
-            except (json.JSONDecodeError, ValueError):
-                reasoning = raw
-                confidence = 0.5
-        else:
+    
+    raw = (llm_res.text or "").strip()
+    
+    # Parse response (attempt JSON extraction)
+    if "{" in raw:
+        try:
+            json_part = raw[raw.index("{"):raw.rindex("}")+1]
+            data = json.loads(json_part)
+            optimized_sql = data.get("optimized_sql", source_sql)
+            reasoning = data.get("reasoning", "")
+            confidence = float(data.get("confidence_score", 0.6))
+        except (json.JSONDecodeError, ValueError):
             reasoning = raw
             confidence = 0.5
-
-    except requests.exceptions.RequestException as exc:
-        error = f"Ollama connection failed: {exc}"
-        log.warning(error)
-        return None
-    except Exception as exc:
-        error = str(exc)
-        log.error("Ollama optimization failed for %s: %s", object_name, exc)
-        return None
+    else:
+        reasoning = raw
+        confidence = 0.5
 
     elapsed = round(time.time() - t0, 2)
     result = OptimizationResult(
@@ -262,10 +227,10 @@ def _optimize_with_ollama(
         execution_plan_used=execution_plan,
         findings_used=findings,
         confidence_score=confidence,
-        model_used=ollama_model,
+        model_used=LLM_MODEL,
         tokens_used=0,  # Ollama doesn't track tokens easily
         elapsed_sec=elapsed,
-        error=error,
+        error=None,
     )
 
     # Persist to DB

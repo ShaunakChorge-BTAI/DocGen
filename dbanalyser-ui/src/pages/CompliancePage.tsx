@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useOutletContext } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis } from 'recharts'
-import { runApi, findingsApi } from '../lib/api'
+import { runApi, findingsApi, dbApi } from '../lib/api'
 import PageHeader from '../components/PageHeader'
 import TabBar from '../components/TabBar'
 import KpiCard from '../components/KpiCard'
@@ -86,13 +86,39 @@ function FindingsTable({ findings, emptyMsg }: { findings: any[]; emptyMsg: stri
 
 export default function CompliancePage() {
   const [tab, setTab] = useState('overview')
-  const { selectedRun } = useOutletContext<{ selectedDb: string | null; selectedRun: number | null }>()
+  const outlet = useOutletContext<{ selectedDb: string | null; selectedRun: number | null }>()
+
+  const [selectedDb, setSelectedDb] = useState<string | null>(null)
+  const [selectedRun, setSelectedRun] = useState<number | null>(null)
+
+  useEffect(() => {
+    if (outlet?.selectedDb && !selectedDb) setSelectedDb(outlet.selectedDb)
+    if (outlet?.selectedRun && !selectedRun) setSelectedRun(outlet.selectedRun)
+  }, [outlet])
+
+  const { data: dbsData } = useQuery({
+    queryKey: ['databases'],
+    queryFn: () => dbApi.list().then(r => r.data),
+  })
+  const databases: any[] = dbsData ?? []
 
   const { data: runData } = useQuery({
-    queryKey: ['runs'],
-    queryFn:  () => runApi.list().then(r => r.data.runs ?? []),
+    queryKey: ['runs', selectedDb],
+    queryFn:  () => runApi.list(selectedDb || undefined).then(r => r.data.runs ?? []),
   })
-  const effectiveRunId = selectedRun ?? runData?.[0]?.id ?? null
+  const runs = runData ?? []
+
+  useEffect(() => {
+    if (selectedDb && runs.length > 0) {
+      if (!runs.find(r => r.id === selectedRun)) {
+        setSelectedRun(runs[0].id)
+      }
+    } else if (!selectedDb && !selectedRun) {
+      setSelectedRun(null)
+    }
+  }, [selectedDb, runs])
+
+  const effectiveRunId = selectedRun
 
   const { data: findingsData } = useQuery({
     queryKey: ['findings', effectiveRunId],
@@ -132,6 +158,43 @@ export default function CompliancePage() {
         subtitle={`${compFindings.length} compliance findings · SOX · GDPR · RBI · Security`}
       />
       <TabBar tabs={TABS} active={tab} onChange={setTab} />
+
+      {/* Selectors */}
+      <div className="bg-surface-lowest rounded-xl shadow-card p-4 mb-6 mt-4 flex gap-4 items-end">
+        <div className="flex-1">
+          <label className="text-sm font-medium text-on-surface block mb-1">Select Database</label>
+          <select
+            value={selectedDb ?? ''}
+            onChange={(e) => setSelectedDb(e.target.value || null)}
+            className="w-full bg-surface-low border border-surface-variant rounded-lg px-3 py-2 text-on-surface"
+          >
+            <option value="">All Databases</option>
+            {databases.map(db => (
+              <option key={db.id} value={db.name}>{db.name}</option>
+            ))}
+          </select>
+        </div>
+        <div className="flex-1">
+          <label className="text-sm font-medium text-on-surface block mb-1">Select Run</label>
+          <select
+            value={selectedRun ?? ''}
+            onChange={(e) => setSelectedRun(e.target.value ? parseInt(e.target.value) : null)}
+            className="w-full bg-surface-low border border-surface-variant rounded-lg px-3 py-2 text-on-surface"
+            disabled={!selectedDb}
+          >
+            <option value="">Choose a run...</option>
+            {runs.length === 0 ? (
+              <option disabled>{selectedDb ? 'No runs found' : 'Select a database first'}</option>
+            ) : (
+              runs.map(run => (
+                <option key={run.id} value={run.id}>
+                  Run #{run.id} - {run.label} ({run.total_issues} findings)
+                </option>
+              ))
+            )}
+          </select>
+        </div>
+      </div>
 
       {tab === 'overview' && (
         <div className="space-y-6">

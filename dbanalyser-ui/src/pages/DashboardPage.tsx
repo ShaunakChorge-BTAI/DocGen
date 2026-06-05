@@ -90,8 +90,8 @@ function RunButton({
 
 // ── View Runs slide-over panel ────────────────────────────────────────────────
 function RunsPanel({
-  dbName, onClose, onSelectRun,
-}: { dbName: string; onClose: () => void; onSelectRun: (id: number) => void }) {
+  dbName, onClose, onSelectRun, onNavigate,
+}: { dbName: string; onClose: () => void; onSelectRun: (id: number) => void; onNavigate: (id: number) => void }) {
   const { data: runData } = useQuery({
     queryKey: ['runs', dbName],
     queryFn:  () => runApi.list(dbName).then(r => r.data.runs),
@@ -100,14 +100,14 @@ function RunsPanel({
 
   const downloadRun = async (runId: number) => {
     try {
-      const res = await fetch(`${API_BASE}/reports/download/${runId}?fmt=json`, {
+      const res = await fetch(`${API_BASE}/reports/download/${runId}?fmt=pdf`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` },
       })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const blob = await res.blob()
       const url  = URL.createObjectURL(blob)
       const a    = document.createElement('a')
-      a.href = url; a.download = `report_run${runId}.json`; a.click()
+      a.href = url; a.download = `report_run${runId}.pdf`; a.click()
       URL.revokeObjectURL(url)
     } catch (e: any) { alert(`Download failed: ${e.message}`) }
   }
@@ -167,13 +167,13 @@ function RunsPanel({
                   </div>
                   <div className="flex items-center gap-1.5 flex-shrink-0">
                     <button
-                      onClick={() => { onSelectRun(r.id); onClose() }}
+                      onClick={() => { onSelectRun(r.id); onClose(); onNavigate(r.id) }}
                       className="px-2.5 py-1.5 rounded-lg text-xs font-medium text-white"
                       style={{ background: 'linear-gradient(135deg, #630ed4, #7c3aed)' }}
                     >Select</button>
                     <button
                       onClick={() => downloadRun(r.id)}
-                      title="Download JSON report"
+                      title="Download PDF report"
                       className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-surface-low text-on-surface-variant"
                     >
                       <span className="material-symbols-outlined" style={{ fontSize: 15 }}>download</span>
@@ -232,14 +232,14 @@ export default function DashboardPage() {
 
   const downloadRunReport = async (runId: number) => {
     try {
-      const res = await fetch(`${API_BASE}/reports/download/${runId}?fmt=json`, {
+      const res = await fetch(`${API_BASE}/reports/download/${runId}?fmt=pdf`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` },
       })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const blob = await res.blob()
       const url  = URL.createObjectURL(blob)
       const a    = document.createElement('a')
-      a.href = url; a.download = `report_run${runId}.json`; a.click()
+      a.href = url; a.download = `report_run${runId}.pdf`; a.click()
       URL.revokeObjectURL(url)
     } catch (e: any) { alert(`Download failed: ${e.message}`) }
   }
@@ -251,6 +251,7 @@ export default function DashboardPage() {
         <RunsPanel
           dbName={runsPanel}
           onClose={() => setRunsPanel(null)}
+          onNavigate={(id) => nav(`/analysis?run_id=${id}`)}
           onSelectRun={(id) => {
             if (typeof setSelectedRun === 'function') setSelectedRun(id)
           }}
@@ -548,11 +549,11 @@ export default function DashboardPage() {
                     <td className="px-4 py-3">
                       <button
                         onClick={() => downloadRunReport(r.id)}
-                        title="Download JSON report"
+                        title="Download PDF report"
                         className="flex items-center gap-1 text-xs text-primary hover:underline"
                       >
                         <span className="material-symbols-outlined" style={{ fontSize: 14 }}>download</span>
-                        JSON
+                        PDF
                       </button>
                     </td>
                   </tr>

@@ -1,0 +1,19 @@
+# Local environment and databases
+analysis_config_local.yaml
+*.db
+*.sqlite
+*.sqlite3
+.env
+.env.local
+psycopg2/
+venv/
+test_scan.py
+
+# Build and cache directories
+__pycache__/
+*.pyc
+.pytest_cache/
+dbanalyser.egg-info/
+
+# Log files
+*.log

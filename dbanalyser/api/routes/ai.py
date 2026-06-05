@@ -107,3 +107,22 @@ def list_optimizations(
         optimizations=[_to_optimization_response(r) for r in rows],
         total=total,
     )
+
+
+@router.get("/health", dependencies=[AuthDep])
+def ai_health_status():
+    """Check Ollama service health status."""
+    from dbanalyser.ai_optimizer.llm_client import call_llm, OLLAMA_BASE_URL, LLM_MODEL
+    
+    # Simple prompt to test if Ollama answers quickly
+    res = call_llm(prompt="Respond exactly with 'OK'", timeout=5)
+    
+    status = "healthy" if res.text and not res.error else "unhealthy"
+    
+    return {
+        "status": status,
+        "ollama_url": OLLAMA_BASE_URL,
+        "model": LLM_MODEL,
+        "latency_ms": res.latency_ms,
+        "error": res.error
+    }

@@ -17,7 +17,7 @@ router = APIRouter(prefix="/reports", tags=["Reports"])
 @router.get("/download/{run_id}", dependencies=[AuthDep])
 def download_report(
     run_id:  int,
-    fmt:     str = Query("excel", description="excel | html | json | csv"),
+    fmt:     str = Query("pdf", description="pdf | excel | html | json | csv"),
 ):
     """
     Generate and stream a report for a given run.

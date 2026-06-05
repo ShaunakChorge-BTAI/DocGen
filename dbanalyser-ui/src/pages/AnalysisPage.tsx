@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { runApi, findingsApi, dbApi } from '../lib/api'
+import { useSearchParams } from 'react-router-dom'
+import { runApi, findingsApi, dbApi, api } from '../lib/api'
 import PageHeader from '../components/PageHeader'
 
 export default function AnalysisPage() {
+  const [searchParams, setSearchParams] = useSearchParams()
   const [selectedDb, setSelectedDb] = useState<string | null>(null)
   const [selectedRun, setSelectedRun] = useState<number | null>(null)
   const [filters, setFilters] = useState({
     severity: null,
-    status: 'Pending',
+    status: '',
     rule_id: null
   })
   const [pagination, setPagination] = useState({ limit: 50, offset: 0 })
@@ -29,27 +31,43 @@ export default function AnalysisPage() {
   })
   const runs = runsData ?? []
 
-  // Auto-select latest run (only once, when runs are first loaded)
+  // Auto-select run from URL or latest run
   useEffect(() => {
-    if (runs.length > 0 && selectedRun === null) {
+    const urlRunId = searchParams.get('run_id')
+    if (urlRunId) {
+      const id = parseInt(urlRunId, 10)
+      if (!isNaN(id) && selectedRun !== id) {
+        setSelectedRun(id)
+        // Optionally update selectedDb if we can infer it, but user can select.
+        // Clear the URL param
+        searchParams.delete('run_id')
+        setSearchParams(searchParams, { replace: true })
+      }
+    } else if (runs.length > 0 && selectedRun === null) {
       setSelectedRun(runs[0].id)
     }
-  }, [runs.length])
+  }, [runs.length, searchParams, selectedRun, setSearchParams])
 
   // When database changes, reset selected run to latest for that db (or null if none)
   useEffect(() => {
-    if (selectedDb && runs.length > 0) {
+    // Only reset if we didn't just load from URL
+    if (selectedDb && runs.length > 0 && selectedRun !== runs[0].id) {
       setSelectedRun(runs[0].id)
-    } else {
+    } else if (!selectedDb && !selectedRun) {
       setSelectedRun(null)
     }
     setPagination({ limit: 50, offset: 0 })
-  }, [selectedDb])
+  }, [selectedDb, runs])
 
   // Fetch findings with filters and pagination — API returns { findings: Finding[], total }
   const { data: findingsData, isLoading } = useQuery({
     queryKey: ['findings', selectedRun, filters, pagination],
-    queryFn:  () => findingsApi.byRun(selectedRun!).then(r => r.data),
+    queryFn:  () => findingsApi.byRun(selectedRun!, {
+      ...(filters.severity ? { severity: filters.severity } : {}),
+      ...(filters.status   ? { status:   filters.status   } : {}),
+      limit:  pagination.limit,
+      offset: pagination.offset,
+    }).then(r => r.data),
     enabled: !!selectedRun
   })
 
@@ -298,7 +316,7 @@ function FindingDetailModal({ finding, isOpen, onClose }) {
 
   const { data: details, refetch } = useQuery({
     queryKey: ['finding-detail', finding.id],
-    queryFn: () => fetch(`/api/findings/${finding.id}`).then(r => r.json()),
+    queryFn: () => api.get(`/findings/${finding.id}`).then(r => r.data),
     enabled: isOpen
   })
 
@@ -306,13 +324,9 @@ function FindingDetailModal({ finding, isOpen, onClose }) {
 
   const handleStatusChange = async () => {
     try {
-      await fetch(`/api/findings/${finding.id}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          new_status: newStatus,
-          reason: 'Status updated'
-        })
+      await api.patch(`/findings/${finding.id}/status`, {
+        new_status: newStatus,
+        reason: 'Status updated'
       })
       refetch()
     } catch (error) {
@@ -323,13 +337,9 @@ function FindingDetailModal({ finding, isOpen, onClose }) {
   const handleAddComment = async () => {
     if (!newComment.trim()) return
     try {
-      await fetch(`/api/findings/${finding.id}/comments`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          comment_text: newComment,
-          is_internal: false
-        })
+      await api.post(`/findings/${finding.id}/comments`, {
+        comment_text: newComment,
+        is_internal: false
       })
       refetch()
       setNewComment('')

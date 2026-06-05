@@ -103,8 +103,19 @@ export default function SchemaQualityPage() {
   )
 
   // Overview stats
-  const objCounts = effectiveSummary?.counts ?? {}
-  const objChartData = Object.entries(objCounts).map(([k, v]) => ({ name: k, count: v as number }))
+  let objCounts = effectiveSummary?.counts ?? {}
+  let objChartData = Object.entries(objCounts).map(([k, v]) => ({ name: k, count: v as number }))
+
+  if (objChartData.length === 0 && allObjects.length > 0) {
+    const counts: Record<string, number> = {}
+    allObjects.forEach(o => {
+      counts[o.object_type] = (counts[o.object_type] || 0) + 1
+    })
+    objCounts = counts
+    objChartData = Object.entries(counts).map(([k, v]) => ({ name: k, count: v }))
+  }
+
+  const totalObjects = effectiveSummary?.total ?? Object.values(objCounts).reduce((a: any, b: any) => a + b, 0) || allObjects.length
 
   // Run object count for subtitle (from actual run, more accurate than schema_objects)
   const currentRun = runData?.[0]
@@ -137,7 +148,7 @@ export default function SchemaQualityPage() {
       {tab === 'overview' && (
         <div className="space-y-6">
           <div className="grid grid-cols-5 gap-4">
-            <KpiCard label="Total Objects"   value={effectiveSummary?.total ?? runObjectCount} icon="layers"     color="#630ed4" />
+            <KpiCard label="Total Objects"   value={totalObjects} icon="layers"     color="#630ed4" />
             <KpiCard label="Tables"          value={objCounts.table ?? 0}                 icon="table_chart" />
             <KpiCard label="Procedures"      value={objCounts.procedure ?? 0}             icon="code" />
             <KpiCard label="Views"           value={objCounts.view ?? 0}                  icon="view_list" />
@@ -159,22 +170,28 @@ export default function SchemaQualityPage() {
 
             <div className="bg-surface-lowest rounded-xl p-5 shadow-card">
               <div className="text-sm font-semibold text-on-surface mb-4">Quality Issues Summary</div>
-              <div className="space-y-3 mt-2">
-                {[
-                  { label: 'Tables without Primary Key', count: tablesNoPK.length, color: '#dc2626', icon: 'key_off' },
-                  { label: 'Performance Issues (SELECT *, missing indexes)', count: perfFindings.length, color: '#f59e0b', icon: 'speed' },
-                  { label: 'Column Type Mismatches', count: typeMismatches.length, color: '#0284c7', icon: 'table_chart' },
-                  { label: 'Maintainability / Orphan Issues', count: orphanFindings.length, color: '#8b5cf6', icon: 'device_hub' },
-                ].map(item => (
-                  <div key={item.label} className="flex items-center justify-between py-2" style={{ borderBottom: '1px solid rgba(74,68,85,0.08)' }}>
-                    <div className="flex items-center gap-2">
-                      <span className="material-symbols-outlined" style={{ fontSize: 16, color: item.color }}>{item.icon}</span>
-                      <span className="text-sm text-on-surface">{item.label}</span>
+              {!effectiveRunId ? (
+                <div className="bg-amber-50 rounded-lg p-4 text-sm text-amber-700">
+                  Run an assessment to see quality data.
+                </div>
+              ) : (
+                <div className="space-y-3 mt-2">
+                  {[
+                    { label: 'Tables without Primary Key', count: tablesNoPK.length, color: '#dc2626', icon: 'key_off' },
+                    { label: 'Performance Issues (SELECT *, missing indexes)', count: perfFindings.length, color: '#f59e0b', icon: 'speed' },
+                    { label: 'Column Type Mismatches', count: typeMismatches.length, color: '#0284c7', icon: 'table_chart' },
+                    { label: 'Maintainability / Orphan Issues', count: orphanFindings.length, color: '#8b5cf6', icon: 'device_hub' },
+                  ].map(item => (
+                    <div key={item.label} className="flex items-center justify-between py-2" style={{ borderBottom: '1px solid rgba(74,68,85,0.08)' }}>
+                      <div className="flex items-center gap-2">
+                        <span className="material-symbols-outlined" style={{ fontSize: 16, color: item.color }}>{item.icon}</span>
+                        <span className="text-sm text-on-surface">{item.label}</span>
+                      </div>
+                      <span className="text-sm font-bold" style={{ color: item.color }}>{item.count}</span>
                     </div>
-                    <span className="text-sm font-bold" style={{ color: item.color }}>{item.count}</span>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 

@@ -677,7 +677,7 @@ export default function LiveDbPage() {
               </div>
 
               {/* Live status summary */}
-              {liveStatus && (
+              {liveStatus && !liveStatus.not_supported && (
                 <div className="grid grid-cols-3 gap-4">
                   {/* Blocking sessions */}
                   <div className="bg-surface-lowest rounded-xl p-5 shadow-card">
@@ -737,6 +737,16 @@ export default function LiveDbPage() {
                     ) : (
                       <p className="text-xs text-on-surface-variant">No tables fetched</p>
                     )}
+                  </div>
+                </div>
+              )}
+
+              {liveStatus?.not_supported && (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 text-amber-800 flex items-start gap-3">
+                  <span className="material-symbols-outlined" style={{ fontSize: 24 }}>warning</span>
+                  <div>
+                    <h3 className="font-semibold text-sm">⚠ Not applicable for PostgreSQL</h3>
+                    <p className="text-sm mt-1">{liveStatus.reason}</p>
                   </div>
                 </div>
               )}

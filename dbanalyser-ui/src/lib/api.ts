@@ -61,7 +61,8 @@ export const runApi = {
 // Finding fields: id, run_id, rule_id, category, severity, object_name, object_type,
 //                 schema_name, issue, recommendation, line_number, snippet, status
 export const findingsApi = {
-  byRun:   (runId: number)               => api.get<{ findings: any[]; total: number }>(`/findings/run/${runId}`),
+  byRun:   (runId: number, params?: Record<string, any>) =>
+    api.get<{ findings: any[]; total: number }>('/findings/', { params: { run_id: runId, limit: 5000, ...params } }),
   summary: (runId: number)               => api.get<any>(`/findings/summary/${runId}`),
 }
 

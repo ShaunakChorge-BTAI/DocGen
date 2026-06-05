@@ -84,7 +84,7 @@ def upsert_db_registry(db: DbRegistry, org_id: Optional[int] = None) -> int:
                     org_id, name, db_type, environment, host, port, database_name,
                     connection_string, use_windows_auth, username, password,
                     description, owner_label, tags, is_active
-                ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                 RETURNING id
             """, (params["org_id"], params["name"], params["db_type"], params["environment"],
                   params["host"], params["port"], params["database_name"],

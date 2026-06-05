@@ -1,7 +1,5 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { dbApi, runApi } from '../lib/api'
+import { useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../lib/auth'
-import { useLocation } from 'react-router-dom'
 
 interface Props {
   selectedDb:    string | null
@@ -13,66 +11,12 @@ interface Props {
 export default function TopBar({ selectedDb, setSelectedDb, selectedRun, setSelectedRun }: Props) {
   const { user, logout } = useAuth()
   const qc = useQueryClient()
-  const location = useLocation()
-
-  // Hide DB/Run selectors on Dashboard (QW-2 UX improvement)
-  const showSelectors = !location.pathname.includes('/dashboard')
-
-  const { data: dbData } = useQuery({
-    queryKey: ['databases', false],
-    queryFn:  () => dbApi.list(false).then(r => r.data),
-  })
-  const dbs = dbData ?? []
-
-  const { data: runData, isLoading: runsLoading } = useQuery({
-    queryKey: ['runs', selectedDb],
-    queryFn:  () => runApi.list(selectedDb ?? undefined).then(r => r.data.runs),
-    staleTime: 30000, // 30 seconds
-  })
-  const runs = runData ?? []
 
   return (
     <header
       className="h-14 bg-surface-lowest flex items-center px-6 gap-4 flex-shrink-0"
       style={{ borderBottom: '1px solid rgba(74,68,85,0.08)' }}
     >
-      {/* DB selector — hidden on Dashboard (QW-2) */}
-      {showSelectors && (
-        <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-on-surface-variant" style={{ fontSize: 16 }}>storage</span>
-          <select
-            className="text-sm font-mono bg-surface-low rounded-lg px-3 py-1.5 text-on-surface border-0 outline-none focus:ring-2 focus:ring-primary/20 min-w-36"
-            value={selectedDb ?? ''}
-            onChange={(e) => { setSelectedDb(e.target.value || null); setSelectedRun(null) }}
-          >
-            <option value="">All Databases</option>
-            {dbs.map((db: any) => (
-              <option key={db.id} value={db.name}>{db.name}</option>
-            ))}
-          </select>
-        </div>
-      )}
-
-      {/* Run selector — hidden on Dashboard (QW-2) */}
-      {showSelectors && (
-        <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-on-surface-variant" style={{ fontSize: 16 }}>history</span>
-          <select
-            className="text-sm font-mono bg-surface-low rounded-lg px-3 py-1.5 text-on-surface border-0 outline-none focus:ring-2 focus:ring-primary/20 min-w-52"
-            value={selectedRun ?? ''}
-            onChange={(e) => setSelectedRun(e.target.value ? Number(e.target.value) : null)}
-            disabled={runsLoading}
-          >
-            <option value="">{runsLoading ? 'Loading runs...' : `Latest Run${runs.length > 0 ? ` (${runs.length} available)` : ''}`}</option>
-            {runs.map((r: any) => (
-              <option key={r.id} value={r.id}>
-                {r.label || `Run #${r.id}`} — {new Date(r.timestamp).toLocaleDateString()}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
-
       <div className="flex-1" />
 
       {/* Refresh */}

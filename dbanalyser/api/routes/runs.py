@@ -392,9 +392,11 @@ def _persist_result(cfg, result, run_label: str, db_entry) -> int:
         insert_run, bulk_insert_findings, upsert_db_registry,
         update_db_registry_last_run, upsert_health_trend,
         detect_and_mark_content_drift, enrich_findings_with_history,
+        bulk_insert_snapshots,
     )
-    from dbanalyser.db.models import DbRegistry, Finding, HealthTrend, Run
+    from dbanalyser.db.models import DbRegistry, Finding, HealthTrend, Run, ObjectSnapshot
     import uuid as _uuid
+    import hashlib
 
     init_pool(cfg.postgres)
     logger.info("_persist_result called for db_entry=%s", db_entry.name if db_entry else None)
@@ -430,6 +432,30 @@ def _persist_result(cfg, result, run_label: str, db_entry) -> int:
             health_score=result.overall_health, status="success",
         )
         run_int_id = insert_run(run)
+
+        snapshots = [
+            ObjectSnapshot(
+                run_id=run_int_id,
+                object_name=or_.obj.name,
+                object_type=or_.obj.obj_type,
+                schema_name=or_.obj.schema or "dbo",
+                file_path=or_.obj.file_path,
+                content_hash=hashlib.md5(or_.obj.source.encode("utf-8")).hexdigest() if or_.obj.source else None,
+                lines=or_.obj.lines,
+                size_kb=or_.obj.size_kb,
+                risk_score=or_.health_score,
+                risk_level="CRITICAL" if or_.severity_counts.get("Critical", 0) > 0 else "HIGH" if or_.severity_counts.get("High", 0) > 0 else "MEDIUM" if or_.severity_counts.get("Medium", 0) > 0 else "MINIMAL",
+                issue_count=len(or_.findings),
+                critical_count=or_.severity_counts.get("Critical", 0),
+                high_count=or_.severity_counts.get("High", 0),
+                source="live_db" if result.source_mode == "live_db" else "file",
+                content_drift=False,
+            )
+            for or_ in result.object_results
+        ]
+        logger.info("Created %s ObjectSnapshot objects", len(snapshots))
+        bulk_insert_snapshots(snapshots)
+        logger.info("bulk_insert_snapshots completed successfully")
 
         findings = [
             Finding(run_id=run_int_id, schema_name=or_.obj.schema,
