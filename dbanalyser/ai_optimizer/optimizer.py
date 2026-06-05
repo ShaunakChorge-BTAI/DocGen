@@ -195,7 +195,8 @@ def _optimize_with_ollama(
     from dbanalyser.ai_optimizer.llm_client import call_llm, LLM_MODEL
     
     model_to_use = model or LLM_MODEL
-    llm_res = call_llm(prompt=prompt, timeout=30, model=model_to_use)
+    # Pass timeout=None to fall back to the default (10, 300) connection and read timeout tuple
+    llm_res = call_llm(prompt=prompt, timeout=None, model=model_to_use)
     
     if llm_res.error:
         log.warning(f"Ollama optimization failed: {llm_res.error}")
@@ -212,10 +213,14 @@ def _optimize_with_ollama(
         try:
             json_part = raw[raw.index("{"):raw.rindex("}")+1]
             data = json.loads(json_part)
-            optimized_sql = data.get("optimized_sql", source_sql)
-            reasoning = data.get("reasoning", "")
-            confidence = float(data.get("confidence_score", 0.6))
-        except (json.JSONDecodeError, ValueError):
+            if isinstance(data, dict):
+                optimized_sql = data.get("optimized_sql", source_sql)
+                reasoning = data.get("reasoning", "")
+                confidence = float(data.get("confidence_score") if data.get("confidence_score") is not None else 0.6)
+            else:
+                reasoning = raw
+                confidence = 0.5
+        except (json.JSONDecodeError, ValueError, AttributeError, TypeError):
             reasoning = raw
             confidence = 0.5
     else:

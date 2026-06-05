@@ -6,6 +6,7 @@ Calls local Ollama instance to generate optimization suggestions
 import asyncio
 import json
 import logging
+import os
 import re
 from typing import Optional, Dict, Any
 from datetime import datetime
@@ -19,17 +20,28 @@ class OllamaOptimizer:
 
     def __init__(
         self,
-        host: str = "localhost",
-        port: int = 11434,
-        model: str = "mistral",
-        timeout_seconds: int = 30
+        host: Optional[str] = None,
+        port: Optional[int] = None,
+        model: Optional[str] = None,
+        timeout_seconds: Optional[int] = None
     ):
-        self.host = host
-        self.port = port
-        self.model = model
-        self.timeout_seconds = timeout_seconds
-        self.base_url = f"http://{host}:{port}"
-        self.client = httpx.AsyncClient(timeout=timeout_seconds)
+        self.host = host or os.environ.get("OLLAMA_HOST") or os.environ.get("OLLAMA_URL") or "localhost"
+        self.port = port or int(os.environ.get("OLLAMA_PORT") or "11434")
+        self.model = model or os.environ.get("OLLAMA_MODEL") or os.environ.get("LLM_MODEL") or "llama3:8b-instruct-q4_K_M"
+        self.timeout_seconds = timeout_seconds or int(os.environ.get("OLLAMA_TIMEOUT") or "300")
+        
+        # Robust URL building in case host is already a full URL
+        host_str = self.host
+        if host_str.startswith("http://") or host_str.startswith("https://"):
+            # If the host already contains a port, don't append it again
+            if ":" in host_str.replace("http://", "").replace("https://", ""):
+                self.base_url = host_str
+            else:
+                self.base_url = f"{host_str}:{self.port}"
+        else:
+            self.base_url = f"http://{host_str}:{self.port}"
+            
+        self.client = httpx.AsyncClient(timeout=self.timeout_seconds)
 
     async def check_availability(self) -> Dict[str, Any]:
         """Check if Ollama is running and model is available"""
@@ -99,7 +111,9 @@ class OllamaOptimizer:
                     "model": self.model,
                     "prompt": prompt,
                     "stream": False,
-                    "temperature": 0.3,  # Lower temp = more deterministic
+                    "temperature": 0.7,
+                    "num_ctx": 1024,
+                    "num_predict": 512,
                 },
             )
 
@@ -227,16 +241,17 @@ Confidence: 0.0-1.0, based on certainty of suggestion
             if json_match:
                 json_str = json_match.group(0)
                 data = json.loads(json_str)
-                return {
-                    "suggested_sql": data.get("suggested_sql", ""),
-                    "explanation": data.get("explanation", ""),
-                    "confidence_score": float(data.get("confidence_score", 0.7)),
-                    "estimated_improvement_pct": int(
-                        data.get("estimated_improvement_pct", 20)
-                    ),
-                    "estimated_risk_level": data.get("estimated_risk_level", "medium"),
-                }
-        except (json.JSONDecodeError, ValueError) as e:
+                if isinstance(data, dict):
+                    return {
+                        "suggested_sql": data.get("suggested_sql", ""),
+                        "explanation": data.get("explanation", ""),
+                        "confidence_score": float(data.get("confidence_score") if data.get("confidence_score") is not None else 0.7),
+                        "estimated_improvement_pct": int(
+                            data.get("estimated_improvement_pct") if data.get("estimated_improvement_pct") is not None else 20
+                        ),
+                        "estimated_risk_level": data.get("estimated_risk_level", "medium"),
+                    }
+        except (json.JSONDecodeError, ValueError, TypeError, AttributeError) as e:
             logger.warning(f"Failed to parse Ollama JSON response: {e}")
 
         # Fallback: return the full response as explanation

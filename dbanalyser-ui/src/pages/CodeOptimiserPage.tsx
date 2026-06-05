@@ -10,13 +10,7 @@ const TABS = [
   { id: 'history',  label: 'History',       icon: 'history' },
 ]
 
-const MODELS = [
-  { value: 'llama3:8b-instruct-q4_K_M',  label: 'Llama 3 (8B Instruct - Default)' },
-  { value: 'llama3',                     label: 'Llama 3 (8B)' },
-  { value: 'codellama',                  label: 'CodeLlama (7B)' },
-  { value: 'mistral',                    label: 'Mistral (7B)' },
-  { value: 'phi3',                       label: 'Phi 3 (3.8B)' },
-]
+const DEFAULT_MODEL = 'llama3:8b-instruct-q4_K_M'
 
 const SEV_BG: Record<string, string> = {
   high:   'bg-red-50 border-red-200',
@@ -53,7 +47,7 @@ export default function CodeOptimiserPage() {
   const [objectName, setObjectName] = useState('')
   const [sql,        setSql]        = useState('')
   const [apiKey,     setApiKey]     = useState('')
-  const [model,      setModel]      = useState(MODELS[0].value)
+  const [model,      setModel]      = useState(DEFAULT_MODEL)
   const [findings,   setFindings]   = useState('')
   const [showAdv,    setShowAdv]    = useState(false)
   const [sourceIssueId, setSourceIssueId] = useState<number | null>(null)
@@ -289,28 +283,11 @@ export default function CodeOptimiserPage() {
                 </span>
               </div>
 
-              {/* Model Select */}
+              {/* Model Info (Static) */}
               <div className="space-y-2">
-                <div className="text-xs font-medium text-on-surface-variant uppercase tracking-wide">Select Model</div>
-                <div className="grid grid-cols-1 gap-2">
-                  {MODELS.map(m => (
-                    <label key={m.value}
-                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer border transition-all ${
-                        model === m.value
-                          ? 'border-primary bg-primary/5 text-primary'
-                          : 'border-surface-low hover:border-primary/30 text-on-surface-variant'
-                      }`}>
-                      <input
-                        type="radio"
-                        name="model"
-                        value={m.value}
-                        checked={model === m.value}
-                        onChange={() => setModel(m.value)}
-                        className="accent-primary"
-                      />
-                      <span className="text-xs font-medium">{m.label}</span>
-                    </label>
-                  ))}
+                <div className="text-xs font-medium text-on-surface-variant uppercase tracking-wide">Model</div>
+                <div className="px-3 py-2.5 bg-surface-low text-on-surface rounded-lg text-xs font-medium border border-surface-low">
+                  Llama 3 (8B Instruct - llama3:8b-instruct-q4_K_M)
                 </div>
               </div>
 
