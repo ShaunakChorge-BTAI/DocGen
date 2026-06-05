@@ -1258,15 +1258,15 @@ def cmd_ingest(config, db, files, db_registry_id, use_transformers) -> None:
 @click.option("--sql-file", default="", help="Path to .sql file containing the object source")
 @click.option("--execution-plan", default="", help="Path to XML execution plan file")
 @click.option("--db-registry-id", default=None, type=int)
-@click.option("--model", default="", help="Claude model ID (overrides config)")
+@click.option("--model", default="", help="Ollama model ID (overrides config)")
 @click.option("--no-persist", is_flag=True, default=False, help="Do not save result to DB")
 def cmd_optimize(config, object_name, sql_file, execution_plan, db_registry_id,
                  model, no_persist) -> None:
-    """AI-optimize a SQL object using Anthropic Claude.
+    """AI-optimize a SQL object using Ollama.
 
     \b
     Fetches schema context from the knowledge base, then sends the SQL
-    to Claude with the schema context, rule findings, and execution plan
+    to Ollama with the schema context, rule findings, and execution plan
     (if provided) for optimization suggestions.
 
     \b
@@ -1316,7 +1316,7 @@ def cmd_optimize(config, object_name, sql_file, execution_plan, db_registry_id,
             console.print(f"[yellow]Warning: {w}[/yellow]")
 
         console.print(
-            f"[cyan]Calling Claude ({chosen_model}) — context quality: "
+            f"[cyan]Calling Ollama ({chosen_model}) — context quality: "
             f"{ctx['context_quality']}…[/cyan]"
         )
 

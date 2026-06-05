@@ -97,29 +97,25 @@ class TestBuildOptimizationContext:
 # optimizer — optimize_sql_object
 # ─────────────────────────────────────────────────────────────────────────────
 
-def _make_mock_anthropic(optimized_sql="SELECT Id FROM Accounts",
-                          reasoning="Added covering index hint.",
-                          confidence=0.85,
-                          input_tokens=500,
-                          output_tokens=300):
-    """Return a mock anthropic.Anthropic() client that returns structured JSON."""
-    mock_client     = MagicMock()
-    mock_message    = MagicMock()
-    mock_usage      = MagicMock()
-    mock_usage.input_tokens  = input_tokens
-    mock_usage.output_tokens = output_tokens
-    mock_message.usage   = mock_usage
-    mock_message.content = [MagicMock(text=json.dumps({
-        "optimized_sql":   optimized_sql,
-        "reasoning":       reasoning,
-        "changes":         [{"type": "performance", "before": "SELECT *",
-                             "after": "SELECT Id", "impact": "Reduced I/O"}],
-        "confidence_score": confidence,
-        "no_change_needed": False,
-        "no_change_reason": "",
-    }))]
-    mock_client.messages.create.return_value = mock_message
-    return mock_client
+from dbanalyser.ai_optimizer.llm_client import LLMResult
+
+def _make_mock_ollama(optimized_sql="SELECT Id FROM Accounts",
+                      reasoning="Added covering index hint.",
+                      confidence=0.85,
+                      error=None):
+    return LLMResult(
+        text=json.dumps({
+            "optimized_sql":   optimized_sql,
+            "reasoning":       reasoning,
+            "changes":         [{"type": "performance", "before": "SELECT *",
+                                 "after": "SELECT Id", "impact": "Reduced I/O"}],
+            "confidence_score": confidence,
+            "no_change_needed": False,
+            "no_change_reason": "",
+        }) if not error else None,
+        error=error,
+        latency_ms=100
+    )
 
 
 _SCHEMA_CTX = "## Schema Context for usp_X\n### dbo.Accounts (table)\n  - Id int  NOT NULL"
@@ -130,192 +126,138 @@ import sys
 from contextlib import contextmanager
 
 
-@contextmanager
-def _mock_anthropic(mock_client):
-    """Context manager: inject mock anthropic module into sys.modules."""
-    mock_module = MagicMock()
-    mock_module.Anthropic.return_value = mock_client
-    old = sys.modules.get("anthropic")
-    sys.modules["anthropic"] = mock_module
-    try:
-        yield mock_module
-    finally:
-        if old is None:
-            sys.modules.pop("anthropic", None)
-        else:
-            sys.modules["anthropic"] = old
-
-
 class TestOptimizeSqlObject:
     def test_returns_optimization_result(self):
         from dbanalyser.ai_optimizer.optimizer import optimize_sql_object, OptimizationResult
-        mock_client = _make_mock_anthropic()
-        with _mock_anthropic(mock_client), \
+        mock_res = _make_mock_ollama()
+        with patch("dbanalyser.ai_optimizer.llm_client.call_llm", return_value=mock_res), \
              patch("dbanalyser.ai_optimizer.optimizer._persist_result"):
             result = optimize_sql_object(
                 "usp_X", _SOURCE_SQL,
                 schema_context=_SCHEMA_CTX,
-                api_key="sk-test",
                 persist=False,
             )
         assert isinstance(result, OptimizationResult)
 
     def test_optimized_sql_from_response(self):
         from dbanalyser.ai_optimizer.optimizer import optimize_sql_object
-        mock_client = _make_mock_anthropic(optimized_sql="SELECT Id FROM dbo.Accounts")
-        with _mock_anthropic(mock_client), \
+        mock_res = _make_mock_ollama(optimized_sql="SELECT Id FROM dbo.Accounts")
+        with patch("dbanalyser.ai_optimizer.llm_client.call_llm", return_value=mock_res), \
              patch("dbanalyser.ai_optimizer.optimizer._persist_result"):
             result = optimize_sql_object(
                 "usp_X", _SOURCE_SQL,
                 schema_context=_SCHEMA_CTX,
-                api_key="sk-test",
                 persist=False,
             )
         assert "Id" in result.optimized_sql
 
     def test_confidence_score_parsed(self):
         from dbanalyser.ai_optimizer.optimizer import optimize_sql_object
-        mock_client = _make_mock_anthropic(confidence=0.92)
-        with _mock_anthropic(mock_client), \
+        mock_res = _make_mock_ollama(confidence=0.92)
+        with patch("dbanalyser.ai_optimizer.llm_client.call_llm", return_value=mock_res), \
              patch("dbanalyser.ai_optimizer.optimizer._persist_result"):
             result = optimize_sql_object(
                 "usp_X", _SOURCE_SQL,
                 schema_context=_SCHEMA_CTX,
-                api_key="sk-test",
                 persist=False,
             )
         assert abs(result.confidence_score - 0.92) < 0.01
 
     def test_tokens_used_summed(self):
         from dbanalyser.ai_optimizer.optimizer import optimize_sql_object
-        mock_client = _make_mock_anthropic(input_tokens=400, output_tokens=200)
-        with _mock_anthropic(mock_client), \
+        mock_res = _make_mock_ollama()
+        with patch("dbanalyser.ai_optimizer.llm_client.call_llm", return_value=mock_res), \
              patch("dbanalyser.ai_optimizer.optimizer._persist_result"):
             result = optimize_sql_object(
                 "usp_X", _SOURCE_SQL,
                 schema_context=_SCHEMA_CTX,
-                api_key="sk-test",
                 persist=False,
             )
-        assert result.tokens_used == 600
+        # Ollama has tokens_used set to 0 by default
+        assert result.tokens_used == 0
 
-    def test_no_api_key_returns_error(self):
+    def test_no_api_key_works_fine(self):
         from dbanalyser.ai_optimizer.optimizer import optimize_sql_object
-        import os
-        env_backup = {k: v for k, v in os.environ.items()
-                      if k in ("ANTHROPIC_API_KEY", "DBANALYSER_AI_OPTIMIZER_API_KEY")}
-        for k in list(env_backup):
-            del os.environ[k]
-        try:
+        mock_res = _make_mock_ollama()
+        with patch("dbanalyser.ai_optimizer.llm_client.call_llm", return_value=mock_res), \
+             patch("dbanalyser.ai_optimizer.optimizer._persist_result"):
             result = optimize_sql_object(
                 "usp_X", _SOURCE_SQL,
                 schema_context=_SCHEMA_CTX,
                 api_key="",
                 persist=False,
             )
-        finally:
-            os.environ.update(env_backup)
-        assert result.error is not None
-        assert "api key" in result.error.lower()
-
-    def test_missing_anthropic_package_returns_error(self):
-        from dbanalyser.ai_optimizer.optimizer import optimize_sql_object
-        # Remove anthropic from sys.modules to simulate it not being installed
-        old = sys.modules.pop("anthropic", None)
-        # Prevent re-import by inserting None
-        sys.modules["anthropic"] = None  # type: ignore
-        try:
-            result = optimize_sql_object(
-                "usp_X", _SOURCE_SQL,
-                schema_context=_SCHEMA_CTX,
-                api_key="sk-test",
-                persist=False,
-            )
-        finally:
-            if old is None:
-                sys.modules.pop("anthropic", None)
-            else:
-                sys.modules["anthropic"] = old
-        assert result.error is not None
+        assert result.error is None
 
     def test_schema_context_enforced_when_empty(self):
-        """When schema_context is empty the optimizer should log a warning but continue."""
         from dbanalyser.ai_optimizer.optimizer import optimize_sql_object
-        mock_client = _make_mock_anthropic()
-        with _mock_anthropic(mock_client), \
+        mock_res = _make_mock_ollama()
+        with patch("dbanalyser.ai_optimizer.llm_client.call_llm", return_value=mock_res), \
              patch("dbanalyser.ai_optimizer.optimizer._persist_result"):
             result = optimize_sql_object(
                 "usp_X", _SOURCE_SQL,
                 schema_context="",
-                api_key="sk-test",
                 persist=False,
             )
         assert result is not None
 
     def test_persist_called_when_enabled(self):
         from dbanalyser.ai_optimizer.optimizer import optimize_sql_object
-        mock_client = _make_mock_anthropic()
-        with _mock_anthropic(mock_client), \
+        mock_res = _make_mock_ollama()
+        with patch("dbanalyser.ai_optimizer.llm_client.call_llm", return_value=mock_res), \
              patch("dbanalyser.ai_optimizer.optimizer._persist_result") as mock_persist:
             optimize_sql_object(
                 "usp_X", _SOURCE_SQL,
                 schema_context=_SCHEMA_CTX,
-                api_key="sk-test",
                 persist=True,
             )
         mock_persist.assert_called_once()
 
     def test_persist_not_called_when_disabled(self):
         from dbanalyser.ai_optimizer.optimizer import optimize_sql_object
-        mock_client = _make_mock_anthropic()
-        with _mock_anthropic(mock_client), \
+        mock_res = _make_mock_ollama()
+        with patch("dbanalyser.ai_optimizer.llm_client.call_llm", return_value=mock_res), \
              patch("dbanalyser.ai_optimizer.optimizer._persist_result") as mock_persist:
             optimize_sql_object(
                 "usp_X", _SOURCE_SQL,
                 schema_context=_SCHEMA_CTX,
-                api_key="sk-test",
                 persist=False,
             )
         mock_persist.assert_not_called()
 
     def test_api_exception_sets_error_field(self):
         from dbanalyser.ai_optimizer.optimizer import optimize_sql_object
-        mock_client = MagicMock()
-        mock_client.messages.create.side_effect = RuntimeError("Rate limit exceeded")
-        with _mock_anthropic(mock_client), \
+        mock_res = _make_mock_ollama(error="Connection timeout")
+        with patch("dbanalyser.ai_optimizer.llm_client.call_llm", return_value=mock_res), \
              patch("dbanalyser.ai_optimizer.optimizer._persist_result"):
             result = optimize_sql_object(
                 "usp_X", _SOURCE_SQL,
                 schema_context=_SCHEMA_CTX,
-                api_key="sk-test",
                 persist=False,
             )
         assert result.error is not None
-        assert "Rate limit" in result.error
+        assert "Ollama" in result.error or "Connection" in result.error
 
     def test_no_change_needed_response(self):
         from dbanalyser.ai_optimizer.optimizer import optimize_sql_object
-        mock_client     = MagicMock()
-        mock_message    = MagicMock()
-        mock_usage      = MagicMock()
-        mock_usage.input_tokens  = 100
-        mock_usage.output_tokens = 50
-        mock_message.usage   = mock_usage
-        mock_message.content = [MagicMock(text=json.dumps({
-            "optimized_sql": _SOURCE_SQL,
-            "reasoning": "",
-            "changes": [],
-            "confidence_score": 0.9,
-            "no_change_needed": True,
-            "no_change_reason": "SQL is already optimal.",
-        }))]
-        mock_client.messages.create.return_value = mock_message
-        with _mock_anthropic(mock_client), \
+        from dbanalyser.ai_optimizer.llm_client import LLMResult
+        mock_res = LLMResult(
+            text=json.dumps({
+                "optimized_sql": _SOURCE_SQL,
+                "reasoning": "",
+                "changes": [],
+                "confidence_score": 0.9,
+                "no_change_needed": True,
+                "no_change_reason": "SQL is already optimal.",
+            }),
+            error=None,
+            latency_ms=100
+        )
+        with patch("dbanalyser.ai_optimizer.llm_client.call_llm", return_value=mock_res), \
              patch("dbanalyser.ai_optimizer.optimizer._persist_result"):
             result = optimize_sql_object(
                 "usp_X", _SOURCE_SQL,
                 schema_context=_SCHEMA_CTX,
-                api_key="sk-test",
                 persist=False,
             )
         assert "No optimization needed" in result.reasoning or result.error is None

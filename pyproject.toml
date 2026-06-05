@@ -52,13 +52,12 @@ postgres  = ["psycopg2-binary>=2.9"]
 mysql     = ["pymysql>=1.1"]
 api       = ["fastapi>=0.110", "uvicorn[standard]>=0.29"]
 auth      = ["PyJWT>=2.8", "bcrypt>=4.1"]
-ai        = ["anthropic>=0.30"]                         # AI optimizer (Claude)
+ai        = []                                          # AI optimizer (Ollama uses requests from main dependencies)
 embeddings = ["sentence-transformers>=2.7"]             # higher-quality schema embeddings
 dev       = ["pytest>=8.0", "pytest-cov>=5.0", "black>=24.0", "ruff>=0.4"]
 all       = [
     "fastapi>=0.110", "uvicorn[standard]>=0.29",
     "PyJWT>=2.8", "bcrypt>=4.1",
-    "anthropic>=0.30",
     "psycopg2-binary>=2.9",
     "pyodbc>=5.0",
 ]

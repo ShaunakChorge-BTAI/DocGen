@@ -11,9 +11,11 @@ const TABS = [
 ]
 
 const MODELS = [
-  { value: 'claude-3-5-haiku-20241022',  label: 'Claude 3.5 Haiku  (fast)'    },
-  { value: 'claude-3-5-sonnet-20241022', label: 'Claude 3.5 Sonnet (balanced)' },
-  { value: 'claude-3-opus-20240229',     label: 'Claude 3 Opus     (deep)'     },
+  { value: 'llama3:8b-instruct-q4_K_M',  label: 'Llama 3 (8B Instruct - Default)' },
+  { value: 'llama3',                     label: 'Llama 3 (8B)' },
+  { value: 'codellama',                  label: 'CodeLlama (7B)' },
+  { value: 'mistral',                    label: 'Mistral (7B)' },
+  { value: 'phi3',                       label: 'Phi 3 (3.8B)' },
 ]
 
 const SEV_BG: Record<string, string> = {
@@ -90,10 +92,9 @@ export default function CodeOptimiserPage() {
         object_name: objectName || 'ad_hoc_query',
         sql,
         persist: true,
-        mode: optimizationMode,
+        mode: 'quick',
+        model: model,
       }
-      if (optimizationMode === 'advanced') body.model = model
-      if (apiKey.trim())  body.api_key  = apiKey.trim()
       if (findings.trim()) body.findings = findings.trim().split('\n').map(l => l.trim()).filter(Boolean)
 
       const res = await api.post('/ai/optimize', body)
@@ -101,11 +102,7 @@ export default function CodeOptimiserPage() {
       if (tab === 'history') refetchHist()
     } catch (e: any) {
       const errorMsg = e?.response?.data?.detail || e?.message || 'Optimisation failed.'
-      if (errorMsg.includes('API key') || errorMsg.includes('ANTHROPIC_API_KEY')) {
-        setError('API key not configured. Using Quick (Ollama) mode instead. Select "Quick (Ollama)" above and try again.')
-      } else {
-        setError(errorMsg)
-      }
+      setError(errorMsg)
     } finally {
       setLoading(false)
     }
@@ -187,7 +184,7 @@ export default function CodeOptimiserPage() {
     <div>
       <PageHeader
         title="SQL Code Optimiser"
-        subtitle="AI-powered SQL optimisation using Claude — paste code, get instant improvements"
+        subtitle="AI-powered SQL optimisation using local Ollama — paste code, get instant improvements"
       />
       <TabBar tabs={TABS} active={tab} onChange={setTab} />
 
@@ -267,10 +264,10 @@ export default function CodeOptimiserPage() {
               </div>
             </div>
 
-            {/* Optimization Mode + advanced */}
+            {/* Model Selection */}
             <div className="bg-surface-lowest rounded-xl p-4 shadow-card space-y-3">
               <div className="flex items-center justify-between">
-                <div className="text-sm font-semibold text-on-surface">Optimization Mode</div>
+                <div className="text-sm font-semibold text-on-surface">Ollama LLM Model</div>
                 <button
                   onClick={() => setShowAdv(!showAdv)}
                   className="text-xs text-primary hover:underline flex items-center gap-1"
@@ -278,94 +275,47 @@ export default function CodeOptimiserPage() {
                   <span className="material-symbols-outlined" style={{ fontSize: 13 }}>
                     {showAdv ? 'expand_less' : 'expand_more'}
                   </span>
-                  {showAdv ? 'Hide' : 'Advanced'}
+                  {showAdv ? 'Hide Settings' : 'Advanced Settings'}
                 </button>
               </div>
 
-              {/* Mode selector */}
-              <div className="grid grid-cols-1 gap-2">
-                <label className={`flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer border transition-all ${
-                  optimizationMode === 'quick'
-                    ? 'border-primary bg-primary/5'
-                    : 'border-surface-low hover:border-primary/30'
-                }`}>
-                  <input
-                    type="radio"
-                    name="mode"
-                    value="quick"
-                    checked={optimizationMode === 'quick'}
-                    onChange={() => setOptimizationMode('quick')}
-                    className="accent-primary"
-                  />
-                  <div>
-                    <span className="text-xs font-medium text-on-surface">Quick (Ollama)</span>
-                    {ollamaAvailable === false && (
-                      <div className="text-xs text-error mt-0.5">⚠ Ollama not available</div>
-                    )}
-                    {ollamaAvailable === true && (
-                      <div className="text-xs text-success mt-0.5">✓ Ollama ready</div>
-                    )}
-                  </div>
-                </label>
-
-                <label className={`flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer border transition-all ${
-                  optimizationMode === 'advanced'
-                    ? 'border-primary bg-primary/5'
-                    : 'border-surface-low hover:border-primary/30'
-                }`}>
-                  <input
-                    type="radio"
-                    name="mode"
-                    value="advanced"
-                    checked={optimizationMode === 'advanced'}
-                    onChange={() => setOptimizationMode('advanced')}
-                    className="accent-primary"
-                  />
-                  <span className="text-xs font-medium text-on-surface">Advanced (Claude)</span>
-                </label>
+              {/* Status Indicator */}
+              <div className="flex items-center gap-2 text-xs py-1.5 px-3 rounded-lg bg-surface-low border border-surface-low">
+                <span className="material-symbols-outlined" style={{ fontSize: 14, color: ollamaAvailable ? '#10b981' : '#ef4444' }}>
+                  {ollamaAvailable ? 'check_circle' : 'error'}
+                </span>
+                <span className="font-medium text-on-surface">
+                  Ollama Status: {ollamaAvailable === null ? 'Checking…' : ollamaAvailable ? 'Ready (Local)' : 'Not available'}
+                </span>
               </div>
 
-              {/* Claude model selector - only show in advanced mode */}
-              {optimizationMode === 'advanced' && (
-                <div className="space-y-2 pt-2 border-t border-surface-low">
-                  <div className="text-xs font-medium text-on-surface-variant uppercase tracking-wide">Claude Model</div>
-                  <div className="grid grid-cols-1 gap-2">
-                    {MODELS.map(m => (
-                      <label key={m.value}
-                        className={`flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer border transition-all ${
-                          model === m.value
-                            ? 'border-primary bg-primary/5 text-primary'
-                            : 'border-surface-low hover:border-primary/30 text-on-surface-variant'
-                        }`}>
-                        <input
-                          type="radio"
-                          name="model"
-                          value={m.value}
-                          checked={model === m.value}
-                          onChange={() => setModel(m.value)}
-                          className="accent-primary"
-                        />
-                        <span className="text-xs font-medium">{m.label}</span>
-                      </label>
-                    ))}
-                  </div>
+              {/* Model Select */}
+              <div className="space-y-2">
+                <div className="text-xs font-medium text-on-surface-variant uppercase tracking-wide">Select Model</div>
+                <div className="grid grid-cols-1 gap-2">
+                  {MODELS.map(m => (
+                    <label key={m.value}
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer border transition-all ${
+                        model === m.value
+                          ? 'border-primary bg-primary/5 text-primary'
+                          : 'border-surface-low hover:border-primary/30 text-on-surface-variant'
+                      }`}>
+                      <input
+                        type="radio"
+                        name="model"
+                        value={m.value}
+                        checked={model === m.value}
+                        onChange={() => setModel(m.value)}
+                        className="accent-primary"
+                      />
+                      <span className="text-xs font-medium">{m.label}</span>
+                    </label>
+                  ))}
                 </div>
-              )}
+              </div>
 
               {showAdv && (
-                <div className="space-y-3 pt-1">
-                  <div>
-                    <label className="text-xs font-medium text-on-surface-variant uppercase tracking-wide mb-1 block">
-                      Anthropic API Key <span className="text-on-surface-variant opacity-50">(overrides server config)</span>
-                    </label>
-                    <input
-                      type="password"
-                      value={apiKey}
-                      onChange={e => setApiKey(e.target.value)}
-                      placeholder="sk-ant-…  (leave blank to use server key)"
-                      className="w-full bg-surface-low rounded-lg px-3 py-2 text-sm text-on-surface border-0 outline-none focus:ring-2 focus:ring-primary/20"
-                    />
-                  </div>
+                <div className="space-y-3 pt-2 border-t border-surface-low">
                   <div>
                     <label className="text-xs font-medium text-on-surface-variant uppercase tracking-wide mb-1 block">
                       Known Findings <span className="text-on-surface-variant opacity-50">(one per line — guides the AI)</span>
@@ -398,7 +348,7 @@ export default function CodeOptimiserPage() {
                     style={{ fontSize: 18 }}>
                 {loading ? 'hourglass_empty' : 'auto_fix_high'}
               </span>
-              {loading ? 'Analysing with Claude…' : 'Optimise SQL'}
+              {loading ? 'Optimising with Ollama…' : 'Optimise SQL'}
             </button>
           </div>
 
@@ -416,7 +366,7 @@ export default function CodeOptimiserPage() {
                 </div>
                 <div className="text-sm font-semibold text-on-surface">Paste SQL → Get Optimisations</div>
                 <div className="text-xs text-on-surface-variant max-w-xs leading-5">
-                  Claude will analyse your SQL, identify performance issues, and suggest
+                  Ollama will analyse your SQL, identify performance issues, and suggest
                   improvements with explanations and a diff view.
                 </div>
                 <div className="flex flex-wrap gap-2 justify-center mt-2">
@@ -430,7 +380,7 @@ export default function CodeOptimiserPage() {
             {loading && (
               <div className="bg-surface-lowest rounded-xl p-10 shadow-card flex flex-col items-center gap-4 min-h-96 justify-center">
                 <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
-                <div className="text-sm text-on-surface-variant">Claude is analysing your SQL…</div>
+                <div className="text-sm text-on-surface-variant">Ollama is analysing your SQL…</div>
               </div>
             )}
 
@@ -482,7 +432,7 @@ export default function CodeOptimiserPage() {
                 {result.reasoning && (
                   <div className="bg-surface-lowest rounded-xl p-4 shadow-card">
                     <div className="text-xs font-semibold text-on-surface-variant uppercase tracking-wide mb-2">
-                      Claude's Analysis
+                      Ollama's Analysis
                     </div>
                     <div className="text-sm text-on-surface leading-6 whitespace-pre-wrap">{result.reasoning}</div>
                   </div>

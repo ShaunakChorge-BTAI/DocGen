@@ -13,16 +13,17 @@ class LLMResult(NamedTuple):
     error: Optional[str]
     latency_ms: int
 
-def call_llm(prompt: str, timeout: int = 60) -> LLMResult:
+def call_llm(prompt: str, timeout: int = 60, model: Optional[str] = None) -> LLMResult:
     """Call Ollama LLM with defensive logging and structured results."""
     endpoint = f"{OLLAMA_BASE_URL}/api/generate"
+    chosen_model = model or LLM_MODEL
     payload = {
-        "model": LLM_MODEL,
+        "model": chosen_model,
         "prompt": prompt,
         "stream": False
     }
     
-    logger.info(f"Calling Ollama at {endpoint} with model {LLM_MODEL} (prompt length: {len(prompt)} chars)")
+    logger.info(f"Calling Ollama at {endpoint} with model {chosen_model} (prompt length: {len(prompt)} chars)")
     
     try:
         response = requests.post(endpoint, json=payload, timeout=timeout)

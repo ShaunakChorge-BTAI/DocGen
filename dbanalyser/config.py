@@ -315,14 +315,11 @@ class AuthConfig(BaseModel):
 
 class AIOptimizerConfig(BaseModel):
     """
-    AI SQL Optimizer — Anthropic Claude integration settings.
-
-    api_key : Anthropic API key. Can also be set via ANTHROPIC_API_KEY or
-              DBANALYSER_AI_OPTIMIZER_API_KEY environment variables.
+    AI SQL Optimizer — Ollama settings.
     """
     enabled:                bool  = False
     api_key:                str   = ""
-    model:                  str   = "claude-3-5-haiku-20241022"
+    model:                  str   = "llama3:8b-instruct-q4_K_M"
     max_tokens:             int   = 4096
     temperature:            float = 0.1
     include_schema:         bool  = True

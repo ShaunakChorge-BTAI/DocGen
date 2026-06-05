@@ -231,9 +231,8 @@ auth:
       password_hash: "$2b$12$jJVgeSpmMM40p25I2Sj7M.PotuJHVcmnK/OE.KEjr2fxeJfMos1yC"   # Admin@123
       role: admin
 
-# ── AI Optimizer (Anthropic Claude) ───────────────────────────────────────────
-# Uses Claude to analyse and optimize SQL stored procedures, views, and functions.
-# Requires: pip install "dbanalyser[ai]"  (installs anthropic package)
+# ── AI Optimizer (Ollama) ──────────────────────────────────────────────────────
+# Uses Ollama to analyse and optimize SQL stored procedures, views, and functions.
 #
 # ENFORCEMENT RULES (from CLAUDE.md):
 #   1. Schema context is ALWAYS fetched before optimization (via schema_intel)
@@ -249,15 +248,16 @@ auth:
 # Dashboard: AI OPTIMIZATION → AI Optimizer page
 ai_optimizer:
   enabled: false
-  api_key: ""             # or set ANTHROPIC_API_KEY environment variable
-  model: "claude-3-5-haiku-20241022"   # fast + cost-effective for SQL optimization
+  api_key: ""
+  model: "llama3:8b-instruct-q4_K_M"   # default Ollama model
   # Available models:
-  #   claude-3-5-haiku-20241022    ← recommended (fast, low cost)
-  #   claude-3-5-sonnet-20241022   ← higher quality
-  #   claude-sonnet-4-6            ← latest Sonnet
-  #   claude-opus-4-6              ← highest quality, highest cost
+  #   llama3:8b-instruct-q4_K_M
+  #   llama3
+  #   codellama
+  #   mistral
+  #   phi3
   max_tokens: 4096
-  temperature: 0.1         # low temperature = deterministic, less creative
+  temperature: 0.1         # low temperature = deterministic
   include_schema: true     # always include schema context (DO NOT DISABLE)
   include_execution_plan: true  # include execution plan when provided
   persist_results: true    # save all results to ai_optimizations table

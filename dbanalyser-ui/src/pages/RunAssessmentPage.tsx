@@ -161,7 +161,7 @@ export default function RunAssessmentPage() {
               {/* Coming soon modules */}
               {[
                 { label: 'Compliance Pack',      desc: 'SOX, GDPR, RBI rules — coming soon', icon: 'gavel'     },
-                { label: 'AI Recommendations',   desc: 'Claude-powered optimisation — configure API key first', icon: 'smart_toy' },
+                { label: 'AI Recommendations',   desc: 'Ollama-powered SQL optimisation', icon: 'smart_toy' },
               ].map(({ label: lbl, desc, icon }) => (
                 <div key={lbl} className="flex items-start gap-3 opacity-40 cursor-not-allowed">
                   <div className="mt-0.5">

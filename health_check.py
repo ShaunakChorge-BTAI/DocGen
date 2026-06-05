@@ -34,7 +34,7 @@ def _():
     cfg = load_config("analysis_config.yaml")
     assert isinstance(cfg, Settings)
     assert isinstance(cfg.ai_optimizer, AIOptimizerConfig)
-    assert cfg.ai_optimizer.model == "claude-3-5-haiku-20241022"
+    assert cfg.ai_optimizer.model == "llama3:8b-instruct-q4_K_M"
     assert cfg.ai_optimizer.persist_results is True
     assert cfg.ai_optimizer.include_schema is True
     assert cfg.ai_optimizer.max_tokens == 4096
@@ -173,46 +173,39 @@ def _():
     assert ctx_partial["warnings"]   # missing plan + findings warnings
 
 
-# ── 8. AI optimizer (mocked Anthropic API) ────────────────────────────────────
-@check(8, "AI optimizer — mocked Anthropic API call")
+# ── 8. AI optimizer (mocked Ollama API) ───────────────────────────────────────
+@check(8, "AI optimizer — mocked Ollama API call")
 def _():
     from dbanalyser.ai_optimizer.optimizer import (
         optimize_sql_object, OptimizationResult, _format_reasoning,
     )
+    from dbanalyser.ai_optimizer.llm_client import LLMResult
     good = "## Schema Context for usp_X\n### dbo.Accounts (table)\n  - Id int  NOT NULL  "
-    mock_mod = MagicMock()
-    mock_msg = MagicMock()
-    mock_msg.usage.input_tokens = 400
-    mock_msg.usage.output_tokens = 200
-    mock_msg.content = [MagicMock(text=json.dumps({
-        "optimized_sql": "SELECT Id FROM dbo.Accounts WITH (NOLOCK)",
-        "reasoning": "Replaced SELECT * — reduces I/O significantly.",
-        "changes": [{"type": "performance", "before": "SELECT *",
-                     "after": "SELECT Id", "impact": "Reduced I/O"}],
-        "confidence_score": 0.88,
-        "no_change_needed": False,
-        "no_change_reason": "",
-    }))]
-    mock_mod.Anthropic.return_value.messages.create.return_value = mock_msg
-    sys.modules["anthropic"] = mock_mod
-    try:
+    
+    mock_res = LLMResult(
+        text=json.dumps({
+            "optimized_sql": "SELECT Id FROM dbo.Accounts WITH (NOLOCK)",
+            "reasoning": "Replaced SELECT * — reduces I/O significantly.",
+            "changes": [{"type": "performance", "before": "SELECT *",
+                         "after": "SELECT Id", "impact": "Reduced I/O"}],
+            "confidence_score": 0.88,
+            "no_change_needed": False,
+            "no_change_reason": "",
+        }),
+        error=None,
+        latency_ms=100
+    )
+    with patch("dbanalyser.ai_optimizer.llm_client.call_llm", return_value=mock_res):
         result = optimize_sql_object(
             "usp_X", "SELECT * FROM dbo.Accounts",
             schema_context=good,
             findings=[{"rule_id": "PERF001", "severity": "High", "issue": "SELECT *"}],
-            api_key="sk-test", persist=False,
+            persist=False,
         )
         assert isinstance(result, OptimizationResult)
         assert result.error is None
         assert "Id" in result.optimized_sql
         assert abs(result.confidence_score - 0.88) < 0.01
-        assert result.tokens_used == 600
-        # no api key
-        r2 = optimize_sql_object("usp_X", "SELECT 1", schema_context=good,
-                                  api_key="", persist=False)
-        assert r2.error is not None and "api key" in r2.error.lower()
-    finally:
-        del sys.modules["anthropic"]
     # _format_reasoning
     txt = _format_reasoning({"no_change_needed": True, "no_change_reason": "Already optimal."})
     assert "No optimization needed" in txt
@@ -256,7 +249,6 @@ def _():
         toml = tomllib.load(f)
     opts = toml["project"]["optional-dependencies"]
     assert "ai" in opts, "Missing [ai] extra"
-    assert any("anthropic" in d for d in opts["ai"]), "anthropic not in [ai] deps"
     assert "embeddings" in opts, "Missing [embeddings] extra"
     assert any("sentence-transformers" in d for d in opts["embeddings"])
     assert "all" in opts, "Missing [all] meta-extra"
@@ -268,7 +260,7 @@ def _():
     from dbanalyser.config import load_config
     cfg = load_config("analysis_config.yaml")
     assert cfg.ai_optimizer.enabled is False
-    assert cfg.ai_optimizer.model == "claude-3-5-haiku-20241022"
+    assert cfg.ai_optimizer.model == "llama3:8b-instruct-q4_K_M"
     assert cfg.ai_optimizer.max_tokens == 4096
     assert cfg.ai_optimizer.temperature == 0.1
     assert cfg.ai_optimizer.include_schema is True

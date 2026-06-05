@@ -35,11 +35,10 @@ def _to_optimization_response(r: dict) -> AiOptimizationResponse:
 @router.post("/optimize", response_model=OptimizeResponse, dependencies=[AuthDep])
 def optimize_object(body: OptimizeRequest):
     """
-    Run AI optimization on a SQL object using Claude or Ollama.
+    Run AI optimization on a SQL object using Ollama.
 
     - `schema_context` is optional — when omitted the API fetches it automatically
       via the schema intelligence layer.
-    - `mode` selects the optimization provider: "quick" (Ollama, fast) or "advanced" (Claude, thorough)
     - Results are persisted to `ai_optimizations` when `persist=True` (default).
     """
     from dbanalyser.ai_optimizer.optimizer import optimize_sql_object
@@ -57,9 +56,9 @@ def optimize_object(body: OptimizeRequest):
             optimization_mode = body.mode,
         )
     except Exception as exc:
-        return OptimizeResponse(
-            object_name  = body.object_name,
-            error        = f"Optimization failed: {exc}",
+        raise HTTPException(
+            status_code=500,
+            detail=f"Optimization failed: {exc}",
         )
 
     if result.error:

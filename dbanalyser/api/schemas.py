@@ -387,7 +387,7 @@ class OptimizeRequest(BaseModel):
     model:           Optional[str] = None
     api_key:         Optional[str] = None
     persist:         bool = True
-    mode:            str = "advanced"  # "quick" (Ollama) or "advanced" (Claude)
+    mode:            str = "quick"  # "quick" (Ollama) or "advanced" (deprecated)
 
 
 class OptimizationChangeItem(BaseModel):

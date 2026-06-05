@@ -178,6 +178,7 @@ def _optimize_with_ollama(
     db_registry_id: Optional[int] = None,
     run_id:         Optional[int] = None,
     persist:        bool = True,
+    model:          Optional[str] = None,
 ) -> Optional[OptimizationResult]:
     """Optimize SQL using Ollama (fast, local)."""
     t0 = time.time()
@@ -193,7 +194,8 @@ def _optimize_with_ollama(
 
     from dbanalyser.ai_optimizer.llm_client import call_llm, LLM_MODEL
     
-    llm_res = call_llm(prompt=prompt, timeout=30)
+    model_to_use = model or LLM_MODEL
+    llm_res = call_llm(prompt=prompt, timeout=30, model=model_to_use)
     
     if llm_res.error:
         log.warning(f"Ollama optimization failed: {llm_res.error}")
@@ -230,7 +232,7 @@ def _optimize_with_ollama(
         execution_plan_used=execution_plan,
         findings_used=findings,
         confidence_score=confidence,
-        model_used=LLM_MODEL,
+        model_used=model_to_use,
         tokens_used=0,  # Ollama doesn't track tokens easily
         elapsed_sec=elapsed,
         error=None,
@@ -261,7 +263,7 @@ def optimize_sql_object(
     provider:       Optional[str] = None,  # Override provider (ollama)
 ) -> OptimizationResult:
     """
-    Send a SQL object to Claude or Ollama for AI optimization.
+    Send a SQL object to Ollama for AI optimization.
 
     PRECONDITIONS (enforced by CLAUDE.md):
       - schema_context MUST be non-empty (fetch via build_schema_context_for_object())
@@ -274,14 +276,14 @@ def optimize_sql_object(
         schema_context    : output of build_schema_context_for_object() — REQUIRED
         findings          : list of RuleFinding dicts for this object
         execution_plan    : parsed execution plan text (optional but recommended)
-        api_key           : Anthropic API key (falls back to env var ANTHROPIC_API_KEY)
-        model             : Claude model to use
+        api_key           : Ignored (Claude/Anthropic support removed)
+        model             : Ollama model to use
         max_tokens        : max response tokens
         db_registry_id    : for persistence
         run_id            : for persistence
         persist           : save result to ai_optimizations table
-        optimization_mode : "quick" (Ollama) or "advanced" (Claude)
-        provider          : override provider ("ollama" or "claude")
+        optimization_mode : ignored (always quick/Ollama)
+        provider          : ignored (always ollama)
 
     Returns:
         OptimizationResult with optimized SQL, reasoning, and metadata.
@@ -299,6 +301,7 @@ def optimize_sql_object(
         db_registry_id=db_registry_id,
         run_id=run_id,
         persist=persist,
+        model=model,
     )
     if result:
         return result
@@ -309,7 +312,7 @@ def optimize_sql_object(
         optimized_sql=source_sql, reasoning="",
         schema_context_used=schema_context,
         execution_plan_used=execution_plan, findings_used=findings or [],
-        confidence_score=0.0, model_used=_DEFAULT_MODEL, tokens_used=0,
+        confidence_score=0.0, model_used=model or _DEFAULT_MODEL, tokens_used=0,
         elapsed_sec=0.0, changes=[], no_change_needed=False, no_change_reason="",
         error="Ollama optimization service is not available or failed. Claude/Anthropic support has been removed.",
     )
