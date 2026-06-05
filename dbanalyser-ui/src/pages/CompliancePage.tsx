@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { useOutletContext } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis } from 'recharts'
 import { runApi, findingsApi, dbApi } from '../lib/api'
@@ -89,12 +88,6 @@ export default function CompliancePage() {
   const [selectedDb, setSelectedDb] = useState<string>('')
   const [selectedRun, setSelectedRun] = useState<number | null>(null)
   const [selectedSeverity, setSelectedSeverity] = useState<string>('')
-
-  const { selectedDb: ctxDb } = useOutletContext<{ selectedDb: string | null }>()
-
-  useEffect(() => {
-    if (ctxDb && !selectedDb) setSelectedDb(ctxDb)
-  }, [ctxDb, selectedDb])
 
   const { data: dbsData } = useQuery({
     queryKey: ['databases'],

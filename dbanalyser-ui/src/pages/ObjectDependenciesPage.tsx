@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { useOutletContext } from 'react-router-dom'
 import { api, dbApi } from '../lib/api'
 import PageHeader from '../components/PageHeader'
 

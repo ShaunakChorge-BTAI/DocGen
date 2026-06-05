@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { useOutletContext } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, CartesianGrid } from 'recharts'
 import { api, runApi } from '../lib/api'
@@ -23,13 +22,6 @@ export default function ReportsPage() {
   
   const [selectedDb, setSelectedDb] = useState<string>('')
   const [selectedRun, setSelectedRun] = useState<number | null>(null)
-
-  const { selectedDb: ctxDb } = useOutletContext<{ selectedDb: string | null }>()
-
-  // Sync DB from context
-  useEffect(() => {
-    if (ctxDb && !selectedDb) setSelectedDb(ctxDb)
-  }, [ctxDb, selectedDb])
 
   // Databases
   const { data: dbList = [] } = useQuery({

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { useOutletContext } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { api, dbApi, findingsApi } from '../lib/api'
@@ -24,12 +23,6 @@ export default function SchemaQualityPage() {
   const [dbFilter, setDbFilter] = useState<string>('')
   const [selectedRun, setSelectedRun] = useState<number | null>(null)
   const [issueTypeFilter, setIssueTypeFilter] = useState<'all' | 'pk' | 'indexes' | 'columns' | 'orphans'>('all')
-
-  const { selectedDb } = useOutletContext<{ selectedDb: string | null }>()
-
-  useEffect(() => {
-    if (selectedDb && !dbFilter) setDbFilter(selectedDb)
-  }, [selectedDb, dbFilter])
 
   // All registered databases for the filter dropdown
   const { data: dbListData } = useQuery({

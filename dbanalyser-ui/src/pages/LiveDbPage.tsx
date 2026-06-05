@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { useOutletContext } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -60,11 +59,6 @@ export default function LiveDbPage() {
   const [selectedRun, setSelectedRun] = useState<number | null>(null)
 
   const queryClient = useQueryClient()
-  const { selectedDb: ctxDb } = useOutletContext<{ selectedDb: string | null }>()
-
-  useEffect(() => {
-    if (ctxDb && !selectedDb) setSelectedDb(ctxDb)
-  }, [ctxDb, selectedDb])
 
   // Databases
   const { data: dbList = [] } = useQuery({
