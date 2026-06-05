@@ -33,7 +33,10 @@ from typing import Any, Dict, List, Optional
 
 log = logging.getLogger(__name__)
 
-_DEFAULT_MODEL = "claude-3-5-haiku-20241022"
+from dbanalyser.ai_optimizer import llm_client as _llm_client
+
+# Default model now comes from the configured LLM client (Ollama)
+_DEFAULT_MODEL = getattr(_llm_client, "LLM_MODEL", "llama3:8b-instruct-q4_K_M")
 
 
 # ── Result dataclass ──────────────────────────────────────────────────────────
@@ -254,8 +257,8 @@ def optimize_sql_object(
     db_registry_id: Optional[int] = None,
     run_id:         Optional[int] = None,
     persist:        bool = True,
-    optimization_mode: str = "advanced",  # "quick" (Ollama) or "advanced" (Claude)
-    provider:       Optional[str] = None,  # Override provider (ollama | claude)
+    optimization_mode: str = "quick",  # Use Ollama by default
+    provider:       Optional[str] = None,  # Override provider (ollama)
 ) -> OptimizationResult:
     """
     Send a SQL object to Claude or Ollama for AI optimization.
@@ -283,141 +286,33 @@ def optimize_sql_object(
     Returns:
         OptimizationResult with optimized SQL, reasoning, and metadata.
     """
-    # ── Route to appropriate provider ──────────────────────────────────────────
-    actual_provider = provider
-    if not actual_provider:
-        actual_provider = "ollama" if optimization_mode == "quick" else "claude"
+    # Use Ollama only: route directly to the Ollama optimizer
+    log.info(f"optimize_sql_object: optimization_mode={optimization_mode!r}, provider forced to 'ollama'")
 
-    log.info(f"optimize_sql_object: optimization_mode={optimization_mode!r}, actual_provider={actual_provider!r}")
-
-    if actual_provider == "ollama":
-        result = _optimize_with_ollama(
-            object_name=object_name,
-            source_sql=source_sql,
-            schema_context=schema_context,
-            findings=findings or [],
-            execution_plan=execution_plan,
-            max_tokens=max_tokens,
-            db_registry_id=db_registry_id,
-            run_id=run_id,
-            persist=persist,
-        )
-        if result:
-            return result
-        # If Ollama explicitly requested and fails, don't fallback to Claude without API key
-        if optimization_mode == "quick":
-            return OptimizationResult(
-                object_name=object_name, original_sql=source_sql,
-                optimized_sql=source_sql, reasoning="",
-                schema_context_used=schema_context,
-                execution_plan_used=execution_plan, findings_used=findings or [],
-                confidence_score=0.0, model_used="ollama", tokens_used=0,
-                elapsed_sec=0.0, changes=[], no_change_needed=False, no_change_reason="",
-                error="Ollama optimization service is not available. Make sure Ollama is running at the configured endpoint.",
-            )
-        # Fallback to Claude if advanced mode and Ollama fails
-        log.warning("Ollama optimization failed for %s, falling back to Claude", object_name)
-        actual_provider = "claude"
-
-    # Default to Claude optimization
-    # ── Enforce: schema context must be present ───────────────────────────────
-    if not schema_context or schema_context.strip() == "":
-        log.error(
-            "CLAUDE.md VIOLATION: optimize_sql_object called without schema_context "
-            "for object '%s'. Always call build_schema_context_for_object() first.",
-            object_name,
-        )
-        schema_context = "## Schema Context\n*Schema not available — optimization limited.*"
-
-    t0      = time.time()
-    findings = findings or []
-
-    # ── Resolve API key ───────────────────────────────────────────────────────
-    key = api_key or os.environ.get("ANTHROPIC_API_KEY", "") or os.environ.get("DBANALYSER_AI_OPTIMIZER_API_KEY", "")
-    if not key:
-        error_msg = "Anthropic API key not configured for Claude optimization. "
-        if optimization_mode == "advanced":
-            error_msg += "Set ANTHROPIC_API_KEY environment variable or use Quick (Ollama) mode instead."
-        else:
-            error_msg += "Please use Quick (Ollama) mode or provide an API key for advanced Claude mode."
-        return OptimizationResult(
-            object_name=object_name, original_sql=source_sql,
-            optimized_sql=source_sql, reasoning="",
-            schema_context_used=schema_context,
-            execution_plan_used=execution_plan, findings_used=findings,
-            confidence_score=0.0, model_used=model, tokens_used=0,
-            elapsed_sec=0.0, changes=[], no_change_needed=False, no_change_reason="",
-            error=error_msg,
-        )
-
-    # ── Call Anthropic API ────────────────────────────────────────────────────
-    try:
-        import anthropic   # type: ignore
-    except ImportError:
-        return OptimizationResult(
-            object_name=object_name, original_sql=source_sql,
-            optimized_sql=source_sql, reasoning="",
-            schema_context_used=schema_context,
-            execution_plan_used=execution_plan, findings_used=findings,
-            confidence_score=0.0, model_used=model, tokens_used=0,
-            elapsed_sec=0.0,
-            error="anthropic package not installed. Run: pip install anthropic",
-        )
-
-    optimized_sql = source_sql
-    reasoning     = ""
-    confidence    = 0.0
-    tokens_used   = 0
-    error         = None
-
-    try:
-        client = anthropic.Anthropic(api_key=key)
-        user_prompt = _build_user_prompt(
-            object_name=object_name,
-            source_sql=source_sql,
-            schema_context=schema_context,
-            findings=findings,
-            execution_plan=execution_plan,
-        )
-        message = client.messages.create(
-            model=model,
-            max_tokens=max_tokens,
-            system=_SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": user_prompt}],
-        )
-        tokens_used = message.usage.input_tokens + message.usage.output_tokens
-        raw         = message.content[0].text.strip()
-
-        # Parse JSON response
-        if raw.startswith("{"):
-            data          = json.loads(raw)
-            optimized_sql = data.get("optimized_sql", source_sql)
-            reasoning     = _format_reasoning(data)
-            confidence    = float(data.get("confidence_score", 0.7))
-        else:
-            # Model responded in plain text — extract SQL if possible
-            reasoning  = raw
-            confidence = 0.5
-
-    except Exception as exc:
-        error = str(exc)
-        log.error("AI optimization failed for %s: %s", object_name, exc)
-
-    elapsed = round(time.time() - t0, 2)
-    result  = OptimizationResult(
-        object_name=object_name, original_sql=source_sql,
-        optimized_sql=optimized_sql, reasoning=reasoning,
-        schema_context_used=schema_context,
-        execution_plan_used=execution_plan, findings_used=findings,
-        confidence_score=confidence, model_used=model,
-        tokens_used=tokens_used, elapsed_sec=elapsed, error=error,
+    result = _optimize_with_ollama(
+        object_name=object_name,
+        source_sql=source_sql,
+        schema_context=schema_context,
+        findings=findings or [],
+        execution_plan=execution_plan,
+        max_tokens=max_tokens,
+        db_registry_id=db_registry_id,
+        run_id=run_id,
+        persist=persist,
     )
+    if result:
+        return result
 
-    # ── Persist to DB ─────────────────────────────────────────────────────────
-    if persist:
-        _persist_result(result, db_registry_id=db_registry_id, run_id=run_id)
-
-    return result
+    # If Ollama failed, return an error result — Claude/Anthropic support removed
+    return OptimizationResult(
+        object_name=object_name, original_sql=source_sql,
+        optimized_sql=source_sql, reasoning="",
+        schema_context_used=schema_context,
+        execution_plan_used=execution_plan, findings_used=findings or [],
+        confidence_score=0.0, model_used=_DEFAULT_MODEL, tokens_used=0,
+        elapsed_sec=0.0, changes=[], no_change_needed=False, no_change_reason="",
+        error="Ollama optimization service is not available or failed. Claude/Anthropic support has been removed.",
+    )
 
 
 def _format_reasoning(data: dict) -> str:

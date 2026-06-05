@@ -5,8 +5,8 @@ from typing import NamedTuple, Optional
 
 logger = logging.getLogger(__name__)
 
-OLLAMA_BASE_URL = os.environ.get("OLLAMA_URL", "http://172.19.26.252:11434")
-LLM_MODEL       = os.environ.get("LLM_MODEL",  "llama3.1")
+OLLAMA_BASE_URL = os.environ.get("OLLAMA_URL", "https://ollama.osourceglobal.com:11434")
+LLM_MODEL       = os.environ.get("LLM_MODEL",  "llama3:8b-instruct-q4_K_M")
 
 class LLMResult(NamedTuple):
     text: Optional[str]
