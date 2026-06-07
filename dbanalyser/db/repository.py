@@ -468,10 +468,55 @@ def bulk_insert_findings(run_int_id: int, findings: List[Finding]) -> None:
 
 
 def get_finding_by_id(finding_id: int) -> Optional[Dict[str, Any]]:
+    """Return full finding detail including comments and status history."""
     with get_cursor() as cur:
         cur.execute("SELECT * FROM findings WHERE id = %s", (finding_id,))
         row = cur.fetchone()
-        return dict(row) if row else None
+        if not row:
+            return None
+        finding = dict(row)
+
+        # Fetch comments if the table exists
+        comments = []
+        try:
+            cur.execute(
+                "SELECT * FROM finding_comments WHERE finding_id = %s ORDER BY created_at ASC",
+                (finding_id,)
+            )
+            comments = [dict(r) for r in cur.fetchall()]
+        except Exception:
+            pass
+
+        # Fetch status history if the table exists
+        status_history = []
+        try:
+            cur.execute(
+                "SELECT * FROM finding_status_history WHERE finding_id = %s ORDER BY changed_at ASC",
+                (finding_id,)
+            )
+            status_history = [dict(r) for r in cur.fetchall()]
+        except Exception:
+            pass
+
+        # Fetch related schema object if available
+        schema_object = None
+        try:
+            cur.execute(
+                """SELECT so.* FROM schema_objects so
+                   WHERE so.object_name = %s AND so.object_type = %s
+                   LIMIT 1""",
+                (finding.get("object_name"), finding.get("object_type", "").lower())
+            )
+            so_row = cur.fetchone()
+            if so_row:
+                schema_object = dict(so_row)
+        except Exception:
+            pass
+
+        finding["comments"] = comments
+        finding["status_history"] = status_history
+        finding["schema_object"] = schema_object
+        return finding
 
 def get_findings(run_int_id: int,
                  severity: Optional[str] = None,

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { api, dbApi } from '../lib/api'
 import PageHeader from '../components/PageHeader'
 
@@ -32,6 +32,8 @@ export default function ObjectDependenciesPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [dbRegistryId, setDbRegistryId] = useState<number | null>(null)
+  const [syncMsg, setSyncMsg] = useState<string | null>(null)
+  const queryClient = useQueryClient()
 
   // Fetch database ID when database is selected
   const { data: databases } = useQuery({
@@ -173,7 +175,27 @@ export default function ObjectDependenciesPage() {
               ) : !dbRegistryId ? (
                 <div className="text-sm text-on-surface-variant py-2">Database ID not found</div>
               ) : !objects || objects.length === 0 ? (
-                <div className="text-sm text-on-surface-variant py-2">No objects of type "{selectedObjectType}" found</div>
+                <div className="space-y-3 py-2">
+                  <div className="text-sm text-on-surface-variant">No objects of type "{selectedObjectType}" found in schema index.</div>
+                  {syncMsg && <p className="text-xs text-green-600 font-medium">{syncMsg}</p>}
+                  <button
+                    onClick={async () => {
+                      try {
+                        const res = await api.post('/schema/sync-from-snapshots', null, {
+                          params: dbRegistryId ? { db_registry_id: dbRegistryId } : {}
+                        })
+                        setSyncMsg(res.data?.message || 'Sync complete')
+                        queryClient.invalidateQueries({ queryKey: ['schema-objects'] })
+                      } catch {
+                        setSyncMsg('Sync failed — run an assessment first')
+                      }
+                    }}
+                    className="px-3 py-1.5 text-xs text-white rounded-lg"
+                    style={{ background: 'linear-gradient(135deg, #630ed4, #7c3aed)' }}
+                  >
+                    Sync Schema from Runs
+                  </button>
+                </div>
               ) : (
                 <>
                   <input

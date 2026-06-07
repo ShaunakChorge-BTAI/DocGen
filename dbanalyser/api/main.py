@@ -60,12 +60,41 @@ async def _lifespan(app: FastAPI):
             "  → Check postgres.host / port / dbname in analysis_config.yaml.",
             exc,
         )
+    # Ensure auxiliary tables exist (non-critical — best effort)
+    try:
+        from dbanalyser.db.connection import get_cursor
+        with get_cursor() as cur:
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS finding_status_history (
+                    id SERIAL PRIMARY KEY,
+                    finding_id INTEGER NOT NULL,
+                    old_status TEXT,
+                    new_status TEXT NOT NULL,
+                    reason TEXT,
+                    changed_by TEXT,
+                    changed_at TIMESTAMPTZ DEFAULT NOW()
+                )
+            """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS finding_comments (
+                    id SERIAL PRIMARY KEY,
+                    finding_id INTEGER NOT NULL,
+                    user_id INTEGER,
+                    comment_text TEXT NOT NULL,
+                    is_internal BOOLEAN DEFAULT FALSE,
+                    created_at TIMESTAMPTZ DEFAULT NOW()
+                )
+            """)
+        _log.info("Auxiliary tables (finding_status_history, finding_comments) verified.")
+    except Exception as exc:
+        _log.warning("Could not verify auxiliary tables: %s", exc)
     yield
     try:
         from dbanalyser.db.connection import close_pool
         close_pool()
     except Exception:
         pass
+
 
 
 # ── App factory ───────────────────────────────────────────────────────────────

@@ -87,17 +87,71 @@ def get_finding_detail(finding_id: int):
 
 @router.patch("/{finding_id}/status", dependencies=[AuthDep])
 def patch_finding_status(finding_id: int, body: dict):
-    """Update finding status."""
+    """Update finding status and record history."""
     try:
         from dbanalyser.db.repository import update_finding_status
+        from dbanalyser.db.connection import get_cursor
         new_status = body.get("new_status")
+        reason = body.get("reason", "")
         if new_status:
+            # Get old status first for history
+            with get_cursor() as cur:
+                cur.execute("SELECT status FROM findings WHERE id = %s", (finding_id,))
+                row = cur.fetchone()
+                old_status = row["status"] if row else None
             update_finding_status(finding_id, new_status)
+            # Record status history
+            try:
+                with get_cursor() as cur:
+                    cur.execute(
+                        """INSERT INTO finding_status_history
+                           (finding_id, old_status, new_status, reason, changed_at)
+                           VALUES (%s, %s, %s, %s, NOW())
+                           ON CONFLICT DO NOTHING""",
+                        (finding_id, old_status, new_status, reason)
+                    )
+            except Exception:
+                pass  # Table may not exist yet
         return {"status": "ok"}
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
 
 @router.post("/{finding_id}/comments", dependencies=[AuthDep])
 def post_finding_comment(finding_id: int, body: dict):
-    """Add finding comment (mocked)."""
-    return {"status": "ok"}
+    """Add a comment to a finding."""
+    try:
+        from dbanalyser.db.connection import get_cursor
+        comment_text = body.get("comment_text", "")
+        is_internal = body.get("is_internal", False)
+        if not comment_text.strip():
+            raise HTTPException(status_code=400, detail="comment_text is required")
+        with get_cursor() as cur:
+            try:
+                cur.execute(
+                    """INSERT INTO finding_comments (finding_id, comment_text, is_internal, created_at)
+                       VALUES (%s, %s, %s, NOW()) RETURNING id""",
+                    (finding_id, comment_text, is_internal)
+                )
+            except Exception:
+                # Table may not exist — create it on the fly
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS finding_comments (
+                        id SERIAL PRIMARY KEY,
+                        finding_id INTEGER NOT NULL REFERENCES findings(id) ON DELETE CASCADE,
+                        user_id INTEGER,
+                        comment_text TEXT NOT NULL,
+                        is_internal BOOLEAN DEFAULT FALSE,
+                        created_at TIMESTAMPTZ DEFAULT NOW()
+                    )
+                """)
+                cur.execute(
+                    """INSERT INTO finding_comments (finding_id, comment_text, is_internal, created_at)
+                       VALUES (%s, %s, %s, NOW()) RETURNING id""",
+                    (finding_id, comment_text, is_internal)
+                )
+        return {"status": "ok"}
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+

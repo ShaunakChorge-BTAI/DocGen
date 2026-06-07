@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
 import { runApi, findingsApi, dbApi, api } from '../lib/api'
 import PageHeader from '../components/PageHeader'
@@ -128,11 +128,10 @@ export default function AnalysisPage() {
                 setPagination({ limit: 50, offset: 0 })
               }}
               className="w-full border rounded-lg px-3 py-2"
-              disabled={!selectedDb}
             >
               <option value="">Choose a run...</option>
               {runs.length === 0 ? (
-                <option disabled>{selectedDb ? 'No runs found for this database' : 'Select a database first'}</option>
+                <option disabled>{selectedDb ? 'No runs found for this database' : 'No runs available'}</option>
               ) : (
                 runs.map(run => (
                   <option key={run.id} value={run.id}>
@@ -176,6 +175,7 @@ export default function AnalysisPage() {
               className="border rounded-lg px-3 py-2"
             >
               <option value="">All</option>
+              <option value="Open">Open</option>
               <option value="Pending">Pending</option>
               <option value="In Progress">In Progress</option>
               <option value="Optimized">Optimized</option>
@@ -231,9 +231,12 @@ export default function AnalysisPage() {
                       <td className="px-6 py-3 text-sm text-gray-600">{finding.object_type}</td>
                       <td className="px-6 py-3 text-sm">
                         <span className={`px-2 py-1 rounded text-xs ${
+                          finding.status === 'Open' ? 'bg-cyan-100 text-cyan-700' :
                           finding.status === 'Pending' ? 'bg-blue-100 text-blue-700' :
                           finding.status === 'In Progress' ? 'bg-yellow-100 text-yellow-700' :
                           finding.status === 'Optimized' ? 'bg-green-100 text-green-700' :
+                          finding.status === 'Acknowledged' ? 'bg-purple-100 text-purple-700' :
+                          finding.status === 'CR_Submitted' ? 'bg-orange-100 text-orange-700' :
                           'bg-gray-100 text-gray-700'
                         }`}>
                           {finding.status}
@@ -313,6 +316,7 @@ function FindingDetailModal({ finding, isOpen, onClose }) {
   const [activeTab, setActiveTab] = useState('problem')
   const [newComment, setNewComment] = useState('')
   const [newStatus, setNewStatus] = useState(finding.status)
+  const queryClient = useQueryClient()
 
   const { data: details, refetch } = useQuery({
     queryKey: ['finding-detail', finding.id],
@@ -329,6 +333,7 @@ function FindingDetailModal({ finding, isOpen, onClose }) {
         reason: 'Status updated'
       })
       refetch()
+      queryClient.invalidateQueries({ queryKey: ['findings'] })
     } catch (error) {
       console.error('Error:', error)
     }
@@ -376,10 +381,12 @@ function FindingDetailModal({ finding, isOpen, onClose }) {
               onChange={(e) => setNewStatus(e.target.value)}
               className="mt-1 border rounded-lg px-3 py-1 text-sm"
             >
+              <option value="Open">Open</option>
               <option value="Pending">Pending</option>
               <option value="In Progress">In Progress</option>
               <option value="Optimized">Optimized</option>
               <option value="CR_Submitted">CR Submitted</option>
+              <option value="Acknowledged">Acknowledged</option>
             </select>
           </div>
           {newStatus !== finding.status && (

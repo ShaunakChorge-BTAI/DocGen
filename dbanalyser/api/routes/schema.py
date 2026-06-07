@@ -150,3 +150,60 @@ def clear_schema_for_db(db_registry_id: int):
     from dbanalyser.schema_intel.repository import delete_schema_for_db
     deleted = delete_schema_for_db(db_registry_id)
     return OkResponse(message=f"Deleted {deleted} schema objects for db_registry_id={db_registry_id}")
+
+
+@router.post("/sync-from-snapshots", response_model=OkResponse, dependencies=[AuthDep])
+def sync_schema_from_snapshots(
+    db_registry_id: Optional[int] = Query(None, description="Sync for specific DB. Omit for all."),
+):
+    """
+    Populate schema_objects table from existing object_snapshots data.
+    This lets Schema Quality and Object Dependencies work without a full metadata refresh.
+    """
+    from dbanalyser.db.connection import get_cursor
+    inserted = 0
+    try:
+        with get_cursor() as cur:
+            # Build filter clause
+            where = "WHERE os.run_id IN (SELECT id FROM runs WHERE db_registry_id = %s)" if db_registry_id else ""
+            params = [db_registry_id] if db_registry_id else []
+
+            cur.execute(f"""
+                SELECT DISTINCT
+                    r.db_registry_id,
+                    os.object_type,
+                    COALESCE(os.schema_name, 'dbo') AS schema_name,
+                    os.object_name,
+                    '' AS parent_name
+                FROM object_snapshots os
+                JOIN runs r ON r.id = os.run_id
+                {where}
+                AND r.db_registry_id IS NOT NULL
+                AND os.object_name IS NOT NULL
+            """, params)
+            rows = cur.fetchall()
+
+            for row in rows:
+                db_reg_id = row["db_registry_id"]
+                obj_type = (row["object_type"] or "").lower()
+                schema_name = row["schema_name"] or "dbo"
+                object_name = row["object_name"] or ""
+                if not object_name:
+                    continue
+                try:
+                    cur.execute("""
+                        INSERT INTO schema_objects
+                            (db_registry_id, object_type, schema_name, object_name,
+                             parent_name, embedding_json)
+                        VALUES (%s, %s, %s, %s, %s, %s)
+                        ON CONFLICT (db_registry_id, object_type, schema_name, object_name, parent_name)
+                        DO UPDATE SET ingested_at = NOW()
+                    """, (db_reg_id, obj_type, schema_name, object_name, "", "[]"))
+                    inserted += 1
+                except Exception:
+                    pass  # Skip individual insert errors
+
+        return OkResponse(message=f"Synced {inserted} schema objects from snapshots.")
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Sync failed: {exc}")
+

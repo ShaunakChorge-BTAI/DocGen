@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { api, dbApi, findingsApi } from '../lib/api'
 import PageHeader from '../components/PageHeader'
@@ -23,6 +23,8 @@ export default function SchemaQualityPage() {
   const [dbFilter, setDbFilter] = useState<string>('')
   const [selectedRun, setSelectedRun] = useState<number | null>(null)
   const [issueTypeFilter, setIssueTypeFilter] = useState<'all' | 'pk' | 'indexes' | 'columns' | 'orphans'>('all')
+  const [syncMsg, setSyncMsg] = useState<string | null>(null)
+  const queryClient = useQueryClient()
 
   // All registered databases for the filter dropdown
   const { data: dbListData } = useQuery({
@@ -253,9 +255,34 @@ export default function SchemaQualityPage() {
                     </td>
                   </tr>
                 ))}
-                {allObjects.length === 0 && (
-                  <tr><td colSpan={7} className="px-4 py-8 text-center text-on-surface-variant">No schema objects indexed. Run an assessment first.</td></tr>
-                )}
+              {allObjects.length === 0 && (
+                <tr><td colSpan={7} className="px-4 py-8 text-center text-on-surface-variant">
+                  <div className="flex flex-col items-center gap-3">
+                    <span className="material-symbols-outlined" style={{ fontSize: 32, color: '#7c3aed' }}>schema</span>
+                    <p className="text-sm">No schema objects indexed yet.</p>
+                    <p className="text-xs text-on-surface-variant">Run an assessment first, then click Sync below to load schema objects.</p>
+                    {syncMsg && <p className="text-xs text-green-600 font-medium">{syncMsg}</p>}
+                    <button
+                      onClick={async () => {
+                        try {
+                          const res = await api.post('/schema/sync-from-snapshots', null, {
+                            params: dbRegistryId ? { db_registry_id: dbRegistryId } : {}
+                          })
+                          setSyncMsg(res.data?.message || 'Sync complete')
+                          queryClient.invalidateQueries({ queryKey: ['schema-objects'] })
+                          queryClient.invalidateQueries({ queryKey: ['schema-summary'] })
+                        } catch (e) {
+                          setSyncMsg('Sync failed — run an assessment first')
+                        }
+                      }}
+                      className="px-4 py-2 text-sm text-white rounded-lg"
+                      style={{ background: 'linear-gradient(135deg, #630ed4, #7c3aed)' }}
+                    >
+                      Sync Schema from Runs
+                    </button>
+                  </div>
+                </td></tr>
+              )}
               </tbody>
             </table>
             {allObjects.length > 50 && (
