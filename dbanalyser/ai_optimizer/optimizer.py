@@ -192,11 +192,11 @@ def _optimize_with_ollama(
         execution_plan=execution_plan,
     )
 
-    from dbanalyser.ai_optimizer.llm_client import call_llm, LLM_MODEL
-    
+    from dbanalyser.ai_optimizer.llm_client import call_llm, LLM_MODEL, DEFAULT_TIMEOUT
+
     model_to_use = model or LLM_MODEL
-    # Pass timeout=None to fall back to the default (10, 300) connection and read timeout tuple
-    llm_res = call_llm(prompt=prompt, timeout=None, model=model_to_use)
+    # Use the module DEFAULT_TIMEOUT unless caller overrides
+    llm_res = call_llm(prompt=prompt, timeout=DEFAULT_TIMEOUT, model=model_to_use)
     
     if llm_res.error:
         log.warning(f"Ollama optimization failed: {llm_res.error}")

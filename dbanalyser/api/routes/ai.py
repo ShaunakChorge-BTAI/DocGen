@@ -44,10 +44,19 @@ def optimize_object(body: OptimizeRequest):
     from dbanalyser.ai_optimizer.optimizer import optimize_sql_object
 
     try:
+        schema_ctx = body.schema_context
+        if not schema_ctx:
+            # Build schema context automatically if caller omitted it
+            from dbanalyser.schema_intel.searcher import build_schema_context_for_object
+            try:
+                schema_ctx = build_schema_context_for_object(body.object_name, body.sql or "")
+            except Exception:
+                schema_ctx = ""  # fallback to empty string; optimizer handles absence
+
         result = optimize_sql_object(
             object_name       = body.object_name,
             source_sql        = body.sql,
-            schema_context    = body.schema_context,
+            schema_context    = schema_ctx,
             findings          = body.findings,
             execution_plan    = body.execution_plan,
             api_key           = body.api_key or "",
@@ -76,10 +85,15 @@ def optimize_object(body: OptimizeRequest):
         )
         for c in (result.changes or [])
     ]
+    # Coerce reasoning into a string for API response (some LLM outputs may be lists)
+    reasoning_text = result.reasoning if isinstance(result.reasoning, str) else (
+        "\n".join(result.reasoning) if isinstance(result.reasoning, (list, tuple)) else str(result.reasoning or "")
+    )
+
     return OptimizeResponse(
         object_name      = body.object_name,
         optimized_sql    = result.optimized_sql,
-        reasoning        = result.reasoning or "",
+        reasoning        = reasoning_text,
         changes          = changes,
         confidence_score = float(result.confidence_score or 0.0),
         no_change_needed = bool(result.no_change_needed),

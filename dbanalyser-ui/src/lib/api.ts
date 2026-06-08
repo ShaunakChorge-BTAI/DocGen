@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8001',
+  baseURL: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000',
 })
 
 api.interceptors.request.use((cfg) => {
@@ -62,7 +62,12 @@ export const runApi = {
 //                 schema_name, issue, recommendation, line_number, snippet, status
 export const findingsApi = {
   byRun:   (runId: number, params?: Record<string, any>) =>
-    api.get<{ findings: any[]; total: number }>('/findings/', { params: { run_id: runId, limit: 5000, ...params } }),
+    api.get<{ data: any[]; total: number }>('/findings/', { params: { run_id: runId, limit: 5000, ...params } })
+      .then(res => {
+        // Normalize backend responses that may return stringified JSON in res.data
+        const payload = typeof res.data === 'string' ? JSON.parse(res.data) : res.data
+        return { ...res, data: payload }
+      }),
   summary: (runId: number)               => api.get<any>(`/findings/summary/${runId}`),
 }
 

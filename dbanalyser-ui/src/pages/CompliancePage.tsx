@@ -113,10 +113,15 @@ export default function CompliancePage() {
 
   const { data: findingsData } = useQuery({
     queryKey: ['findings', effectiveRunId],
-    queryFn:  () => findingsApi.byRun(effectiveRunId!).then(r => r.data),
+    queryFn:  async () => {
+      const res = await findingsApi.byRun(effectiveRunId!)
+      const payload = typeof res.data === 'string' ? JSON.parse(res.data) : res.data
+      return payload
+    },
     enabled:  !!effectiveRunId,
   })
-  const allFindingsRaw: any[] = findingsData?.findings ?? []
+  const allFindingsRaw: any[] = (findingsData && findingsData.findings) ? findingsData.findings : []
+
 
   // Filter by severity if selected
   const allFindings = selectedSeverity
@@ -222,7 +227,8 @@ export default function CompliancePage() {
           <label className="text-sm font-medium text-on-surface block mb-1">Select Database</label>
           <select
             value={selectedDb ?? ''}
-            onChange={(e) => setSelectedDb(e.target.value || null)}
+            // onChange={(e) => setSelectedDb(e.target.value || 'null')}
+            onChange={(e) => setSelectedDb(e.target.value)}
             className="w-full bg-surface-low border border-surface-variant rounded-lg px-3 py-2 text-on-surface"
           >
             <option value="">All Databases</option>

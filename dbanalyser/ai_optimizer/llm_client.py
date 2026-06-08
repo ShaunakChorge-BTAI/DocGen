@@ -3,19 +3,20 @@ import logging
 import requests
 from typing import NamedTuple, Optional
 
+
 logger = logging.getLogger(__name__)
 
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_HOST") or os.environ.get("OLLAMA_URL") or os.environ.get("OLLAMA_BASE_URL") or "https://ollama.osourceglobal.com:11434"
-LLM_MODEL       = os.environ.get("OLLAMA_MODEL") or os.environ.get("LLM_MODEL") or "llama3:8b-instruct-q4_K_M"
+LLM_MODEL       = os.environ.get("OLLAMA_MODEL") or os.environ.get("LLM_MODEL") or os.environ.get("MODEL_NAME") or "llama3:8b-instruct-q4_K_M"
 
-# Parameters matching test.py
+# Parameters matching test.py defaults
 TEMPERATURE = float(os.environ.get("OLLAMA_TEMPERATURE") or os.environ.get("TEMPERATURE", "0.7"))
 NUM_CTX     = int(os.environ.get("OLLAMA_NUM_CTX") or os.environ.get("NUM_CTX", "1024"))
 NUM_PREDICT = int(os.environ.get("OLLAMA_NUM_PREDICT") or os.environ.get("NUM_PREDICT", "512"))
 
-# Timeout configuration
-CONNECTION_TIMEOUT = 10
-READ_TIMEOUT = 300
+# Timeout configuration (seconds)
+CONNECTION_TIMEOUT = int(os.environ.get("OLLAMA_CONNECTION_TIMEOUT") or 10)
+READ_TIMEOUT = int(os.environ.get("OLLAMA_READ_TIMEOUT") or 300)
 DEFAULT_TIMEOUT = (CONNECTION_TIMEOUT, READ_TIMEOUT)
 
 class LLMResult(NamedTuple):
@@ -27,6 +28,7 @@ def call_llm(prompt: str, timeout: any = DEFAULT_TIMEOUT, model: Optional[str] =
     """Call Ollama LLM with defensive logging and structured results."""
     endpoint = f"{OLLAMA_BASE_URL}/api/generate"
     chosen_model = model or LLM_MODEL
+
     payload = {
         "model": chosen_model,
         "prompt": prompt,
@@ -39,7 +41,9 @@ def call_llm(prompt: str, timeout: any = DEFAULT_TIMEOUT, model: Optional[str] =
     logger.info(f"Calling Ollama at {endpoint} with model {chosen_model} (prompt length: {len(prompt)} chars)")
     
     try:
-        response = requests.post(endpoint, json=payload, timeout=timeout)
+        # If caller passed None, fall back to module DEFAULT_TIMEOUT
+        req_timeout = timeout if timeout is not None else DEFAULT_TIMEOUT
+        response = requests.post(endpoint, json=payload, timeout=req_timeout)
         latency_ms = int(response.elapsed.total_seconds() * 1000)
         
         if response.status_code == 200:
