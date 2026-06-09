@@ -81,7 +81,7 @@ def refresh_database_metadata(db_name: str):
             cursor.execute(run_sql, (run_id, row['id'], f"Metadata Refresh - {db_name}", timestamp_iso, metadata.total_objects))
             cursor_result = cursor.fetchone()
             if cursor_result:
-                run_pk = cursor_result[0]
+                run_pk = cursor_result['id']
             else:
                 raise Exception("Failed to create run record")
 
@@ -212,14 +212,14 @@ def get_database_metadata(db_name: str, object_type: Optional[str] = None):
         # Group by type
         grouped = {}
         for obj in objects:
-            obj_type = obj[1]
+            obj_type = obj['object_type']
             if obj_type not in grouped:
                 grouped[obj_type] = []
             grouped[obj_type].append({
-                'name': obj[0],
-                'schema': obj[2],
-                'hash': obj[3],
-                'fetched_at': obj[4].isoformat() if hasattr(obj[4], 'isoformat') else obj[4]
+                'name': obj['object_name'],
+                'schema': obj['schema_name'],
+                'hash': obj['metadata_hash'],
+                'fetched_at': obj['created_at'].isoformat() if hasattr(obj['created_at'], 'isoformat') else obj['created_at']
             })
 
     return {

@@ -89,7 +89,7 @@ def scan_live_metrics(db_name: str, req: Optional[ScanRequest] = None):
             cursor.execute(run_sql, (run_id, row['id'], f"Live Metrics - {db_name}", timestamp_iso))
             cursor_result = cursor.fetchone()
             if cursor_result:
-                run_pk = cursor_result[0]
+                run_pk = cursor_result['id']
             else:
                 raise Exception("Failed to create run record")
 
@@ -501,8 +501,8 @@ def get_live_metrics(run_id: int, metric_type: str):
 
         metrics = [
             {
-                'data': json.loads(row[0]) if isinstance(row[0], str) else row[0],
-                'captured_at': row[1].isoformat() if row[1] else None,
+                'data': json.loads(row['data_json']) if isinstance(row['data_json'], str) else row['data_json'],
+                'captured_at': row['created_at'].isoformat() if row['created_at'] else None,
             }
             for row in rows
         ]
