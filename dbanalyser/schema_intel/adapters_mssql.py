@@ -81,11 +81,8 @@ class MSSQLSchemaAdapter(SchemaAdapter):
             ORDER BY c.ORDINAL_POSITION
         """
         try:
-            results = self.driver.execute_query(sql, {
-                'param1': f"{schema_name}.{table_name}",
-                'param2': table_name,
-                'param3': schema_name
-            })
+            # pyodbc / driver expects positional parameters as a sequence for '?' markers
+            results = self.driver.execute_query(sql, (f"{schema_name}.{table_name}", table_name, schema_name))
 
             columns = []
             for row in results:

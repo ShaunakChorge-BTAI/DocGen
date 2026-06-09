@@ -124,7 +124,8 @@ class MSSQLDriver(DatabaseDriver):
             WHERE TABLE_NAME = ? AND TABLE_SCHEMA = ?
             ORDER BY ORDINAL_POSITION
         """
-        results = self.execute_query(sql, {'param1': table_name, 'param2': schema})
+        # Use positional parameters for '?' markers
+        results = self.execute_query(sql, (table_name, schema))
         return [
             ColumnDef(
                 table_name=table_name,

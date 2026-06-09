@@ -98,13 +98,14 @@ class PostgreSQLSchemaAdapter(SchemaAdapter):
 
     def extract_procedures(self) -> List[SchemaProcedure]:
         """Extract all stored procedures and functions."""
+        # information_schema.routines exposes columns as routine_name and routine_schema
         sql = """
             SELECT
-                routinename as routine_name,
+                routine_name as routine_name,
                 routine_schema as routine_schema
             FROM information_schema.routines
             WHERE routine_schema NOT IN ('pg_catalog', 'information_schema')
-            ORDER BY routine_schema, routinename
+            ORDER BY routine_schema, routine_name
         """
         try:
             results = self.driver.execute_query(sql)
