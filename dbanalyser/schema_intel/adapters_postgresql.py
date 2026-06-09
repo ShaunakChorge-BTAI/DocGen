@@ -44,7 +44,7 @@ class PostgreSQLSchemaAdapter(SchemaAdapter):
         """
         try:
             self.driver.connect()
-            results = self.driver.execute_query(sql)
+            results = self.driver.execute_query(sql, as_dict=True)
 
             tables = []
             for row in results:
@@ -78,7 +78,7 @@ class PostgreSQLSchemaAdapter(SchemaAdapter):
             ORDER BY ordinal_position
         """
         try:
-            results = self.driver.execute_query(sql, (table_name, schema_name))
+            results = self.driver.execute_query(sql, (table_name, schema_name), as_dict=True)
 
             columns = []
             for row in results:
@@ -108,7 +108,7 @@ class PostgreSQLSchemaAdapter(SchemaAdapter):
             ORDER BY routine_schema, routine_name
         """
         try:
-            results = self.driver.execute_query(sql)
+            results = self.driver.execute_query(sql, as_dict=True)
             procedures = [
                 SchemaProcedure(
                     name=row.get('routine_name') or row.get('routinename') or row.get('name'),
@@ -132,7 +132,7 @@ class PostgreSQLSchemaAdapter(SchemaAdapter):
             ORDER BY schemaname, viewname
         """
         try:
-            results = self.driver.execute_query(sql)
+            results = self.driver.execute_query(sql, as_dict=True)
             views = [
                 SchemaView(
                     name=row.get('view_name') or row.get('viewname') or row.get('name'),
@@ -158,7 +158,7 @@ class PostgreSQLSchemaAdapter(SchemaAdapter):
             ORDER BY tablename, indexname
         """
         try:
-            results = self.driver.execute_query(sql)
+            results = self.driver.execute_query(sql, as_dict=True)
             indexes = [
                 SchemaIndex(
                     name=row.get('index_name') or row.get('indexname') or row.get('name'),
