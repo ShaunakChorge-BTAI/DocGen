@@ -542,11 +542,7 @@ def get_findings(run_int_id: int,
             f"ORDER BY severity, object_name LIMIT %(limit)s",
             params)
         rows = [dict(r) for r in cur.fetchall()]
-    try:
-        import pandas as pd
-        return pd.DataFrame(rows)
-    except ImportError:
-        return rows
+    return rows
 
 
 def get_all_findings_for_db(db_registry_id: int,
@@ -578,11 +574,7 @@ def get_all_findings_for_db(db_registry_id: int,
                  LIMIT %s
             """, (db_registry_id, limit))
         rows = [dict(r) for r in cur.fetchall()]
-    try:
-        import pandas as pd
-        return pd.DataFrame(rows)
-    except ImportError:
-        return rows
+    return rows
 
 
 def update_finding_status(finding_id: int, status: str,
@@ -707,11 +699,7 @@ def get_trend_for_db(db_registry_id: int, limit: int = 60):
              ORDER BY timestamp DESC LIMIT %s
         """, (db_registry_id, limit))
         rows = [dict(r) for r in cur.fetchall()]
-    try:
-        import pandas as pd
-        return pd.DataFrame(rows)
-    except ImportError:
-        return rows
+    return rows
 
 
 def get_trend_all_dbs(limit_per_db: int = 30):
@@ -730,11 +718,7 @@ def get_trend_all_dbs(limit_per_db: int = 30):
              ORDER BY t.health_score ASC
         """)
         rows = [dict(r) for r in cur.fetchall()]
-    try:
-        import pandas as pd
-        return pd.DataFrame(rows)
-    except ImportError:
-        return rows
+    return rows
 
 
 # ─── AI Optimizations ────────────────────────────────────────────────────────

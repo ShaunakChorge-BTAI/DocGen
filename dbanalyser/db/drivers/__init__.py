@@ -8,11 +8,8 @@ from .base import (
     ViewDef,
     IndexDef,
 )
-from .mssql_driver import MSSQLDriver
-
 __all__ = [
     'DatabaseDriver',
-    'MSSQLDriver',
     'TableDef',
     'ColumnDef',
     'ProcedureDef',

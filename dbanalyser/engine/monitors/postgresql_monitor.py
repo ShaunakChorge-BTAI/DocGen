@@ -45,7 +45,7 @@ class PostgreSQLMonitorAdapter(LiveMonitorAdapter):
             LIMIT {limit}
         """
         try:
-            rows = self.driver.execute_query(sql)
+            rows = self.driver.execute_query(sql, as_dict=False)
             return [
                 IndexStatistic(
                     index_name=row[0],
@@ -95,7 +95,7 @@ class PostgreSQLMonitorAdapter(LiveMonitorAdapter):
             LIMIT {limit}
         """
         try:
-            rows = self.driver.execute_query(sql)
+            rows = self.driver.execute_query(sql, as_dict=False)
             return [
                 IndexStatistic(
                     index_name=row[0],
@@ -130,7 +130,7 @@ class PostgreSQLMonitorAdapter(LiveMonitorAdapter):
         # Check if pg_stat_statements is available
         check_ext = "SELECT 1 FROM pg_extension WHERE extname = 'pg_stat_statements' LIMIT 1"
         try:
-            ext_result = self.driver.execute_query(check_ext)
+            ext_result = self.driver.execute_query(check_ext, as_dict=False)
             if not ext_result:
                 logger.warning("pg_stat_statements extension not installed")
                 return []
@@ -166,7 +166,7 @@ class PostgreSQLMonitorAdapter(LiveMonitorAdapter):
             ) sub
         """
         try:
-            rows = self.driver.execute_query(sql)
+            rows = self.driver.execute_query(sql, as_dict=False)
             return [
                 SlowQuery(
                     query_hash=str(row[0]) if row[0] else "",
@@ -215,7 +215,7 @@ class PostgreSQLMonitorAdapter(LiveMonitorAdapter):
             ORDER BY COALESCE(blocking_pids[1], 0), pid
         """
         try:
-            rows = self.driver.execute_query(sql)
+            rows = self.driver.execute_query(sql, as_dict=False)
             return [
                 BlockingSession(
                     session_id=int(row[0]),
@@ -267,7 +267,7 @@ class PostgreSQLMonitorAdapter(LiveMonitorAdapter):
             LIMIT {limit}
         """
         try:
-            rows = self.driver.execute_query(sql)
+            rows = self.driver.execute_query(sql, as_dict=False)
             return [
                 TableSize(
                     table_name=row[0],

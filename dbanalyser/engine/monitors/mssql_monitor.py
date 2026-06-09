@@ -52,7 +52,7 @@ class MSSQLMonitorAdapter(LiveMonitorAdapter):
             ORDER BY (s.user_seeks + s.user_scans + s.user_lookups) DESC
         """
         try:
-            rows = self.driver.execute_query(sql)
+            rows = self.driver.execute_query(sql, as_dict=False)
             return [
                 IndexStatistic(
                     index_name=row[0],
@@ -105,7 +105,7 @@ class MSSQLMonitorAdapter(LiveMonitorAdapter):
             ORDER BY SUM(p.used_page_count) DESC
         """
         try:
-            rows = self.driver.execute_query(sql)
+            rows = self.driver.execute_query(sql, as_dict=False)
             return [
                 IndexStatistic(
                     index_name=row[0],
@@ -147,7 +147,7 @@ class MSSQLMonitorAdapter(LiveMonitorAdapter):
             ORDER BY improvement DESC
         """
         try:
-            rows = self.driver.execute_query(sql)
+            rows = self.driver.execute_query(sql, as_dict=False)
             return [
                 MissingIndex(
                     table_name=row[3],
@@ -188,7 +188,7 @@ class MSSQLMonitorAdapter(LiveMonitorAdapter):
             ORDER BY qs.total_elapsed_time DESC
         """
         try:
-            rows = self.driver.execute_query(sql)
+            rows = self.driver.execute_query(sql, as_dict=False)
             return [
                 SlowQuery(
                     query_hash=str(row[11]) if row[11] else "",
@@ -235,7 +235,7 @@ class MSSQLMonitorAdapter(LiveMonitorAdapter):
             ORDER BY r.blocking_session_id, r.session_id
         """
         try:
-            rows = self.driver.execute_query(sql)
+            rows = self.driver.execute_query(sql, as_dict=False)
             return [
                 BlockingSession(
                     session_id=int(row[0]),
@@ -274,7 +274,7 @@ class MSSQLMonitorAdapter(LiveMonitorAdapter):
             ORDER BY wait_time_ms DESC
         """
         try:
-            rows = self.driver.execute_query(sql)
+            rows = self.driver.execute_query(sql, as_dict=False)
             return [
                 WaitStatistic(
                     wait_type=row[0],
@@ -311,7 +311,7 @@ class MSSQLMonitorAdapter(LiveMonitorAdapter):
             ORDER BY SUM(p.used_page_count) DESC
         """
         try:
-            rows = self.driver.execute_query(sql)
+            rows = self.driver.execute_query(sql, as_dict=False)
             return [
                 TableSize(
                     table_name=row[0],

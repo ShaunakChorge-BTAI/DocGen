@@ -65,7 +65,7 @@ class PostgreSQLDriver(DatabaseDriver):
             self.connection.close()
             self.connection = None
 
-    def execute_query(self, sql: str, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
+    def execute_query(self, sql: str, params: Optional[Dict[str, Any]] = None, as_dict: bool = True) -> List[Any]:
         """Execute query and return results."""
         if not self.connection:
             self.connect()
@@ -77,9 +77,25 @@ class PostgreSQLDriver(DatabaseDriver):
             else:
                 cursor.execute(sql)
 
-            columns = [desc[0] for desc in cursor.description] if cursor.description else []
-            results = [dict(zip(columns, row)) for row in cursor.fetchall()]
-            return results
+            if as_dict:
+                columns = [desc[0] for desc in cursor.description] if cursor.description else []
+                results = []
+                for row in cursor.fetchall():
+                    if isinstance(row, dict):
+                        results.append(dict(row))
+                    else:
+                        results.append(dict(zip(columns, row)))
+                return results
+            else:
+                # Mock psycopg2 sometimes returns dictionaries directly even when fetching all, 
+                # we need to make sure we return tuples if as_dict=False
+                results = []
+                for row in cursor.fetchall():
+                    if isinstance(row, dict):
+                        results.append(tuple(row.values()))
+                    else:
+                        results.append(tuple(row))
+                return results
         finally:
             cursor.close()
 

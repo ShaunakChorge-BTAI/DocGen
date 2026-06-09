@@ -43,15 +43,15 @@ def refresh_database_metadata(db_name: str):
     # Create DatabaseEntry from registry row
     db_entry = DatabaseEntry(
         name              = row['name'],
-        db_type           = row.get('db_type', 'mssql'),
+        db_type           = row.get('db_type') or 'mssql',
         environment       = row['environment'],
-        host              = row['host'],
+        host              = row.get('host') or 'localhost',
         port              = row.get('port'),
-        database_name     = row['database_name'],
-        connection_string = row.get('connection_string'),
-        use_windows_auth  = row.get('use_windows_auth', False),
-        username          = row.get('username'),
-        password          = row.get('password'),
+        database_name     = row.get('database_name') or '',
+        connection_string = row.get('connection_string') or '',
+        use_windows_auth  = bool(row.get('use_windows_auth')),
+        username          = row.get('username') or '',
+        password          = row.get('password') or '',
         oracle_sid_or_service = row.get('oracle_sid_or_service'),
         snowflake_warehouse   = row.get('snowflake_warehouse'),
         snowflake_role        = row.get('snowflake_role'),
@@ -185,9 +185,14 @@ def get_database_metadata(db_name: str, object_type: Optional[str] = None):
         cursor.execute(sql, (row['id'],))
         result = cursor.fetchone()
         if not result:
-            raise HTTPException(status_code=404, detail=f"No metadata found for database '{db_name}'.")
+            return {
+                'db_name': db_name,
+                'last_updated': None,
+                'objects': {},
+            }
 
-        run_id, last_updated = result
+        run_id = result['id']
+        last_updated = result['timestamp']
 
         # Get object snapshots
         sql = """
@@ -214,11 +219,11 @@ def get_database_metadata(db_name: str, object_type: Optional[str] = None):
                 'name': obj[0],
                 'schema': obj[2],
                 'hash': obj[3],
-                'fetched_at': obj[4].isoformat() if obj[4] else None
+                'fetched_at': obj[4].isoformat() if hasattr(obj[4], 'isoformat') else obj[4]
             })
 
     return {
         'db_name': db_name,
-        'last_updated': last_updated.isoformat() if last_updated else None,
+        'last_updated': last_updated.isoformat() if hasattr(last_updated, 'isoformat') else last_updated,
         'objects': grouped,
     }

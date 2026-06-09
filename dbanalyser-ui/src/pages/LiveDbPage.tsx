@@ -174,9 +174,13 @@ export default function LiveDbPage() {
     try {
       const result = await liveMetricsApi.scan(selectedDb, selectedMetricTypes)
       setMetricsSuccess(`Live metrics captured: ${result.data.message}`)
-      // Fetch live status to show immediately
-      const status = await liveMetricsApi.getLiveStatus(selectedDb)
-      setLiveStatus(status.data)
+      if (result.data.captured_metrics) {
+        setLiveStatus(result.data.captured_metrics)
+      } else {
+        // Fetch live status to show immediately
+        const status = await liveMetricsApi.getLiveStatus(selectedDb)
+        setLiveStatus(status.data)
+      }
       setTimeout(() => setMetricsSuccess(''), 5000)
     } catch (e: any) {
       setMetricsError(e?.response?.data?.detail || 'Live metrics capture failed.')
@@ -217,6 +221,7 @@ export default function LiveDbPage() {
             onChange={(e) => {
               setSelectedDb(e.target.value)
               setSelectedRun(null)
+              setLiveStatus(null)
             }}
             className="text-sm bg-surface-low rounded-lg px-3 py-1.5 text-on-surface border-0 outline-none focus:ring-2 focus:ring-primary/20"
           >
@@ -724,64 +729,147 @@ export default function LiveDbPage() {
 
               {/* Live status summary */}
               {liveStatus && !liveStatus.not_supported && (
-                <div className="grid grid-cols-3 gap-4">
-                  {/* Blocking sessions */}
-                  <div className="bg-surface-lowest rounded-xl p-5 shadow-card">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {/* Blocking Sessions */}
+                  <div className="bg-surface-lowest rounded-xl p-5 shadow-card flex flex-col h-full">
                     <div className="flex items-center justify-between mb-4">
                       <div className="text-sm font-semibold text-on-surface">Blocking Sessions</div>
                       <span className="text-lg font-bold text-red-600">{liveStatus.blocking_sessions?.length || 0}</span>
                     </div>
                     {liveStatus.blocking_sessions && liveStatus.blocking_sessions.length > 0 ? (
-                      <div className="space-y-2 text-xs">
+                      <div className="space-y-2 text-xs flex-1">
                         {liveStatus.blocking_sessions.slice(0, 5).map((s: any, i: number) => (
-                          <div key={i} className="bg-surface-low rounded px-2 py-1.5">
-                            <div className="font-mono text-on-surface">Session {s.session_id}</div>
-                            <div className="text-on-surface-variant">{s.user_name} • {s.wait_duration_ms}ms</div>
+                          <div key={i} className="bg-surface-low rounded px-2.5 py-2">
+                            <div className="font-mono font-medium text-on-surface">Session {s.session_id}</div>
+                            <div className="text-on-surface-variant mt-0.5">{s.user_name} • {s.wait_duration_ms}ms</div>
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <p className="text-xs text-on-surface-variant">No blocking sessions detected</p>
+                      <p className="text-xs text-on-surface-variant italic">No blocking sessions detected</p>
                     )}
                   </div>
 
-                  {/* Slow queries */}
-                  <div className="bg-surface-lowest rounded-xl p-5 shadow-card">
+                  {/* Slow Queries */}
+                  <div className="bg-surface-lowest rounded-xl p-5 shadow-card flex flex-col h-full">
                     <div className="flex items-center justify-between mb-4">
                       <div className="text-sm font-semibold text-on-surface">Slow Queries</div>
                       <span className="text-lg font-bold text-amber-600">{liveStatus.slow_queries?.length || 0}</span>
                     </div>
                     {liveStatus.slow_queries && liveStatus.slow_queries.length > 0 ? (
-                      <div className="space-y-2 text-xs">
+                      <div className="space-y-2 text-xs flex-1">
                         {liveStatus.slow_queries.slice(0, 5).map((q: any, i: number) => (
-                          <div key={i} className="bg-surface-low rounded px-2 py-1.5">
-                            <div className="text-on-surface truncate">{q.query_text}</div>
-                            <div className="text-on-surface-variant">{Math.round(q.total_duration_ms)}ms • {q.execution_count}x</div>
+                          <div key={i} className="bg-surface-low rounded px-2.5 py-2">
+                            <div className="text-on-surface truncate font-mono" title={q.query_text}>{q.query_text}</div>
+                            <div className="text-on-surface-variant mt-0.5">{Math.round(q.total_duration_ms)}ms • {q.execution_count}x</div>
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <p className="text-xs text-on-surface-variant">No slow queries detected</p>
+                      <p className="text-xs text-on-surface-variant italic">No slow queries detected</p>
                     )}
                   </div>
 
-                  {/* Largest tables */}
-                  <div className="bg-surface-lowest rounded-xl p-5 shadow-card">
+                  {/* Largest Tables */}
+                  <div className="bg-surface-lowest rounded-xl p-5 shadow-card flex flex-col h-full">
                     <div className="flex items-center justify-between mb-4">
                       <div className="text-sm font-semibold text-on-surface">Largest Tables</div>
                       <span className="text-lg font-bold text-blue-600">{liveStatus.largest_tables?.length || 0}</span>
                     </div>
                     {liveStatus.largest_tables && liveStatus.largest_tables.length > 0 ? (
-                      <div className="space-y-2 text-xs">
+                      <div className="space-y-2 text-xs flex-1">
                         {liveStatus.largest_tables.slice(0, 5).map((t: any, i: number) => (
-                          <div key={i} className="bg-surface-low rounded px-2 py-1.5">
-                            <div className="font-mono text-on-surface">{t.table_name}</div>
-                            <div className="text-on-surface-variant">{t.row_count.toLocaleString()} rows • {t.used_mb}MB</div>
+                          <div key={i} className="bg-surface-low rounded px-2.5 py-2">
+                            <div className="font-mono text-on-surface truncate" title={t.table_name}>{t.table_name}</div>
+                            <div className="text-on-surface-variant mt-0.5">{(t.row_count || 0).toLocaleString()} rows • {t.used_mb}MB</div>
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <p className="text-xs text-on-surface-variant">No tables fetched</p>
+                      <p className="text-xs text-on-surface-variant italic">No tables fetched</p>
+                    )}
+                  </div>
+
+                  {/* Index Usage */}
+                  <div className="bg-surface-lowest rounded-xl p-5 shadow-card flex flex-col h-full">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="text-sm font-semibold text-on-surface">Index Usage</div>
+                      <span className="text-lg font-bold text-emerald-600">{liveStatus.index_usage?.length || 0}</span>
+                    </div>
+                    {liveStatus.index_usage && liveStatus.index_usage.length > 0 ? (
+                      <div className="space-y-2 text-xs flex-1">
+                        {liveStatus.index_usage.slice(0, 5).map((idx: any, i: number) => (
+                          <div key={i} className="bg-surface-low rounded px-2.5 py-2">
+                            <div className="font-mono text-on-surface truncate" title={idx.index_name}>{idx.index_name}</div>
+                            <div className="text-on-surface-variant text-[11px] truncate">{idx.table_name}</div>
+                            <div className="text-on-surface-variant text-[11px] mt-0.5">Seeks: {idx.seeks} • Updates: {idx.updates}</div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-on-surface-variant italic">No index usage stats</p>
+                    )}
+                  </div>
+
+                  {/* Unused Indexes */}
+                  <div className="bg-surface-lowest rounded-xl p-5 shadow-card flex flex-col h-full">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="text-sm font-semibold text-on-surface">Unused Indexes</div>
+                      <span className="text-lg font-bold text-purple-600">{liveStatus.unused_indexes?.length || 0}</span>
+                    </div>
+                    {liveStatus.unused_indexes && liveStatus.unused_indexes.length > 0 ? (
+                      <div className="space-y-2 text-xs flex-1">
+                        {liveStatus.unused_indexes.slice(0, 5).map((idx: any, i: number) => (
+                          <div key={i} className="bg-surface-low rounded px-2.5 py-2">
+                            <div className="font-mono text-on-surface truncate" title={idx.index_name}>{idx.index_name}</div>
+                            <div className="text-on-surface-variant text-[11px] truncate">{idx.table_name}</div>
+                            <div className="text-on-surface-variant text-[11px] mt-0.5">Size: {idx.size_mb ? `${idx.size_mb}MB` : '—'}</div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-on-surface-variant italic">No unused indexes detected</p>
+                    )}
+                  </div>
+
+                  {/* Missing Indexes */}
+                  <div className="bg-surface-lowest rounded-xl p-5 shadow-card flex flex-col h-full">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="text-sm font-semibold text-on-surface">Missing Indexes</div>
+                      <span className="text-lg font-bold text-pink-600">{liveStatus.missing_indexes?.length || 0}</span>
+                    </div>
+                    {liveStatus.missing_indexes && liveStatus.missing_indexes.length > 0 ? (
+                      <div className="space-y-2 text-xs flex-1">
+                        {liveStatus.missing_indexes.slice(0, 5).map((idx: any, i: number) => (
+                          <div key={i} className="bg-surface-low rounded px-2.5 py-2">
+                            <div className="font-semibold text-on-surface truncate">{idx.table_name}</div>
+                            <div className="text-on-surface-variant text-[11px] truncate">Cols: {idx.column_list || '—'}</div>
+                            <div className="text-pink-600 font-medium text-[11px] mt-0.5">Improvement: {idx.estimated_improvement_percent}%</div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-on-surface-variant italic">No missing indexes recommended</p>
+                    )}
+                  </div>
+
+                  {/* Wait Statistics */}
+                  <div className="bg-surface-lowest rounded-xl p-5 shadow-card flex flex-col h-full">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="text-sm font-semibold text-on-surface">Wait Statistics</div>
+                      <span className="text-lg font-bold text-indigo-600">{liveStatus.wait_statistics?.length || 0}</span>
+                    </div>
+                    {liveStatus.wait_statistics && liveStatus.wait_statistics.length > 0 ? (
+                      <div className="space-y-2 text-xs flex-1">
+                        {liveStatus.wait_statistics.slice(0, 5).map((w: any, i: number) => (
+                          <div key={i} className="bg-surface-low rounded px-2.5 py-2">
+                            <div className="font-mono text-on-surface truncate" title={w.wait_type}>{w.wait_type}</div>
+                            <div className="text-on-surface-variant text-[11px] mt-0.5">Count: {w.wait_count.toLocaleString()} • Avg: {w.avg_wait_ms.toFixed(1)}ms</div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-on-surface-variant italic">No wait statistics fetched</p>
                     )}
                   </div>
                 </div>

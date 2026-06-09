@@ -323,7 +323,7 @@ def _run_job(job_id: str, req: RunTriggerRequest) -> None:
                             port=reg_row.get("port"), # Port can stay as is (it accepts None)
                             database_name=reg_row.get("database_name") or "",
                             connection_string=reg_row.get("connection_string") or "",
-                            use_windows_auth=reg_row.get("use_windows_auth", False),
+                            use_windows_auth=bool(reg_row.get("use_windows_auth")),
                             username=reg_row.get("username") or "",
                             password=reg_row.get("password") or ""
                         )

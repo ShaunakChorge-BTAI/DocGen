@@ -6,6 +6,7 @@ analysis_config_local.yaml
 .env
 .env.local
 psycopg2/
+pyodbc/
 venv/
 test_scan.py
 

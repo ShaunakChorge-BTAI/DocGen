@@ -77,7 +77,7 @@ class MSSQLDriver(DatabaseDriver):
             self.connection.close()
             self.connection = None
 
-    def execute_query(self, sql: str, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
+    def execute_query(self, sql: str, params: Optional[Dict[str, Any]] = None, as_dict: bool = True) -> List[Any]:
         """Execute query and return results."""
         if not self.connection:
             self.connect()
@@ -89,9 +89,12 @@ class MSSQLDriver(DatabaseDriver):
             else:
                 cursor.execute(sql)
 
-            columns = [desc[0] for desc in cursor.description]
-            results = [dict(zip(columns, row)) for row in cursor.fetchall()]
-            return results
+            if as_dict:
+                columns = [desc[0] for desc in cursor.description]
+                results = [dict(zip(columns, row)) for row in cursor.fetchall()]
+                return results
+            else:
+                return cursor.fetchall()
         finally:
             cursor.close()
 

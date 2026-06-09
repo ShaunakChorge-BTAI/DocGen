@@ -97,9 +97,15 @@ export default function CompliancePage() {
 
   const { data: runData } = useQuery({
     queryKey: ['runs', selectedDb],
-    queryFn:  () => runApi.list(selectedDb || undefined).then(r => r.data.runs ?? []),
+    queryFn:  () => runApi.list(selectedDb || undefined).then(r => {
+      let data = r.data;
+      if (typeof data === 'string') {
+        try { data = JSON.parse(data); } catch(e) {}
+      }
+      return data?.runs || data || [];
+    }),
   })
-  const runs = runData ?? []
+  const runs = Array.isArray(runData) ? runData : []
 
   useEffect(() => {
     if (runs.length > 0 && selectedRun === null) {
@@ -115,12 +121,26 @@ export default function CompliancePage() {
     queryKey: ['findings', effectiveRunId],
     queryFn:  async () => {
       const res = await findingsApi.byRun(effectiveRunId!)
-      const payload = typeof res.data === 'string' ? JSON.parse(res.data) : res.data
+      let payload = res.data
+      if (typeof payload === 'string') {
+        try { payload = JSON.parse(payload) } catch (e) {}
+      }
       return payload
     },
     enabled:  !!effectiveRunId,
   })
-  const allFindingsRaw: any[] = (findingsData && findingsData.findings) ? findingsData.findings : []
+
+  let allFindingsRaw: any[] = []
+  if (findingsData) {
+    if (Array.isArray(findingsData.findings)) {
+      allFindingsRaw = findingsData.findings
+    } else if (Array.isArray(findingsData)) {
+      allFindingsRaw = findingsData
+    } else if (Array.isArray(findingsData.runs)) {
+      // Unlikely, but if findings api returned runs mistakenly, fallback to empty to avoid crash
+      allFindingsRaw = []
+    }
+  }
 
 
   // Filter by severity if selected
@@ -167,57 +187,7 @@ export default function CompliancePage() {
         title="Compliance"
         subtitle={`${compFindings.length} compliance findings · SOX · GDPR · RBI · Security`}
       />
-      {/* ── DB, Run, & Severity Filter dropdowns ──────────────────────────────────────────────── */}
-      <div className="flex flex-wrap items-center gap-6 mb-4">
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-on-surface-variant font-medium uppercase tracking-wide">Database:</span>
-          <select
-            value={selectedDb}
-            onChange={(e) => {
-              setSelectedDb(e.target.value)
-              setSelectedRun(null)
-            }}
-            className="text-sm bg-surface-low rounded-lg px-3 py-1.5 text-on-surface border-0 outline-none focus:ring-2 focus:ring-primary/20"
-          >
-            <option value="">All Databases</option>
-            {databases.map((db: any) => (
-              <option key={db.name} value={db.name}>{db.name}</option>
-            ))}
-          </select>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-on-surface-variant font-medium uppercase tracking-wide">Run:</span>
-          <select
-            value={selectedRun ?? ''}
-            onChange={(e) => setSelectedRun(e.target.value ? parseInt(e.target.value) : null)}
-            className="text-sm bg-surface-low rounded-lg px-3 py-1.5 text-on-surface border-0 outline-none focus:ring-2 focus:ring-primary/20"
-            disabled={!selectedDb}
-          >
-            <option value="">Latest Run</option>
-            {runs.map((r: any) => (
-              <option key={r.id} value={r.id}>
-                Run #{r.id} - {r.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-on-surface-variant font-medium uppercase tracking-wide">Severity:</span>
-          <select
-            value={selectedSeverity}
-            onChange={(e) => setSelectedSeverity(e.target.value)}
-            className="text-sm bg-surface-low rounded-lg px-3 py-1.5 text-on-surface border-0 outline-none focus:ring-2 focus:ring-primary/20"
-          >
-            <option value="">All Severities</option>
-            <option value="Critical">Critical</option>
-            <option value="High">High</option>
-            <option value="Medium">Medium</option>
-            <option value="Low">Low</option>
-          </select>
-        </div>
-      </div>
+      {/* Removed top DB, Run, Severity Filter dropdowns as per user request */}
 
       <TabBar tabs={TABS} active={tab} onChange={setTab} />
 
@@ -227,13 +197,15 @@ export default function CompliancePage() {
           <label className="text-sm font-medium text-on-surface block mb-1">Select Database</label>
           <select
             value={selectedDb ?? ''}
-            // onChange={(e) => setSelectedDb(e.target.value || 'null')}
-            onChange={(e) => setSelectedDb(e.target.value)}
-            className="w-full bg-surface-low border border-surface-variant rounded-lg px-3 py-2 text-on-surface"
+            onChange={(e) => {
+              setSelectedDb(e.target.value)
+              setSelectedRun(null)
+            }}
+            className="w-full bg-surface-low border border-surface-variant rounded-lg px-3 py-2 text-on-surface outline-none focus:ring-2 focus:ring-primary/20"
           >
             <option value="">All Databases</option>
             {databases.map(db => (
-              <option key={db.id} value={db.name}>{db.name}</option>
+              <option key={db.name || db.id} value={db.name}>{db.name}</option>
             ))}
           </select>
         </div>
@@ -242,7 +214,7 @@ export default function CompliancePage() {
           <select
             value={selectedRun ?? ''}
             onChange={(e) => setSelectedRun(e.target.value ? parseInt(e.target.value) : null)}
-            className="w-full bg-surface-low border border-surface-variant rounded-lg px-3 py-2 text-on-surface"
+            className="w-full bg-surface-low border border-surface-variant rounded-lg px-3 py-2 text-on-surface outline-none focus:ring-2 focus:ring-primary/20"
             disabled={!selectedDb}
           >
             <option value="">Choose a run...</option>
@@ -255,6 +227,20 @@ export default function CompliancePage() {
                 </option>
               ))
             )}
+          </select>
+        </div>
+        <div className="flex-1">
+          <label className="text-sm font-medium text-on-surface block mb-1">Select Severity</label>
+          <select
+            value={selectedSeverity}
+            onChange={(e) => setSelectedSeverity(e.target.value)}
+            className="w-full bg-surface-low border border-surface-variant rounded-lg px-3 py-2 text-on-surface outline-none focus:ring-2 focus:ring-primary/20"
+          >
+            <option value="">All Severities</option>
+            <option value="Critical">Critical</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
           </select>
         </div>
       </div>
@@ -278,6 +264,13 @@ export default function CompliancePage() {
             <div className="bg-amber-50 rounded-xl px-5 py-4 flex items-center gap-3 text-sm text-amber-800">
               <span className="material-symbols-outlined" style={{ fontSize: 18 }}>info</span>
               {noRunMsg}
+            </div>
+          )}
+
+          {effectiveRunId && compFindings.length === 0 && (
+            <div className="bg-green-50 rounded-xl px-5 py-4 flex items-center gap-3 text-sm text-green-800 mb-2">
+              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>check_circle</span>
+              Great! No compliance violations or security issues were found for this database. (Note: The Compliance rule packs may not be applicable to this database type).
             </div>
           )}
 
@@ -320,12 +313,10 @@ export default function CompliancePage() {
           </div>
 
           {/* Full compliance findings table */}
-          {compFindings.length > 0 && (
-            <FindingsTable
-              findings={compFindings}
-              emptyMsg={noRunMsg}
-            />
-          )}
+          <FindingsTable
+            findings={compFindings}
+            emptyMsg={effectiveRunId ? 'No compliance violations found in this run.' : noRunMsg}
+          />
         </div>
       )}
 

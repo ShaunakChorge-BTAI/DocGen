@@ -48,8 +48,8 @@ class PostgreSQLSchemaAdapter(SchemaAdapter):
 
             tables = []
             for row in results:
-                table_name = row['table_name']
-                schema_name = row['table_schema']
+                table_name = row.get('table_name') or row.get('tablename') or row.get('name')
+                schema_name = row.get('table_schema') or row.get('schemaname') or row.get('schema')
                 columns = self._get_table_columns(table_name, schema_name)
 
                 table = SchemaTable(
@@ -83,9 +83,9 @@ class PostgreSQLSchemaAdapter(SchemaAdapter):
             columns = []
             for row in results:
                 col = SchemaColumn(
-                    name=row['column_name'],
-                    data_type=row['data_type'],
-                    is_nullable=row['is_nullable'] == 'YES',
+                    name=row.get('column_name') or row.get('name') or '',
+                    data_type=row.get('data_type') or row.get('type') or '',
+                    is_nullable=str(row.get('is_nullable', '')).upper() == 'YES',
                     character_max_length=row.get('character_maximum_length'),
                     default_value=row.get('column_default')
                 )
@@ -110,8 +110,8 @@ class PostgreSQLSchemaAdapter(SchemaAdapter):
             results = self.driver.execute_query(sql)
             procedures = [
                 SchemaProcedure(
-                    name=row['routine_name'],
-                    schema=row['routine_schema']
+                    name=row.get('routine_name') or row.get('routinename') or row.get('name'),
+                    schema=row.get('routine_schema') or row.get('schema') or row.get('nspname')
                 )
                 for row in results
             ]
@@ -134,8 +134,8 @@ class PostgreSQLSchemaAdapter(SchemaAdapter):
             results = self.driver.execute_query(sql)
             views = [
                 SchemaView(
-                    name=row['view_name'],
-                    schema=row['view_schema']
+                    name=row.get('view_name') or row.get('viewname') or row.get('name'),
+                    schema=row.get('view_schema') or row.get('schemaname') or row.get('schema')
                 )
                 for row in results
             ]
@@ -160,9 +160,9 @@ class PostgreSQLSchemaAdapter(SchemaAdapter):
             results = self.driver.execute_query(sql)
             indexes = [
                 SchemaIndex(
-                    name=row['index_name'],
-                    table_name=row['table_name'],
-                    table_schema=row['table_schema'],
+                    name=row.get('index_name') or row.get('indexname') or row.get('name'),
+                    table_name=row.get('table_name') or row.get('tablename') or '',
+                    table_schema=row.get('table_schema') or row.get('schemaname') or row.get('schema') or '',
                     columns=[],
                     is_unique='UNIQUE' in (row.get('indexdef') or '')
                 )
