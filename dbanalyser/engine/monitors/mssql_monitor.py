@@ -43,7 +43,7 @@ class MSSQLMonitorAdapter(LiveMonitorAdapter):
             INNER JOIN sys.indexes i ON s.object_id = i.object_id
                 AND s.index_id = i.index_id
             INNER JOIN sys.objects t ON s.object_id = t.object_id
-            INNER JOIN sys.allocation_units p ON i.object_id = p.container_id
+            INNER JOIN sys.dm_db_partition_stats p ON i.object_id = p.object_id AND i.index_id = p.index_id
             WHERE database_id = DB_ID()
                 AND i.index_id > 0  -- Skip heaps
             GROUP BY i.name, s.object_id, t.schema_id, s.user_seeks, s.user_scans,
@@ -92,7 +92,7 @@ class MSSQLMonitorAdapter(LiveMonitorAdapter):
                 i.is_primary_key
             FROM sys.indexes i
             INNER JOIN sys.objects t ON i.object_id = t.object_id
-            INNER JOIN sys.allocation_units p ON i.object_id = p.container_id
+            INNER JOIN sys.dm_db_partition_stats p ON i.object_id = p.object_id AND i.index_id = p.index_id
             WHERE NOT EXISTS (
                 SELECT 1 FROM sys.dm_db_index_usage_stats s
                 WHERE s.object_id = i.object_id
@@ -140,7 +140,7 @@ class MSSQLMonitorAdapter(LiveMonitorAdapter):
             FROM sys.dm_db_missing_index_details mid
             INNER JOIN sys.dm_db_missing_index_groups mig
                 ON mid.index_handle = mig.index_handle
-            INNER JOIN sys.dm_db_missing_index_groups_stats migs
+            INNER JOIN sys.dm_db_missing_index_group_stats migs
                 ON mig.index_group_id = migs.group_id
                 AND mig.index_handle = migs.index_handle
             WHERE database_id = DB_ID()
@@ -295,7 +295,7 @@ class MSSQLMonitorAdapter(LiveMonitorAdapter):
             SELECT TOP {limit}
                 OBJECT_NAME(p.object_id) AS table_name,
                 SCHEMA_NAME(o.schema_id) AS schema_name,
-                SUM(p.rows) AS row_count,
+                SUM(p.row_count) AS row_count,
                 CAST(SUM(p.reserved_page_count) * 8.0 / 1024 AS NUMERIC(10,2)) AS reserved_mb,
                 CAST(SUM(p.used_page_count) * 8.0 / 1024 AS NUMERIC(10,2)) AS used_mb,
                 CAST(SUM(p.reserved_page_count - p.used_page_count) * 8.0 / 1024 AS NUMERIC(10,2)) AS unused_mb,

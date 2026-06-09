@@ -96,6 +96,10 @@ class PostgreSQLDriver(DatabaseDriver):
                     else:
                         results.append(tuple(row))
                 return results
+        except Exception as e:
+            if self.connection:
+                self.connection.rollback()
+            raise e
         finally:
             cursor.close()
 

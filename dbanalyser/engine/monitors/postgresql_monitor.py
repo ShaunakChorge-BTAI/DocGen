@@ -194,25 +194,26 @@ class PostgreSQLMonitorAdapter(LiveMonitorAdapter):
                 pid AS session_id,
                 datname AS database_name,
                 usename AS user_name,
-                application_name,
-                client_addr,
-                query_start,
-                state,
+                application_name AS program_name,
+                client_hostname AS host_name,
+                backend_start AS login_time,
+                state AS status,
+                wait_event AS wait_type,
                 wait_event_type,
                 EXTRACT(EPOCH FROM (NOW() - query_start)) * 1000 AS wait_duration_ms,
-                blocking_pids[1]::INT AS blocking_session_id,
+                pg_blocking_pids(pid)[1]::INT AS blocking_session_id,
                 state_change,
                 NULL AS open_transaction_count
             FROM pg_stat_activity
             WHERE (
-                ARRAY_LENGTH(blocking_pids, 1) > 0
+                ARRAY_LENGTH(pg_blocking_pids(pid), 1) > 0
                 OR EXISTS (
                     SELECT 1 FROM pg_stat_activity a2
-                    WHERE a2.blocking_pids @> ARRAY[pg_stat_activity.pid]
+                    WHERE pid = ANY(pg_blocking_pids(a2.pid))
                 )
             )
             AND pid != pg_backend_pid()
-            ORDER BY COALESCE(blocking_pids[1], 0), pid
+            ORDER BY COALESCE(pg_blocking_pids(pid)[1], 0), pid
         """
         try:
             rows = self.driver.execute_query(sql, as_dict=False)
@@ -226,9 +227,9 @@ class PostgreSQLMonitorAdapter(LiveMonitorAdapter):
                     start_time=row[5],
                     status=row[6] or "",
                     wait_type=row[7],
-                    wait_duration_ms=int(row[8]) if row[8] else 0,
-                    blocking_session_id=int(row[9]) if row[9] else None,
-                    last_command=row[10],
+                    wait_duration_ms=int(row[9]) if row[9] else 0,
+                    blocking_session_id=int(row[10]) if row[10] else None,
+                    last_command=row[11],
                     open_transaction_count=0,  # Not directly available in PostgreSQL
                 )
                 for row in rows
