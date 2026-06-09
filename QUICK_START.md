@@ -147,7 +147,8 @@ psql -U postgres -d dbanalyser -c "SELECT COUNT(*) FROM schema_object_versions;"
 
 ## Documentation
 
-All documentation is in the repository root:
+All documentation is in the repository root or docs/ directory:
+- [DATABASE_PERMISSIONS.md](file:///d:/Library/Documents/Projects/Internship/DB_Analyser/docs/DATABASE_PERMISSIONS.md) - Database Setup, Extensions & Permissions Guide
 - `PHASE_1_IMPLEMENTATION_SPEC.md` - Technical details
 - `PHASE_2_IMPLEMENTATION_SPEC.md` - Optimizer details
 - `PHASE_1_DEPLOYMENT_GUIDE.md` - Step-by-step
