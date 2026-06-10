@@ -49,6 +49,7 @@ class DatabaseEntry(BaseModel):
     username:                  str            = ""
     password:                  str            = ""
     oracle_sid_or_service:     Optional[str]  = None  # Oracle SID or service name
+    oracle_is_sid:             bool           = False # True if using SID, False for Service Name
     snowflake_warehouse:       Optional[str]  = None  # Snowflake warehouse
     snowflake_role:            Optional[str]  = None  # Snowflake role
     encryption_key_id:         Optional[int]  = None  # Future: for encrypted credentials

@@ -57,6 +57,20 @@ databases:
     is_active: true
 
   # Uncomment and fill in to add more:
+  - name: LOCAL_ORACLE_XE
+    db_type: oracle
+    environment: development
+    host: localhost
+    port: 1521
+    oracle_sid_or_service: XEPDB1
+    oracle_is_sid: false
+    username: system
+    password: "OraclePassword123"
+    description: "Local Oracle sample db"
+    owner_label: "DBA Team"
+    tags: [dev, oracle]
+    is_active: true
+
   # - name: LTFS_UAT
   #   environment: uat
   #   host: uat-sql-server

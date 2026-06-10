@@ -46,6 +46,15 @@ class OracleDriver(DatabaseDriver):
     def _build_dsn(self) -> str:
         """Build Oracle connection DSN."""
         port = self.db_entry.port or 1521
+        
+        if getattr(self.db_entry, 'oracle_is_sid', False):
+            try:
+                import oracledb
+                return oracledb.makedsn(self.db_entry.host, port, sid=self.db_entry.oracle_sid_or_service)
+            except ImportError:
+                # Fallback format if oracledb isn't loaded yet (though it should be)
+                return f"(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST={self.db_entry.host})(PORT={port}))(CONNECT_DATA=(SID={self.db_entry.oracle_sid_or_service})))"
+                
         return f"{self.db_entry.host}:{port}/{self.db_entry.oracle_sid_or_service}"
 
     def get_connection_string(self) -> str:
@@ -81,7 +90,7 @@ class OracleDriver(DatabaseDriver):
             else:
                 cursor.execute(sql)
 
-            columns = [desc[0] for desc in cursor.description]
+            columns = [desc[0].lower() for desc in cursor.description]
             results = [dict(zip(columns, row)) for row in cursor.fetchall()]
             return results
         finally:

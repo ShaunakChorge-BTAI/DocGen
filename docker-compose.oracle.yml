@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  oracle-db:
+    image: gvenzl/oracle-xe:21-slim-faststart
+    container_name: sample-oracle-db
+    environment:
+      - ORACLE_PASSWORD=OraclePassword123
+      - APP_USER=appuser
+      - APP_PASSWORD=apppassword
+    ports:
+      - "1521:1521"
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+
+volumes:
+  oracle-data:
