@@ -74,6 +74,7 @@ def test_database_connection(body: DbRegistryCreate):
         username          = body.username or "",
         password          = body.password or "",
         oracle_sid_or_service = body.oracle_sid_or_service,
+        oracle_is_sid         = body.oracle_is_sid,
         snowflake_warehouse   = body.snowflake_warehouse,
         snowflake_role        = body.snowflake_role,
     )
@@ -112,6 +113,7 @@ def create_or_update_database(body: DbRegistryCreate):
         username          = body.username or "",
         password          = body.password or "",
         oracle_sid_or_service = body.oracle_sid_or_service,
+        oracle_is_sid         = body.oracle_is_sid,
         snowflake_warehouse   = body.snowflake_warehouse,
         snowflake_role        = body.snowflake_role,
     )
@@ -142,6 +144,7 @@ def create_or_update_database(body: DbRegistryCreate):
         username               = body.username,
         password               = body.password,
         oracle_sid_or_service  = body.oracle_sid_or_service,
+        oracle_is_sid          = body.oracle_is_sid,
         snowflake_warehouse    = body.snowflake_warehouse,
         snowflake_role         = body.snowflake_role,
         description            = body.description,

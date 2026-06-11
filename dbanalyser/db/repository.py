@@ -38,6 +38,10 @@ def upsert_db_registry(db: DbRegistry, org_id: Optional[int] = None) -> int:
         "use_windows_auth":  db.use_windows_auth,
         "username":          db.username,
         "password":          db.password,
+        "oracle_sid_or_service": getattr(db, "oracle_sid_or_service", None),
+        "oracle_is_sid":     getattr(db, "oracle_is_sid", False),
+        "snowflake_warehouse": getattr(db, "snowflake_warehouse", None),
+        "snowflake_role":    getattr(db, "snowflake_role", None),
         "description":       db.description,
         "owner_label":       db.owner_label,
         "tags":              db.tags,
@@ -71,11 +75,14 @@ def upsert_db_registry(db: DbRegistry, org_id: Optional[int] = None) -> int:
                 UPDATE db_registry SET
                     name=%s, db_type=%s, environment=%s, host=%s, port=%s, database_name=%s,
                     connection_string=%s, use_windows_auth=%s, username=%s, password=%s,
+                    oracle_sid_or_service=%s, oracle_is_sid=%s, snowflake_warehouse=%s, snowflake_role=%s,
                     description=%s, owner_label=%s, tags=%s, is_active=%s, updated_at=NOW()
                 WHERE id=%s RETURNING id
             """, (params["name"], params["db_type"], params["environment"], params["host"], params["port"],
                   params["database_name"], params["connection_string"],
                   params["use_windows_auth"], params["username"], params["password"],
+                  params["oracle_sid_or_service"], params["oracle_is_sid"],
+                  params["snowflake_warehouse"], params["snowflake_role"],
                   params["description"], params["owner_label"],
                   params["tags"], params["is_active"], existing[0]))
         else:
@@ -83,13 +90,17 @@ def upsert_db_registry(db: DbRegistry, org_id: Optional[int] = None) -> int:
                 INSERT INTO db_registry (
                     org_id, name, db_type, environment, host, port, database_name,
                     connection_string, use_windows_auth, username, password,
+                    oracle_sid_or_service, oracle_is_sid, snowflake_warehouse, snowflake_role,
                     description, owner_label, tags, is_active
-                ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                 RETURNING id
             """, (params["org_id"], params["name"], params["db_type"], params["environment"],
                   params["host"], params["port"], params["database_name"],
                   params["connection_string"], params["use_windows_auth"],
-                  params["username"], params["password"], params["description"],
+                  params["username"], params["password"],
+                  params["oracle_sid_or_service"], params["oracle_is_sid"],
+                  params["snowflake_warehouse"], params["snowflake_role"],
+                  params["description"],
                   params["owner_label"], params["tags"], params["is_active"]))
         row = cur.fetchone()
         return row[0]

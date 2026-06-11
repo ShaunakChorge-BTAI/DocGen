@@ -53,6 +53,7 @@ def refresh_database_metadata(db_name: str):
         username          = row.get('username') or '',
         password          = row.get('password') or '',
         oracle_sid_or_service = row.get('oracle_sid_or_service'),
+        oracle_is_sid         = row.get('oracle_is_sid', False),
         snowflake_warehouse   = row.get('snowflake_warehouse'),
         snowflake_role        = row.get('snowflake_role'),
     )

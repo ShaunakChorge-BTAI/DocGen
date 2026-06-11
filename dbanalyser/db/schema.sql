@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS db_registry (
     username        TEXT,
     password        TEXT,                             -- SQL Auth password (stored in plaintext; use connection_string or vault for security)
     oracle_sid_or_service TEXT,                      -- Oracle SID or service name
+    oracle_is_sid   BOOLEAN     NOT NULL DEFAULT FALSE, -- True if SID, False for Service Name
     snowflake_warehouse TEXT,                        -- Snowflake warehouse
     snowflake_role  TEXT,                            -- Snowflake role
     encryption_key_id INTEGER,                       -- Future: for encrypted credentials

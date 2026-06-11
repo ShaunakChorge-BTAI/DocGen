@@ -247,6 +247,7 @@ def _persist(cfg, result, run_label: str, dmv_results, db_entry=None) -> None:
         if db_entry:
             reg = DbRegistry(
                 name          = db_entry.name,
+                db_type       = getattr(db_entry, 'db_type', 'mssql'),
                 environment   = db_entry.environment,
                 host          = db_entry.host,
                 port          = db_entry.port,
@@ -255,6 +256,10 @@ def _persist(cfg, result, run_label: str, dmv_results, db_entry=None) -> None:
                 use_windows_auth  = db_entry.use_windows_auth,
                 username          = db_entry.username or None,
                 password          = db_entry.password or None,
+                oracle_sid_or_service = getattr(db_entry, 'oracle_sid_or_service', None),
+                oracle_is_sid         = getattr(db_entry, 'oracle_is_sid', False),
+                snowflake_warehouse   = getattr(db_entry, 'snowflake_warehouse', None),
+                snowflake_role        = getattr(db_entry, 'snowflake_role', None),
                 description       = db_entry.description or None,
                 owner_label       = db_entry.owner_label or None,
                 tags              = list(db_entry.tags),
@@ -420,6 +425,7 @@ def db_sync(ctx, config) -> None:
         for db in cfg.databases:
             reg = DbRegistry(
                 name          = db.name,
+                db_type       = getattr(db, 'db_type', 'mssql'),
                 environment   = db.environment,
                 host          = db.host,
                 port          = db.port,
@@ -428,6 +434,10 @@ def db_sync(ctx, config) -> None:
                 use_windows_auth  = db.use_windows_auth,
                 username          = db.username or None,
                 password          = db.password or None,
+                oracle_sid_or_service = getattr(db, 'oracle_sid_or_service', None),
+                oracle_is_sid         = getattr(db, 'oracle_is_sid', False),
+                snowflake_warehouse   = getattr(db, 'snowflake_warehouse', None),
+                snowflake_role        = getattr(db, 'snowflake_role', None),
                 description       = db.description or None,
                 owner_label       = db.owner_label or None,
                 tags              = list(db.tags),
@@ -444,18 +454,27 @@ def db_sync(ctx, config) -> None:
 @db_group.command("add")
 @_config_option
 @click.argument("name")
+@click.option("--type",   "db_type", default="mssql", show_default=True,
+              help="Database type (mssql, oracle, postgresql, mysql, snowflake)")
 @click.option("--env",    default="development", show_default=True)
 @click.option("--host",   default="localhost",   show_default=True)
-@click.option("--port",   default=1433,          show_default=True, type=int)
+@click.option("--port",   default=None,          show_default=True, type=int)
 @click.option("--db",     "database_name", default="",
-              help="SQL Server database name")
+              help="Database name")
 @click.option("--dsn",    "connection_string", default="",
-              help="Full pyodbc connection string (overrides host/port/db)")
+              help="Full connection string (overrides host/port/db)")
+@click.option("--user",   "username", default="", help="Username")
+@click.option("--password", default=None, help="Password")
+@click.option("--oracle-sid", "oracle_sid_or_service", default=None, help="Oracle SID or Service name")
+@click.option("--oracle-is-sid", is_flag=True, default=False, help="Connect to Oracle using SID instead of Service Name")
+@click.option("--snowflake-wh", "snowflake_warehouse", default=None, help="Snowflake warehouse")
+@click.option("--snowflake-role", "snowflake_role", default=None, help="Snowflake role")
 @click.option("--owner",  default="", help="Owner / team label")
 @click.option("--desc",   default="", help="Description")
 @click.pass_context
-def db_add(ctx, config, name, env, host, port, database_name,
-           connection_string, owner, desc) -> None:
+def db_add(ctx, config, name, db_type, env, host, port, database_name,
+           connection_string, username, password, oracle_sid_or_service, oracle_is_sid,
+           snowflake_warehouse, snowflake_role, owner, desc) -> None:
     """Add or update a database in the registry."""
     from .config        import load_config
     from .db.connection import init_pool, close_pool
@@ -466,12 +485,16 @@ def db_add(ctx, config, name, env, host, port, database_name,
     init_pool(cfg.postgres)
     try:
         reg = DbRegistry(
-            name=name, environment=env, host=host, port=port,
+            name=name, db_type=db_type, environment=env, host=host, port=port,
             database_name=database_name,
             connection_string=connection_string or None,
             use_windows_auth=False,
-            username="",
-            password=None,
+            username=username or None,
+            password=password or None,
+            oracle_sid_or_service=oracle_sid_or_service,
+            oracle_is_sid=oracle_is_sid,
+            snowflake_warehouse=snowflake_warehouse,
+            snowflake_role=snowflake_role,
             description=desc or None, owner_label=owner or None,
         )
         db_id = upsert_db_registry(reg)

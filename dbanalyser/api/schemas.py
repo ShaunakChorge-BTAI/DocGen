@@ -40,6 +40,7 @@ class DbRegistryCreate(BaseModel):
     username:                  Optional[str] = None
     password:                  Optional[str] = None   # SQL Auth password; omitted from responses
     oracle_sid_or_service:     Optional[str] = None  # Oracle only
+    oracle_is_sid:             bool = False          # Oracle only
     snowflake_warehouse:       Optional[str] = None  # Snowflake only
     snowflake_role:            Optional[str] = None  # Snowflake only
     description:               Optional[str] = None
@@ -61,6 +62,7 @@ class DbRegistryResponse(BaseModel):
     username:                  Optional[str] = None
     # password intentionally omitted from responses
     oracle_sid_or_service:     Optional[str] = None
+    oracle_is_sid:             bool = False
     snowflake_warehouse:       Optional[str] = None
     snowflake_role:            Optional[str] = None
     description:               Optional[str] = None

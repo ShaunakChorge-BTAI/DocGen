@@ -26,6 +26,7 @@ class DbRegistry:
     username:                  Optional[str]  = None
     password:                  Optional[str]  = None
     oracle_sid_or_service:     Optional[str]  = None
+    oracle_is_sid:             bool           = False
     snowflake_warehouse:       Optional[str]  = None
     snowflake_role:            Optional[str]  = None
     encryption_key_id:         Optional[int]  = None
