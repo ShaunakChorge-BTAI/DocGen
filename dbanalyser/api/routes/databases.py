@@ -79,15 +79,20 @@ def test_database_connection(body: DbRegistryCreate):
     )
 
     # Validate config
+    print(f"[API /validate] Testing DB connection for db_type: {db_entry.db_type}, host: {db_entry.host}")
     driver = get_driver(db_entry)
     is_valid, error_msg = driver.validate_config()
     if not is_valid:
+        print(f"[API /validate] Validation failed: {error_msg}")
         raise HTTPException(status_code=400, detail=f"Invalid configuration: {error_msg}")
 
+    print("[API /validate] Configuration valid. Initiating connection test...")
     # Test connection
     if not driver.test_connection():
+        print("[API /validate] Connection test failed.")
         raise HTTPException(status_code=400, detail="Connection test failed. Check credentials and settings.")
 
+    print("[API /validate] Connection test successful.")
     return OkResponse(message="Connection test successful.")
 
 
@@ -110,14 +115,19 @@ def create_or_update_database(body: DbRegistryCreate):
         snowflake_warehouse   = body.snowflake_warehouse,
         snowflake_role        = body.snowflake_role,
     )
+    print(f"[API /databases POST] Testing DB connection for db_type: {db_entry.db_type}, host: {db_entry.host}")
     driver = get_driver(db_entry)
     is_valid, error_msg = driver.validate_config()
     if not is_valid:
+        print(f"[API /databases POST] Validation failed: {error_msg}")
         raise HTTPException(status_code=400, detail=f"Invalid configuration: {error_msg}")
 
+    print("[API /databases POST] Configuration valid. Initiating connection test before saving...")
     # Test connection before saving
     if not driver.test_connection():
+        print("[API /databases POST] Connection test failed.")
         raise HTTPException(status_code=400, detail="Connection test failed. Check credentials and settings.")
+    print("[API /databases POST] Connection test successful. Proceeding to save...")
 
     reg = DbRegistry(
         id                     = body.id,

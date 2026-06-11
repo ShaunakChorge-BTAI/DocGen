@@ -16,19 +16,32 @@ class OracleDriver(DatabaseDriver):
 
     def test_connection(self) -> bool:
         """Test Oracle connection."""
+        print("[ORACLE DB TEST] Starting Oracle connection test...")
         try:
+            print("[ORACLE DB TEST] Attempting to import oracledb package...")
             import oracledb
+            print(f"[ORACLE DB TEST] Successfully imported oracledb version: {oracledb.__version__}")
         except ImportError:
             logger.error("oracledb package not installed. Install with: pip install oracledb")
+            print("[ORACLE DB TEST] FAILED: oracledb package is not installed.")
             return False
 
         try:
+            print("[ORACLE DB TEST] Building DSN...")
             dsn = self._build_dsn()
-            conn = oracledb.connect(dsn, user=self.db_entry.username, password=self.db_entry.password)
+            print(f"[ORACLE DB TEST] DSN successfully built: {dsn}")
+            
+            print(f"[ORACLE DB TEST] Attempting to connect with username: '{self.db_entry.username}'...")
+            conn = oracledb.connect(dsn=dsn, user=self.db_entry.username, password=self.db_entry.password)
+            print(f"[ORACLE DB TEST] Connection established successfully! Oracle DB version: {getattr(conn, 'version', 'unknown')}")
+            
+            print("[ORACLE DB TEST] Closing test connection...")
             conn.close()
+            print("[ORACLE DB TEST] Test connection closed. Test PASSED.")
             return True
         except Exception as e:
             logger.error(f"Oracle connection test failed: {e}")
+            print(f"[ORACLE DB TEST] FAILED: Exception occurred during connection: {e}")
             return False
 
     def validate_config(self) -> tuple[bool, Optional[str]]:
@@ -46,16 +59,23 @@ class OracleDriver(DatabaseDriver):
     def _build_dsn(self) -> str:
         """Build Oracle connection DSN."""
         port = self.db_entry.port or 1521
+        print(f"[ORACLE DB TEST] Build DSN - Host: {self.db_entry.host}, Port: {port}, SID/Service: {self.db_entry.oracle_sid_or_service}, Is_SID: {getattr(self.db_entry, 'oracle_is_sid', False)}")
         
         if getattr(self.db_entry, 'oracle_is_sid', False):
             try:
                 import oracledb
-                return oracledb.makedsn(self.db_entry.host, port, sid=self.db_entry.oracle_sid_or_service)
+                dsn_str = oracledb.makedsn(self.db_entry.host, port, sid=self.db_entry.oracle_sid_or_service)
+                print(f"[ORACLE DB TEST] Using makedsn for SID. Result: {dsn_str}")
+                return dsn_str
             except ImportError:
                 # Fallback format if oracledb isn't loaded yet (though it should be)
-                return f"(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST={self.db_entry.host})(PORT={port}))(CONNECT_DATA=(SID={self.db_entry.oracle_sid_or_service})))"
+                fallback_dsn = f"(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST={self.db_entry.host})(PORT={port}))(CONNECT_DATA=(SID={self.db_entry.oracle_sid_or_service})))"
+                print(f"[ORACLE DB TEST] Fallback DSN for SID: {fallback_dsn}")
+                return fallback_dsn
                 
-        return f"{self.db_entry.host}:{port}/{self.db_entry.oracle_sid_or_service}"
+        service_dsn = f"{self.db_entry.host}:{port}/{self.db_entry.oracle_sid_or_service}"
+        print(f"[ORACLE DB TEST] Using simple connection string for Service: {service_dsn}")
+        return service_dsn
 
     def get_connection_string(self) -> str:
         """Return DSN for Oracle."""
